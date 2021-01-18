@@ -380,15 +380,34 @@
 		} // end venuecheck_handle_check_venues
 
 		function venuecheck_convert_time( time ) {
-			let hours = Number( time.match( /^(\d+)/ )[ 1 ] );
-			const minutes = Number( time.match( /:(\d+)/ )[ 1 ] );
+			if ( ! time ) {
+				// fallback default
+				return '00:00:00';
+			}
+
+			let hours = 0;
+			const hoursMatch = time.match( /^(\d+)/ );
+			if ( hoursMatch && 1 in hoursMatch ) {
+				hours = Number( hoursMatch[ 1 ] );
+			}
+
+			let minutes = 0;
+			const minutesMatch = time.match( /:(\d+)/ );
+			if ( minutesMatch && 1 in minutesMatch ) {
+				minutes = Number( minutesMatch[ 1 ] );
+			}
+
+			// get am/pm and convert to 24h time if needed
 			const AMPM = time.substr( -2 ).toLowerCase();
 			if ( AMPM === 'pm' && hours < 12 ) hours = hours + 12;
 			if ( AMPM === 'am' && hours === 12 ) hours = hours - 12;
+
+			// hours and minutes to strings with leading zeros
 			let sHours = hours.toString();
 			let sMinutes = minutes.toString();
 			if ( hours < 10 ) sHours = '0' + sHours;
 			if ( minutes < 10 ) sMinutes = '0' + sMinutes;
+
 			return sHours + ':' + sMinutes + ':00';
 		}
 
