@@ -627,6 +627,19 @@
 			venuecheck_find_available_venues
 		);
 
+		// recheck for conflicts whenever any of the date fields change
+		/*
+		$(
+			'#EventStartDate,' +
+				'#EventStartTime,' +
+				'#EventEndDate,' +
+				'#EventEndTime,' +
+				'#allDayCheckbox,' +
+				'#_venuecheck_event_offset_start,' +
+				'#_venuecheck_event_offset_end'
+		).on( 'change', venuecheck_find_available_venues );
+		*/
+
 		//disable venues dropdown
 		$( '#saved_tribe_venue' ).select2( {
 			disabled: true,
