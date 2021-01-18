@@ -65,6 +65,16 @@ body.venuecheck-update #venuecheck-conflicts-button {
 	opacity: 1;
 }
 
+.tribe-dropdown .select2-results .select2-results__option {
+	color: #222;
+}
+
+.tribe-dropdown .select2-results .select2-results__option[aria-disabled="true"] {
+	color: #444;
+	text-decoration: line-through;
+	background-color: #bbb;
+}
+
 #venuecheck-report-links {
 	display: block;
 	margin-top: 15px;
