@@ -64,10 +64,10 @@ class Tribe__Events__Pro__Recurrence_VenueCheck extends Tribe__Events__Pro__Recu
 			&& isset( $recurrence['custom']['end-day'] )
 		) {
 			$start_time_in_seconds = strtotime( $recurrence['custom']['start-time'] );
-			$start_time            = wp_date( 'H:i:s', $start_time_in_seconds );
+			$start_time            = gmdate( 'H:i:s', $start_time_in_seconds );
 
 			$end_time_in_seconds = strtotime( $recurrence['custom']['end-time'] );
-			$end_time            = wp_date( 'H:i:s', $end_time_in_seconds );
+			$end_time            = gmdate( 'H:i:s', $end_time_in_seconds );
 
 			$duration = $end_time_in_seconds - $start_time_in_seconds;
 
