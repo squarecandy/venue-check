@@ -609,7 +609,8 @@
 		const recurrence_warning =
 			'<div id="venuecheck-recurrence-warning" style="display: none;" class="notice notice-warning">' +
 			'It may take up to a minute or more to find available venues for all ' +
-			'<span id="venuecheck-recurrence-count"></span> events in this series. ' +
+			'<span id="venuecheck-recurrence-count"></span> events in this series.<br>' +
+			'<em>Note: this system is only able to check conflicts up to 2 years into the future.</em><br>' +
 			'Would you like to continue? <a id="venuecheck-recurrence-warning-continue">Continue</a>' +
 			'<span class="venuecheck-divider">&nbsp;|&nbsp;</span>' +
 			'<a id="venuecheck-recurrence-warning-cancel">Cancel</a>' +
