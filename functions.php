@@ -91,8 +91,8 @@ function venuecheck_get_event_recurrences() {
 					$by_occurrence_count               = $recurrence_parameters['by-occurrence-count'];
 					$recurrenceRules['type']           = 'Custom';
 					$recurrenceRules['custom']['type'] = $type;
-					$recurrenceRules['EventStartDate'] = wp_date( 'Y-m-d H:i:s', strtotime( "$startdate $start_time" ) );
-					$recurrenceRules['EventEndDate']   = wp_date( 'Y-m-d H:i:s', strtotime( "$enddate $endtime" ) );
+					$recurrenceRules['EventStartDate'] = date( 'Y-m-d H:i:s', strtotime( "$startdate $start_time" ) );
+					$recurrenceRules['EventEndDate']   = date( 'Y-m-d H:i:s', strtotime( "$enddate $endtime" ) );
 					/*CIS
 					 * build_from is used to create an object from recurrence rules and exclusion array
 					 */
@@ -146,8 +146,8 @@ function venuecheck_get_event_recurrences() {
 		$to_create = $removeExcObj->remove_exclusions( $rulesArray, $exclusionArray );
 
 		foreach ( $to_create as $key => $value ) {
-			$to_create[ $key ]['eventStart']       = wp_date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] );
-			$to_create[ $key ]['eventEnd']         = wp_date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] + $to_create[ $key ]['duration'] );
+			$to_create[ $key ]['eventStart']       = date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] );
+			$to_create[ $key ]['eventEnd']         = date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] + $to_create[ $key ]['duration'] );
 			$to_create[ $key ]['eventTimezone']    = $eventTimezone;
 			$to_create[ $key ]['eventOffsetStart'] = $eventOffsetStart;
 			$to_create[ $key ]['eventOffsetEnd']   = $eventOffsetEnd;
