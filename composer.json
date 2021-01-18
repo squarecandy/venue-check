@@ -1,6 +1,6 @@
 {
-	"name": "squarecandy/squarecandy-acf-newplugin",
-	"description": "A new plugin that does something custom.",
+	"name": "squarecandy/venue-check",
+	"description": "Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.",
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.6.2",
 		"wp-coding-standards/wpcs": "*"

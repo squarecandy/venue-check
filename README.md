@@ -1,23 +1,21 @@
-# Square Candy Plugin Starter
+# Venue Check
 
-A WordPress plugin template to get you started with common features and file structure.
+Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.
 
 ## Status
 
 #### develop
-![](https://github.com/squarecandy/squarecandy-plugin-starter/workflows/WordPress%20Standards/badge.svg?branch=develop&event=push)
+![](https://github.com/squarecandy/venue-check/workflows/WordPress%20Standards/badge.svg?branch=develop&event=push)
 
 #### master
-![](https://github.com/squarecandy/squarecandy-plugin-starter/workflows/WordPress%20Standards/badge.svg)
+![](https://github.com/squarecandy/venue-check/workflows/WordPress%20Standards/badge.svg)
 
-## Creating a New Plugin from the Starter
+## Getting Started
 
-* Login to GitHub and go to the [Square Candy Design organization](https://github.com/squarecandy) page 
-* Create a new repository and select Square Candy Plugin Starter as the template. Set it to private and give it a logical name. Our plugins that add new post types and rely on ACF generally follow the naming convention `squarecandy-acf-myspecialplugin`.
-* Clone the repository on your local machine within a WordPress testing environment.
-* Make sure `npm` and `composer` are installed on your server and up to date.
-* Run `npm install` in the plugin directory
-* Run `grunt init --slug=my-plugin-slug --name='My Plugin Name' --description='A basic one line description of the plugin'`. The slug should be the exact name of the repo within the squarecandy account. This will get you started replacing the generic template with your new info, but you may still need to clean things up manually. **You should only run this command once**, when you first setup the custom plugin.
+* run `npm install` in the plugin directory
+* run `grunt` to listen for changes to your scss files and to compile them immediately as you work
+* All commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) standard.
+* always run `grunt preflight` to make sure all linting passes before you commit.
 
 ## [Developer Guide](https://developers.squarecandy.net)
 
