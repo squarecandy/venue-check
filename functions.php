@@ -22,6 +22,7 @@ function venuecheck_scripts_styles( $hook ) {
 		array(
 			'ajax_url'    => admin_url( 'admin-ajax.php' ),
 			'plugins_url' => plugin_dir_url( __FILE__ ),
+			'debug'       => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
 		)
 	);
 

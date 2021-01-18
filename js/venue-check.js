@@ -18,7 +18,7 @@
 			const $form = $( 'form#post' );
 			const origForm = $form.serialize();
 
-			console.log( 'check form change status after 3 seconds' );
+			if ( venuecheck.debug ) console.log( 'check form change status after 3 seconds' );
 
 			//removes the modified message when editing existing events
 			$( document ).on(
@@ -61,9 +61,7 @@
 			}
 
 			const start = formVars.EventStartTime;
-			console.log( 'start' );
-			console.log( start );
-			console.log( 'start' );
+			if ( venuecheck.debug ) console.log( 'start', start );
 			const end = formVars.EventEndTime;
 			const startTime = venuecheck_convert_time( start );
 			const endTime = venuecheck_convert_time( end );
@@ -81,7 +79,7 @@
 			const post_data = $( 'form#post' ).serialize();
 			venuecheck_disable_form();
 			if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
-				console.log( 'RECURRING EVENT' );
+				if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
 				return $.ajax( {
 					type: 'POST',
 					url: venuecheck.ajax_url,
@@ -94,9 +92,11 @@
 				} )
 					.done( function( response ) {
 						$.merge( event_recurrences, response );
-						console.log( '=====/////RECURRENCES-RECURRING/////=====' );
-						console.log( event_recurrences );
-						console.log( '=====/////RECURRENCES-RECURRING/////=====' );
+						if ( venuecheck.debug ) {
+							console.log( '=====/////RECURRENCES-RECURRING/////=====' );
+							console.log( event_recurrences );
+							console.log( '=====/////RECURRENCES-RECURRING/////=====' );
+						}
 						if ( event_recurrences.length > recurrence_warning_limit ) {
 							venuecheck_hide_wait();
 							const recurrrences_num = event_recurrences.length;
@@ -114,26 +114,32 @@
 								.unbind()
 								.click( function() {
 									$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-									console.log( 'venuecheck_check_venues 1' );
+									if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 1' );
 									venuecheck_check_venues( event_recurrences, batchsize );
 								} );
 						} else {
 							venuecheck_hide_wait();
-							console.log( 'venuecheck_check_venues 2' );
+							if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 2' );
 							venuecheck_check_venues( event_recurrences, batchsize );
 						}
 					} )
 					.fail( function( jqXHR, textStatus, error ) {
-						console.log( 'ajax error: ' + error );
+						console.error( 'ajax error: ' + error );
 					} );
 			}
-			console.log( '=====/////RECURRENCES/////=====' );
-			console.log( event_recurrences );
-			console.log( '=====/////RECURRENCES/////=====' );
+
+			if ( venuecheck.debug ) {
+				console.log( '=====/////RECURRENCES/////=====' );
+				console.log( event_recurrences );
+				console.log( '=====/////RECURRENCES/////=====' );
+			}
+
 			venuecheck_hide_wait();
-			console.log( 'venuecheck_check_venues 3' );
+
+			if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 3' );
+
 			venuecheck_check_venues( event_recurrences, batchsize );
-		} //venuecheck_get_event_recurrences
+		} // end venuecheck_get_event_recurrences
 
 		/**
 		 *
@@ -151,7 +157,7 @@
 			// pre-split array into batchs
 			const batchArray = [];
 			for ( let i = 0; i < event_recurrences.length; i += batch_size ) {
-				console.log( i );
+				if ( venuecheck.debug ) console.log( 'venuecheck_check_venues i: ' + i );
 				batchArray.push( event_recurrences.slice( i, i + batch_size ) );
 			}
 
@@ -209,15 +215,11 @@
 						}, {} )
 					);
 
-					console.log( '=====CONFLCTS=====' );
-					console.log( venuecheck_conflicts );
-					console.log( '=====CONFLCTS=====' );
+					if ( venuecheck.debug ) console.log( 'CONFLICTS', venuecheck_conflicts );
 
 					venuecheck_conflicts = result;
 
-					console.log( '=====CONFLCTS MERGED=====' );
-					console.log( venuecheck_conflicts );
-					console.log( '=====CONFLCTS MERGED=====' );
+					if ( venuecheck.debug ) console.log( 'CONFLCTS MERGED', venuecheck_conflicts );
 
 					clearTimeout( progress );
 					$( '#venuecheck-progress .progress-bar span' ).css( {
@@ -241,9 +243,8 @@
 
 		function venuecheck_check_venues_progress( percent_current, percent_end ) {
 			clearTimeout( progress );
-			console.log( '=====percent=====' );
-			console.log( percent_current );
-			console.log( '=====percent=====' );
+
+			if ( venuecheck.debug ) console.log( 'check_venues_progress percent: ' + percent_current );
 
 			$( '#venuecheck-progress .progress-bar span' ).css( {
 				width: percent_current + '%',
@@ -272,11 +273,11 @@
 		function venuecheck_check_venues_handler( venuecheck_conflicts ) {
 			$( 'body' ).addClass( 'venuecheck-update' );
 
-			console.log( 'starting venuecheck_check_venues_handler' );
+			if ( venuecheck.debug ) console.log( 'starting venuecheck_check_venues_handler' );
 			const venuecheck_venues = $( '#saved_tribe_venue' ).find( 'option, optgroup' );
 			const venuecheck_venue_options = [ {} ];
 
-			console.log( 'venuecheck_venues', venuecheck_venues );
+			if ( venuecheck.debug ) console.log( 'venuecheck_venues', venuecheck_venues );
 
 			// remove the confusing double list from Modern Tribe ("My Venues" vs "Available Venues")
 			venuecheck_venues.each( function() {
@@ -316,14 +317,14 @@
 				venuecheck_venue_report += '</div>';
 				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table">';
 
-				console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
-				console.log( 'venuecheck_venue_options', venuecheck_venue_options );
+				if ( venuecheck.debug ) console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
+				if ( venuecheck.debug ) console.log( 'venuecheck_venue_options', venuecheck_venue_options );
 
 				// reset all options to enabled by default before we loop through.
 				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
-					console.log( index, venue.venueID, venue );
+					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
 
 					// disable the option
 					$( '#saved_tribe_venue option[value="' + venue.venueID + '"]' ).attr( 'disabled', 'disabled' );
