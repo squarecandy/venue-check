@@ -278,19 +278,25 @@
 
 			console.log( 'venuecheck_venues', venuecheck_venues );
 
-			if ( typeof venuecheck_venues !== 'undefined' && 'opts' in venuecheck_venues ) {
-				venuecheck_venue_options = venuecheck_venues.opts.data;
-				//if optgroup
-				if ( typeof venuecheck_venue_options[ 0 ].children !== 'undefined' ) {
-					//loop through venuecheck_venue_options and concat venuecheck_venue_options[i].children
-					venuecheck_venue_options = venuecheck_venue_options[ 0 ].children.concat( venuecheck_venue_options[ 1 ].children );
+			// remove the confusing double list from Modern Tribe ("My Venues" vs "Available Venues")
+			venuecheck_venues.each( function() {
+				if (
+					'My Venues' === $( this ).attr( 'label' ) ||
+					'My Venues' ===
+						$( this )
+							.parent()
+							.attr( 'label' )
+				) {
+					$( this ).remove();
 				}
 
-				//re-enable all options before disabling venuecheck_conflicts
-				for ( let i = 0; i < venuecheck_venue_options.length; i++ ) {
-					venuecheck_venue_options[ i ].disabled = false;
+				if ( 'Available Venues' === $( this ).attr( 'label' ) ) {
+					$( this )
+						.parent()
+						.append( $( this ).html() );
+					$( this ).remove();
 				}
-			}
+			} );
 
 			//disable and message any venue venuecheck_conflicts
 			let venuecheck_venue_report_count = '';
