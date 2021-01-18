@@ -312,10 +312,7 @@
 				console.log( 'venuecheck_venue_options', venuecheck_venue_options );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
-					//http://stackoverflow.com/questions/15997879/get-the-index-of-the-object-inside-an-array-matching-a-condition
-					const optionIndex = venuecheck_venue_options.findIndex( function( x ) {
-						return x.id === venue.venueID;
-					} );
+					console.log( index, venue.venueID, venue );
 
 					if ( venuecheck_venue_options[ optionIndex ] ) {
 						venuecheck_venue_options[ optionIndex ].disabled = true;
@@ -348,25 +345,30 @@
 					'<div id="venuecheck-conflicts-report-count" class="notice notice-info">All venues are available.</div>';
 				venuecheck_venue_report += '';
 			}
+
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
 			$( '#venuecheck-conflicts-report' )
 				.append( venuecheck_venue_report )
 				.show();
+
 			$( '#venuecheck-conflicts-report-link, #venuecheck-conflicts-report-close' ).on( 'click', function() {
 				$( '#venuecheck-report-container' ).slideToggle( 'fast' );
 				$( '#venuecheck-conflicts-report-link' ).html(
 					$( '#venuecheck-conflicts-report-link' ).text() === 'Show Details' ? 'Hide Details' : 'Show Details'
 				);
 			} );
+
 			$( '#venuecheck-venue-select' ).show();
+
 			$( '#venuecheck-processing, #venuecheck-progress' ).hide();
+
 			$( '#venuecheck-conflicts-link' ).removeClass( 'venuecheck-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
 			$( '#saved_tribe_venue' ).select2( 'readonly', false );
 			$( '#venuecheck-change-venue' ).hide();
 			$( 'body' ).addClass( 'venuecheck-venues' );
 			venuecheck_enable_form();
-		} //venuecheck_handle_check_venues
+		} // end venuecheck_handle_check_venues
 
 		function venuecheck_convert_time( time ) {
 			let hours = Number( time.match( /^(\d+)/ )[ 1 ] );
@@ -581,9 +583,7 @@
 		$( document ).on(
 			'click',
 			'#venuecheck-conflicts-button, #venuecheck-conflicts-link, #venuecheck-report-conflicts-link, #venuecheck-modified',
-			function() {
-				venuecheck_find_available_venues();
-			}
+			venuecheck_find_available_venues
 		);
 
 		//disable venues dropdown
