@@ -80,11 +80,11 @@ function venuecheck_get_event_recurrences() {
 				foreach ( $recurrences[ $ruleType ] as &$recurrenceRules ) {
 					$type = $recurrenceRules['type'];
 					/*CIS
-					 * Get_recurrence_parameters is a custom function created inside class Tribe__Events__Pro__Recurrence1 in the file venuecheck_get_recurrence_parameters.php
+					 * Get_recurrence_parameters is a custom function created inside class Tribe__Events__Pro__Recurrence_VenueCheck in the file venuecheck_get_recurrence_parameters.php
 					 *    This function is used to create recuuring rules and recuuring exclusions  array in proper format from post data.
 					 * This function returns array of start time , duration , end and by-occurrence-count.
 					 */
-					$recurrence_parameters             = Tribe__Events__Pro__Recurrence1::get_recurrence_parameters( $recurrenceRules, $duration, $enddate, $startdate, $EventAllDay );
+					$recurrence_parameters             = Tribe__Events__Pro__Recurrence_VenueCheck::get_recurrence_parameters( $recurrenceRules, $duration, $enddate, $startdate, $EventAllDay );
 					$start_time                        = $recurrence_parameters['start-time'];
 					$end                               = (int) $recurrence_parameters['end'];
 					$duration                          = $recurrence_parameters['duration'];

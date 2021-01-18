@@ -1,11 +1,11 @@
 <?php
 /**
  * CIS
- * Create a new class Tribe__Events__Pro__Recurrence1
+ * Create a new class Tribe__Events__Pro__Recurrence_VenueCheck
  * it inherits class Tribe__Events__Pro__Recurrence
  * create our custom function get_dates for getting dates
  */
-class Tribe__Events__Pro__Recurrence1 extends Tribe__Events__Pro__Recurrence {
+class Tribe__Events__Pro__Recurrence_VenueCheck extends Tribe__Events__Pro__Recurrence {
 
 	const NO_END = -1;
 	private $start_date;
