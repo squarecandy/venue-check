@@ -18,6 +18,8 @@
 			const $form = $( 'form#post' );
 			const origForm = $form.serialize();
 
+			console.log( 'check form change status after 3 seconds' );
+
 			//removes the modified message when editing existing events
 			$( document ).on(
 				'change',
@@ -272,7 +274,7 @@
 			const venuecheck_venues = $( '#saved_tribe_venue' ).data( 'select2' );
 			let venuecheck_venue_options;
 
-			console.log( venuecheck_venues );
+			console.log( 'venuecheck_venues', venuecheck_venues );
 
 			if ( typeof venuecheck_venues !== 'undefined' && 'opts' in venuecheck_venues ) {
 				venuecheck_venue_options = venuecheck_venues.opts.data;
@@ -306,10 +308,8 @@
 				venuecheck_venue_report += '</div>';
 				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table">';
 
-				console.log( 'venuecheck_conflicts' );
-				console.log( venuecheck_conflicts );
-				console.log( jQuery.type( venuecheck_conflicts ) );
-				console.log( 'venuecheck_conflicts' );
+				console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
+				console.log( 'venuecheck_venue_options', venuecheck_venue_options );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					//http://stackoverflow.com/questions/15997879/get-the-index-of-the-object-inside-an-array-matching-a-condition
