@@ -12,8 +12,7 @@ function venuecheck_scripts_styles( $hook ) {
 	}
 
 	/* REGISTER JS */
-	// @TODO - once we have better working js, point this to 'dist/js/venue-check.min.js'
-	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.1.0', true );
+	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.1.0', true );
 
 	/* LOCALIZE AJAX URL */
 	wp_localize_script(
