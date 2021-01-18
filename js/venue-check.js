@@ -185,7 +185,9 @@
 								if ( batchArray.length > 1 ) {
 									venuecheck_check_venues_progress( percent_current, percent_end );
 								}
-								// $( '#saved_tribe_venue' ).select2( 'readonly', true );
+								$( '#saved_tribe_venue' ).select2( {
+									disabled: true,
+								} );
 							},
 						} ).then( function( data ) {
 							venuecheck_conflicts = venuecheck_conflicts.concat( data );
@@ -271,8 +273,8 @@
 			$( 'body' ).addClass( 'venuecheck-update' );
 
 			console.log( 'starting venuecheck_check_venues_handler' );
-			const venuecheck_venues = $( '#saved_tribe_venue' ).data( 'select2' );
-			let venuecheck_venue_options;
+			const venuecheck_venues = $( '#saved_tribe_venue' ).find( 'option, optgroup' );
+			const venuecheck_venue_options = [ {} ];
 
 			console.log( 'venuecheck_venues', venuecheck_venues );
 
@@ -311,15 +313,14 @@
 				console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
 				console.log( 'venuecheck_venue_options', venuecheck_venue_options );
 
+				// reset all options to enabled by default before we loop through.
+				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
+
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					console.log( index, venue.venueID, venue );
 
-					if ( venuecheck_venue_options[ optionIndex ] ) {
-						venuecheck_venue_options[ optionIndex ].disabled = true;
-						if ( venuecheck_venue_options[ optionIndex ].id === $( '#s2id_saved_tribe_venue' ).select2( 'val' ) ) {
-							$( '#s2id_saved_tribe_venue' ).select2( 'val', '' );
-						}
-					}
+					// disable the option
+					$( '#saved_tribe_venue option[value="' + venue.venueID + '"]' ).attr( 'disabled', 'disabled' );
 
 					//prepare venue report
 					venuecheck_venue_report +=
@@ -341,9 +342,15 @@
 				} );
 				venuecheck_venue_report += '</tbody></table></div>';
 			} else if ( venuecheck_conflicts.length === 0 ) {
+				// there are no conflicts found
+
+				// notificaiton
 				venuecheck_venue_report_count +=
 					'<div id="venuecheck-conflicts-report-count" class="notice notice-info">All venues are available.</div>';
 				venuecheck_venue_report += '';
+
+				// re-enable any previously diabled options
+				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
 			}
 
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
@@ -364,7 +371,9 @@
 
 			$( '#venuecheck-conflicts-link' ).removeClass( 'venuecheck-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
-			$( '#saved_tribe_venue' ).select2( 'readonly', false );
+			$( '#saved_tribe_venue' ).select2( {
+				disabled: false,
+			} );
 			$( '#venuecheck-change-venue' ).hide();
 			$( 'body' ).addClass( 'venuecheck-venues' );
 			venuecheck_enable_form();
@@ -401,7 +410,9 @@
 			$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' ).show();
 			$( '#venuecheck-report-container, #venuecheck-conflicts-report-count, #venuecheck-progress' ).hide();
 			$( '#publish' ).prop( 'disabled', true );
-			$( '#saved_tribe_venue' ).select2( 'readonly', true );
+			$( '#saved_tribe_venue' ).select2( {
+				disabled: true,
+			} );
 			$( '#venuecheck-change-venue' ).show();
 		}
 
@@ -416,7 +427,9 @@
 				$( '#venuecheck-report-container' ).hide();
 				$( '#venuecheck-conflicts-report-link' ).text( 'Show Details' );
 				//here
-				$( '#saved_tribe_venue' ).select2( 'readonly', false );
+				$( '#saved_tribe_venue' ).select2( {
+					disabled: false,
+				} );
 			}
 		}
 
@@ -447,7 +460,9 @@
 				.prop( 'readonly', true )
 				.addClass( 'venuecheck-preserve-disabled' );
 			$( '.tribe-datetime-block :input:disabled' ).addClass( 'venuecheck-preserve-disabled' );
-			// $( '#saved_tribe_venue' ).select2( 'readonly', true );
+			$( '#saved_tribe_venue' ).select2( {
+				disabled: true,
+			} );
 			$( '#publish' ).prop( 'disabled', true );
 			$( '.tribe-datetime-block :input' ).prop( 'disabled', true );
 			$( '#tribe_events_event_details a' )
@@ -587,9 +602,14 @@
 		);
 
 		//disable venues dropdown
+		$( '#saved_tribe_venue' ).select2( {
+			disabled: true,
+		} );
 
 		// empty out the link to edit the venue item
 		$( '.edit-linked-post-link' ).html( '' );
+
+		// show the change venue button
 		$( '#venuecheck-change-venue' ).show();
 
 		venuecheck_show_hide_offsets();
