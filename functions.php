@@ -12,7 +12,7 @@ function venuecheck_scripts_styles( $hook ) {
 	}
 
 	/* REGISTER JS */
-	// wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.1.0', true );
+	// @TODO - once we have better working js, point this to 'dist/js/venue-check.min.js'
 	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.1.0', true );
 
 	/* LOCALIZE AJAX URL */
@@ -91,8 +91,8 @@ function venuecheck_get_event_recurrences() {
 					$by_occurrence_count               = $recurrence_parameters['by-occurrence-count'];
 					$recurrenceRules['type']           = 'Custom';
 					$recurrenceRules['custom']['type'] = $type;
-					$recurrenceRules['EventStartDate'] = date( 'Y-m-d H:i:s', strtotime( "$startdate $start_time" ) );
-					$recurrenceRules['EventEndDate']   = date( 'Y-m-d H:i:s', strtotime( "$enddate $endtime" ) );
+					$recurrenceRules['EventStartDate'] = wp_date( 'Y-m-d H:i:s', strtotime( "$startdate $start_time" ) );
+					$recurrenceRules['EventEndDate']   = wp_date( 'Y-m-d H:i:s', strtotime( "$enddate $endtime" ) );
 					/*CIS
 					 * build_from is used to create an object from recurrence rules and exclusion array
 					 */
@@ -111,7 +111,7 @@ function venuecheck_get_event_recurrences() {
 					 *    getDates function is existing function of class Tribe__Events__Pro__Recurrence
 					 */
 					$recurrenceDates[ $ruleType ] = $recurrenceObj->getDates();
-					if ( $ruleType == 'rules' ) {
+					if ( 'rules' === $ruleType ) {
 						$rulesArray = array_merge( $rulesArray, $recurrenceDates[ $ruleType ] );
 					} else {
 						$exclusionArray = array_merge( $exclusionArray, $recurrenceDates[ $ruleType ] );
@@ -146,15 +146,15 @@ function venuecheck_get_event_recurrences() {
 		$to_create = $removeExcObj->remove_exclusions( $rulesArray, $exclusionArray );
 
 		foreach ( $to_create as $key => $value ) {
-			$to_create[ $key ]['eventStart']       = date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] );
-			$to_create[ $key ]['eventEnd']         = date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] + $to_create[ $key ]['duration'] );
+			$to_create[ $key ]['eventStart']       = wp_date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] );
+			$to_create[ $key ]['eventEnd']         = wp_date( 'Y-m-d H:i:s', $to_create[ $key ]['timestamp'] + $to_create[ $key ]['duration'] );
 			$to_create[ $key ]['eventTimezone']    = $eventTimezone;
 			$to_create[ $key ]['eventOffsetStart'] = $eventOffsetStart;
 			$to_create[ $key ]['eventOffsetEnd']   = $eventOffsetEnd;
 			unset( $to_create[ $key ]['timestamp'] );
 			unset( $to_create[ $key ]['duration'] );
 		}
-		echo json_encode( $to_create );
+		echo wp_json_encode( $to_create );
 		wp_die();
 	} else {
 		add_action( 'admin_notices', 'events_calendar_pro_not_loaded' );
@@ -163,7 +163,7 @@ function venuecheck_get_event_recurrences() {
 
 function venuecheck_check_venues() {
 	//get all upcoming events
-	$now  = date( 'Y-m-d H:i:s' );
+	$now  = wp_date( 'Y-m-d H:i:s' );
 	$args = array(
 		'post_type'      => 'tribe_events',
 		'posts_per_page' => '-1',
@@ -216,7 +216,7 @@ function venuecheck_check_venues() {
 	// Get timezone name from seconds
 	$tz = timezone_name_from_abbr( '', $seconds, 1 );
 	// Workaround for bug #44780
-	if ( $tz === false ) {
+	if ( $tz === false ) { // phpcs:ignore WordPress.PHP.YodaConditions.NotYoda
 		$tz = timezone_name_from_abbr( '', $seconds, 0 );
 	}
 	$tz = timezone_name_from_abbr( '', 16200, 0 );
@@ -224,6 +224,10 @@ function venuecheck_check_venues() {
 	$defaultTimezoneMode = tribe_get_option( 'tribe_events_timezone_mode' );
 
 	//event confict checking
+
+	// @TODO - add nonce verification security
+	// phpcs:disable WordPress.Security.NonceVerification
+
 	if ( isset( $_POST ) ) {
 
 		// CONFLICT: (StartA <= EndB)  and  (EndA >= StartB)
@@ -267,7 +271,7 @@ function venuecheck_check_venues() {
 				$startB = new DateTime( $upcomingEvent->EventStartDate );
 				$endB   = new DateTime( $upcomingEvent->EventEndDate );
 
-				if ( $defaultTimezoneMode == 'site' ) {
+				if ( 'site' === $defaultTimezoneMode ) {
 					date_timezone_set( $startB, timezone_open( $timezone ) );
 					date_timezone_set( $endB, timezone_open( $timezone ) );
 				} else {
@@ -318,7 +322,7 @@ function venuecheck_check_venues() {
 				}
 			);
 		}
-		echo json_encode( $venuecheck_conflicts );
+		echo wp_json_encode( $venuecheck_conflicts );
 	}
 	wp_die();
 }
