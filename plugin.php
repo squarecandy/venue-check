@@ -1,13 +1,22 @@
 <?php
-/*
-Plugin Name: Square Candy Plugin Starter
-Plugin URI: https://github.org/squarecandy/squarecandy-plugin-starter
-GitHub Plugin URI: https://bitbucket.org/squarecandy/squarecandy-plugin-starter
-Description: A WordPress plugin template to get you started with common features and file structure.
-Version: 1.0.6
-Author: Square Candy Design
-Author URI: http://squarecandydesign.com
-Text Domain: squarecandy-acf-emergency
-*/
+/**
+ * Venue Check
+ *
+ * @package   Venueheck
+ * @author    Eric Gauvin <eric.gauvin@expient.com>
+ * @copyright 2018 Expient LLC
+ * @license   GPL-2.0+ http://www.gnu.org/licenses/gpl-2.0.txt
+ *
+ * @wordpress-plugin
+ * Plugin Name: Venue Check
+ * Plugin URI:  https://wordpress.org/plugins/venue-check/
+ * Description: Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.
+ * Version:     2.1.0
+ * Author:      Expient LLC
+ * Author URI:  https://expient.com
+ * Text Domain: venue-check
+ * License:     GPL-2.0+
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 
 require_once plugin_dir_path( __FILE__ ) . 'functions.php';

@@ -1,17 +1,17 @@
 {
-	"name": "squarecandy-plugin-starter",
-	"version": "1.0.6",
-	"description": "A WordPress plugin template to get you started with common features and file structure.",
+	"name": "venue-check",
+	"version": "0.0.1",
+	"description": "Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/squarecandy/squarecandy-plugin-starter.git"
+		"url": "git+https://github.com/squarecandy/venue-check.git"
 	},
 	"author": "Square Candy Design / Peter Wise",
 	"license": "UNLICENSED",
 	"bugs": {
-		"url": "https://github.com/squarecandy/squarecandy-plugin-starter"
+		"url": "https://github.com/squarecandy/venue-check"
 	},
-	"homepage": "https://github.com/squarecandy/squarecandy-plugin-starter",
+	"homepage": "https://github.com/squarecandy/venue-check",
 	"scripts": {
 		"release": "standard-version",
 		"preinstall": "composer install"
