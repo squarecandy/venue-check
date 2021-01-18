@@ -2,9 +2,9 @@
 Contributors: Expient
 Donate link: http://expient.com
 Tags: the events calendar, venue, conflicts, double booking
-Requires at least: 4.7
-Tested up to: 4.9.8
-Stable tag: 2.1.0¸
+Requires at least: 5.6
+Tested up to: 5.6.8
+Stable tag: 2.2.0-rc1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,11 +14,11 @@ Venue Check prevents double booking venues with The Events Calendar by Modern Tr
 
 Venue Check will check for venue conflicts when adding an event. You can also include setup and cleanup time before and after the event. The setup and cleanup time will not display on the events calendar but will be included into the venue conflict checking.
 
-Requires The Events Calendar (4.4.5 or greater) by Modern Tribe.
+Requires The Events Calendar (5.3.1 or greater) by Modern Tribe.
 
 This plugin will work with "The Events Calendar" or "The Events Calendar PRO" and supports the recurring events feature available in the PRO version.
 
-I hope you find this plugin useful. If you find any bugs or have any feedback of any kind, please contact me. 
+I hope you find this plugin useful. If you find any bugs or have any feedback of any kind, please contact me.
 
 [youtube https://www.youtube.com/watch?v=2lcYXwTMJo4]
 
