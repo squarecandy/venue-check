@@ -522,8 +522,7 @@
 		//add conflicts link
 		$( '#event_tribe_venue .edit-linked-post-link' ).after(
 			'<div id="venuecheck-change-venue" style="display: none;">' +
-				'<span class="venuecheck-divider">&nbsp;|&nbsp;</span>' +
-				'<a id="venuecheck-conflicts-link">Change Venue</a>' +
+				'<a id="venuecheck-conflicts-link" class="button">Change Venue</a>' +
 				'</div>'
 		);
 
@@ -588,7 +587,9 @@
 		);
 
 		//disable venues dropdown
-		// $( '#saved_tribe_venue' ).select2( 'readonly', true );
+
+		// empty out the link to edit the venue item
+		$( '.edit-linked-post-link' ).html( '' );
 		$( '#venuecheck-change-venue' ).show();
 
 		venuecheck_show_hide_offsets();

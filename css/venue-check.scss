@@ -14,6 +14,13 @@ body.venuecheck-update #venuecheck-conflicts-button {
 	display: none;
 }
 
+#venuecheck-conflicts-link {
+	min-height: 0;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+
 .venuecheck-divider {
 	color: #999;
 }
