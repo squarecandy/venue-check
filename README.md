@@ -2,15 +2,25 @@
 
 Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.
 
+Requires The Events Calendar (5.3.1 or greater) by Modern Tribe.
+
+**Author**: [Expient](http://expient.com)
+
+**Contributors**: [Expient](http://expient.com), squarecandy
+
 ## Status
 
 #### develop
 ![](https://github.com/squarecandy/venue-check/workflows/WordPress%20Standards/badge.svg?branch=develop&event=push)
 
-#### master
+#### main
 ![](https://github.com/squarecandy/venue-check/workflows/WordPress%20Standards/badge.svg)
 
-## Getting Started
+## WordPress Admins: Installation & FAQ
+
+see https://github.com/squarecandy/venue-check/blob/main/readme.txt
+
+## Developers: Getting Started
 
 * run `npm install` in the plugin directory
 * run `grunt` to listen for changes to your scss files and to compile them immediately as you work
