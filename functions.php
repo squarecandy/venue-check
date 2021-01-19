@@ -12,7 +12,7 @@ function venuecheck_scripts_styles( $hook ) {
 	}
 
 	/* REGISTER JS */
-	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.0-rc1', true );
+	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.0-rc2', true );
 
 	/* LOCALIZE AJAX URL */
 	wp_localize_script(
@@ -26,7 +26,7 @@ function venuecheck_scripts_styles( $hook ) {
 	);
 
 	/* REGISTER CSS */
-	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.2.0-rc1' );
+	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.2.0-rc2' );
 	wp_enqueue_style( 'fontawesome', '//use.fontawesome.com/releases/v5.2.0/css/all.css', array(), '5.2.0' );
 
 }
