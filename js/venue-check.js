@@ -18,6 +18,8 @@
 			const $form = $( 'form#post' );
 			const origForm = $form.serialize();
 
+			if ( venuecheck.debug ) console.log( 'check form change status after 3 seconds' );
+
 			//removes the modified message when editing existing events
 			$( document ).on(
 				'change',
@@ -59,9 +61,7 @@
 			}
 
 			const start = formVars.EventStartTime;
-			console.log( 'start' );
-			console.log( start );
-			console.log( 'start' );
+			if ( venuecheck.debug ) console.log( 'start', start );
 			const end = formVars.EventEndTime;
 			const startTime = venuecheck_convert_time( start );
 			const endTime = venuecheck_convert_time( end );
@@ -79,7 +79,7 @@
 			const post_data = $( 'form#post' ).serialize();
 			venuecheck_disable_form();
 			if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
-				console.log( 'RECURRING EVENT' );
+				if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
 				return $.ajax( {
 					type: 'POST',
 					url: venuecheck.ajax_url,
@@ -92,9 +92,11 @@
 				} )
 					.done( function( response ) {
 						$.merge( event_recurrences, response );
-						console.log( '=====/////RECURRENCES-RECURRING/////=====' );
-						console.log( event_recurrences );
-						console.log( '=====/////RECURRENCES-RECURRING/////=====' );
+						if ( venuecheck.debug ) {
+							console.log( '=====/////RECURRENCES-RECURRING/////=====' );
+							console.log( event_recurrences );
+							console.log( '=====/////RECURRENCES-RECURRING/////=====' );
+						}
 						if ( event_recurrences.length > recurrence_warning_limit ) {
 							venuecheck_hide_wait();
 							const recurrrences_num = event_recurrences.length;
@@ -112,26 +114,32 @@
 								.unbind()
 								.click( function() {
 									$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-									console.log( 'venuecheck_check_venues 1' );
+									if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 1' );
 									venuecheck_check_venues( event_recurrences, batchsize );
 								} );
 						} else {
 							venuecheck_hide_wait();
-							console.log( 'venuecheck_check_venues 2' );
+							if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 2' );
 							venuecheck_check_venues( event_recurrences, batchsize );
 						}
 					} )
 					.fail( function( jqXHR, textStatus, error ) {
-						console.log( 'ajax error: ' + error );
+						console.error( 'ajax error: ' + error );
 					} );
 			}
-			console.log( '=====/////RECURRENCES/////=====' );
-			console.log( event_recurrences );
-			console.log( '=====/////RECURRENCES/////=====' );
+
+			if ( venuecheck.debug ) {
+				console.log( '=====/////RECURRENCES/////=====' );
+				console.log( event_recurrences );
+				console.log( '=====/////RECURRENCES/////=====' );
+			}
+
 			venuecheck_hide_wait();
-			console.log( 'venuecheck_check_venues 3' );
+
+			if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 3' );
+
 			venuecheck_check_venues( event_recurrences, batchsize );
-		} //venuecheck_get_event_recurrences
+		} // end venuecheck_get_event_recurrences
 
 		/**
 		 *
@@ -149,7 +157,7 @@
 			// pre-split array into batchs
 			const batchArray = [];
 			for ( let i = 0; i < event_recurrences.length; i += batch_size ) {
-				console.log( i );
+				if ( venuecheck.debug ) console.log( 'venuecheck_check_venues i: ' + i );
 				batchArray.push( event_recurrences.slice( i, i + batch_size ) );
 			}
 
@@ -183,7 +191,9 @@
 								if ( batchArray.length > 1 ) {
 									venuecheck_check_venues_progress( percent_current, percent_end );
 								}
-								// $( '#saved_tribe_venue' ).select2( 'readonly', true );
+								$( '#saved_tribe_venue' ).select2( {
+									disabled: true,
+								} );
 							},
 						} ).then( function( data ) {
 							venuecheck_conflicts = venuecheck_conflicts.concat( data );
@@ -205,15 +215,11 @@
 						}, {} )
 					);
 
-					console.log( '=====CONFLCTS=====' );
-					console.log( venuecheck_conflicts );
-					console.log( '=====CONFLCTS=====' );
+					if ( venuecheck.debug ) console.log( 'CONFLICTS', venuecheck_conflicts );
 
 					venuecheck_conflicts = result;
 
-					console.log( '=====CONFLCTS MERGED=====' );
-					console.log( venuecheck_conflicts );
-					console.log( '=====CONFLCTS MERGED=====' );
+					if ( venuecheck.debug ) console.log( 'CONFLCTS MERGED', venuecheck_conflicts );
 
 					clearTimeout( progress );
 					$( '#venuecheck-progress .progress-bar span' ).css( {
@@ -237,9 +243,8 @@
 
 		function venuecheck_check_venues_progress( percent_current, percent_end ) {
 			clearTimeout( progress );
-			console.log( '=====percent=====' );
-			console.log( percent_current );
-			console.log( '=====percent=====' );
+
+			if ( venuecheck.debug ) console.log( 'check_venues_progress percent: ' + percent_current );
 
 			$( '#venuecheck-progress .progress-bar span' ).css( {
 				width: percent_current + '%',
@@ -268,25 +273,31 @@
 		function venuecheck_check_venues_handler( venuecheck_conflicts ) {
 			$( 'body' ).addClass( 'venuecheck-update' );
 
-			console.log( 'starting venuecheck_check_venues_handler' );
-			const venuecheck_venues = $( '#saved_tribe_venue' ).data( 'select2' );
-			let venuecheck_venue_options;
+			if ( venuecheck.debug ) console.log( 'starting venuecheck_check_venues_handler' );
+			const venuecheck_venues = $( '#saved_tribe_venue' ).find( 'option, optgroup' );
+			const venuecheck_venue_options = [ {} ];
 
-			console.log( venuecheck_venues );
+			if ( venuecheck.debug ) console.log( 'venuecheck_venues', venuecheck_venues );
 
-			if ( typeof venuecheck_venues !== 'undefined' && 'opts' in venuecheck_venues ) {
-				venuecheck_venue_options = venuecheck_venues.opts.data;
-				//if optgroup
-				if ( typeof venuecheck_venue_options[ 0 ].children !== 'undefined' ) {
-					//loop through venuecheck_venue_options and concat venuecheck_venue_options[i].children
-					venuecheck_venue_options = venuecheck_venue_options[ 0 ].children.concat( venuecheck_venue_options[ 1 ].children );
+			// remove the confusing double list from Modern Tribe ("My Venues" vs "Available Venues")
+			venuecheck_venues.each( function() {
+				if (
+					'My Venues' === $( this ).attr( 'label' ) ||
+					'My Venues' ===
+						$( this )
+							.parent()
+							.attr( 'label' )
+				) {
+					$( this ).remove();
 				}
 
-				//re-enable all options before disabling venuecheck_conflicts
-				for ( let i = 0; i < venuecheck_venue_options.length; i++ ) {
-					venuecheck_venue_options[ i ].disabled = false;
+				if ( 'Available Venues' === $( this ).attr( 'label' ) ) {
+					$( this )
+						.parent()
+						.append( $( this ).html() );
+					$( this ).remove();
 				}
-			}
+			} );
 
 			//disable and message any venue venuecheck_conflicts
 			let venuecheck_venue_report_count = '';
@@ -306,23 +317,17 @@
 				venuecheck_venue_report += '</div>';
 				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table">';
 
-				console.log( 'venuecheck_conflicts' );
-				console.log( venuecheck_conflicts );
-				console.log( jQuery.type( venuecheck_conflicts ) );
-				console.log( 'venuecheck_conflicts' );
+				if ( venuecheck.debug ) console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
+				if ( venuecheck.debug ) console.log( 'venuecheck_venue_options', venuecheck_venue_options );
+
+				// reset all options to enabled by default before we loop through.
+				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
-					//http://stackoverflow.com/questions/15997879/get-the-index-of-the-object-inside-an-array-matching-a-condition
-					const optionIndex = venuecheck_venue_options.findIndex( function( x ) {
-						return x.id === venue.venueID;
-					} );
+					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
 
-					if ( venuecheck_venue_options[ optionIndex ] ) {
-						venuecheck_venue_options[ optionIndex ].disabled = true;
-						if ( venuecheck_venue_options[ optionIndex ].id === $( '#s2id_saved_tribe_venue' ).select2( 'val' ) ) {
-							$( '#s2id_saved_tribe_venue' ).select2( 'val', '' );
-						}
-					}
+					// disable the option
+					$( '#saved_tribe_venue option[value="' + venue.venueID + '"]' ).attr( 'disabled', 'disabled' );
 
 					//prepare venue report
 					venuecheck_venue_report +=
@@ -344,40 +349,72 @@
 				} );
 				venuecheck_venue_report += '</tbody></table></div>';
 			} else if ( venuecheck_conflicts.length === 0 ) {
+				// there are no conflicts found
+
+				// notificaiton
 				venuecheck_venue_report_count +=
 					'<div id="venuecheck-conflicts-report-count" class="notice notice-info">All venues are available.</div>';
 				venuecheck_venue_report += '';
+
+				// re-enable any previously diabled options
+				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
 			}
+
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
 			$( '#venuecheck-conflicts-report' )
 				.append( venuecheck_venue_report )
 				.show();
+
 			$( '#venuecheck-conflicts-report-link, #venuecheck-conflicts-report-close' ).on( 'click', function() {
 				$( '#venuecheck-report-container' ).slideToggle( 'fast' );
 				$( '#venuecheck-conflicts-report-link' ).html(
 					$( '#venuecheck-conflicts-report-link' ).text() === 'Show Details' ? 'Hide Details' : 'Show Details'
 				);
 			} );
+
 			$( '#venuecheck-venue-select' ).show();
+
 			$( '#venuecheck-processing, #venuecheck-progress' ).hide();
+
 			$( '#venuecheck-conflicts-link' ).removeClass( 'venuecheck-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
-			$( '#saved_tribe_venue' ).select2( 'readonly', false );
+			$( '#saved_tribe_venue' ).select2( {
+				disabled: false,
+			} );
 			$( '#venuecheck-change-venue' ).hide();
 			$( 'body' ).addClass( 'venuecheck-venues' );
 			venuecheck_enable_form();
-		} //venuecheck_handle_check_venues
+		} // end venuecheck_handle_check_venues
 
 		function venuecheck_convert_time( time ) {
-			let hours = Number( time.match( /^(\d+)/ )[ 1 ] );
-			const minutes = Number( time.match( /:(\d+)/ )[ 1 ] );
+			if ( ! time ) {
+				// fallback default
+				return '00:00:00';
+			}
+
+			let hours = 0;
+			const hoursMatch = time.match( /^(\d+)/ );
+			if ( hoursMatch && 1 in hoursMatch ) {
+				hours = Number( hoursMatch[ 1 ] );
+			}
+
+			let minutes = 0;
+			const minutesMatch = time.match( /:(\d+)/ );
+			if ( minutesMatch && 1 in minutesMatch ) {
+				minutes = Number( minutesMatch[ 1 ] );
+			}
+
+			// get am/pm and convert to 24h time if needed
 			const AMPM = time.substr( -2 ).toLowerCase();
 			if ( AMPM === 'pm' && hours < 12 ) hours = hours + 12;
 			if ( AMPM === 'am' && hours === 12 ) hours = hours - 12;
+
+			// hours and minutes to strings with leading zeros
 			let sHours = hours.toString();
 			let sMinutes = minutes.toString();
 			if ( hours < 10 ) sHours = '0' + sHours;
 			if ( minutes < 10 ) sMinutes = '0' + sMinutes;
+
 			return sHours + ':' + sMinutes + ':00';
 		}
 
@@ -399,7 +436,9 @@
 			$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' ).show();
 			$( '#venuecheck-report-container, #venuecheck-conflicts-report-count, #venuecheck-progress' ).hide();
 			$( '#publish' ).prop( 'disabled', true );
-			$( '#saved_tribe_venue' ).select2( 'readonly', true );
+			$( '#saved_tribe_venue' ).select2( {
+				disabled: true,
+			} );
 			$( '#venuecheck-change-venue' ).show();
 		}
 
@@ -414,7 +453,9 @@
 				$( '#venuecheck-report-container' ).hide();
 				$( '#venuecheck-conflicts-report-link' ).text( 'Show Details' );
 				//here
-				$( '#saved_tribe_venue' ).select2( 'readonly', false );
+				$( '#saved_tribe_venue' ).select2( {
+					disabled: false,
+				} );
 			}
 		}
 
@@ -445,7 +486,9 @@
 				.prop( 'readonly', true )
 				.addClass( 'venuecheck-preserve-disabled' );
 			$( '.tribe-datetime-block :input:disabled' ).addClass( 'venuecheck-preserve-disabled' );
-			// $( '#saved_tribe_venue' ).select2( 'readonly', true );
+			$( '#saved_tribe_venue' ).select2( {
+				disabled: true,
+			} );
 			$( '#publish' ).prop( 'disabled', true );
 			$( '.tribe-datetime-block :input' ).prop( 'disabled', true );
 			$( '#tribe_events_event_details a' )
@@ -522,8 +565,7 @@
 		//add conflicts link
 		$( '#event_tribe_venue .edit-linked-post-link' ).after(
 			'<div id="venuecheck-change-venue" style="display: none;">' +
-				'<span class="venuecheck-divider">&nbsp;|&nbsp;</span>' +
-				'<a id="venuecheck-conflicts-link">Change Venue</a>' +
+				'<a id="venuecheck-conflicts-link" class="button">Change Venue</a>' +
 				'</div>'
 		);
 
@@ -568,7 +610,8 @@
 		const recurrence_warning =
 			'<div id="venuecheck-recurrence-warning" style="display: none;" class="notice notice-warning">' +
 			'It may take up to a minute or more to find available venues for all ' +
-			'<span id="venuecheck-recurrence-count"></span> events in this series. ' +
+			'<span id="venuecheck-recurrence-count"></span> events in this series.<br>' +
+			'<em>Note: this system is only able to check conflicts up to 2 years into the future.</em><br>' +
 			'Would you like to continue? <a id="venuecheck-recurrence-warning-continue">Continue</a>' +
 			'<span class="venuecheck-divider">&nbsp;|&nbsp;</span>' +
 			'<a id="venuecheck-recurrence-warning-cancel">Cancel</a>' +
@@ -582,13 +625,31 @@
 		$( document ).on(
 			'click',
 			'#venuecheck-conflicts-button, #venuecheck-conflicts-link, #venuecheck-report-conflicts-link, #venuecheck-modified',
-			function() {
-				venuecheck_find_available_venues();
-			}
+			venuecheck_find_available_venues
 		);
 
+		// recheck for conflicts whenever any of the date fields change
+		/*
+		$(
+			'#EventStartDate,' +
+				'#EventStartTime,' +
+				'#EventEndDate,' +
+				'#EventEndTime,' +
+				'#allDayCheckbox,' +
+				'#_venuecheck_event_offset_start,' +
+				'#_venuecheck_event_offset_end'
+		).on( 'change', venuecheck_find_available_venues );
+		*/
+
 		//disable venues dropdown
-		// $( '#saved_tribe_venue' ).select2( 'readonly', true );
+		$( '#saved_tribe_venue' ).select2( {
+			disabled: true,
+		} );
+
+		// empty out the link to edit the venue item
+		$( '.edit-linked-post-link' ).html( '' );
+
+		// show the change venue button
 		$( '#venuecheck-change-venue' ).show();
 
 		venuecheck_show_hide_offsets();
