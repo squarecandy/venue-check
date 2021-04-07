@@ -78,6 +78,7 @@
 			event_recurrences.push( event_recurrence );
 			const post_data = $( 'form#post' ).serialize();
 			venuecheck_disable_form();
+			if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
 			if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
 				if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
 				return $.ajax( {
@@ -86,7 +87,7 @@
 					dataType: 'json',
 					data: {
 						action: 'venuecheck_get_event_recurrences',
-						security: $( '#venuecheck_nonce' ).val(),
+						nonce: venuecheck.nonce,
 						post_data,
 					},
 				} )
@@ -170,12 +171,14 @@
 					const total_count = event_recurrences.length;
 					const batch_count = batchArray.indexOf( batch );
 					return p.then( function() {
+						if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
 						return $.ajax( {
 							type: 'POST',
 							dataType: 'json',
 							url: venuecheck.ajax_url,
 							data: {
 								action: 'venuecheck_check_venues',
+								nonce: venuecheck.nonce,
 								event_recurrences: batch,
 								postID,
 								total_count,

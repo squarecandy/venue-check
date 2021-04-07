@@ -24,6 +24,7 @@ function venuecheck_scripts_styles( $hook ) {
 		'venuecheck',
 		array(
 			'ajax_url'    => admin_url( 'admin-ajax.php' ),
+			'nonce'       => wp_create_nonce( 'venuecheck-nonce' ),
 			'plugins_url' => plugin_dir_url( __FILE__ ),
 			'debug'       => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
 		)
@@ -60,7 +61,13 @@ function prefix_disable_gutenberg( $current_status, $post_type ) {
 
 
 function venuecheck_get_event_recurrences() {
-	check_ajax_referer( 'venuecheck_nonce', 'security', false );
+
+	// Check for nonce security
+	if ( ! wp_verify_nonce( $_POST['nonce'], 'venuecheck-nonce' ) ) {
+		echo wp_json_encode( array( 'error' => 'error: wordpress nonce security check failed' ) );
+		die();
+	}
+
 	include 'src/venuecheck_get_recurrence_parameters.php';
 	if ( isset( $_POST ) ) {
 		$postData = $_POST['post_data'];
@@ -178,6 +185,13 @@ function venuecheck_get_event_recurrences() {
 }
 
 function venuecheck_check_venues() {
+
+	// Check for nonce security
+	if ( ! wp_verify_nonce( $_POST['nonce'], 'venuecheck-nonce' ) ) {
+		echo wp_json_encode( array( 'error' => 'error: wordpress nonce security check failed - ' . $_POST['nonce'] ) );
+		die();
+	}
+
 	//get all upcoming events
 	$now  = gmdate( 'Y-m-d H:i:s' );
 	$args = array(
