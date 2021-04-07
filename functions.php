@@ -237,21 +237,6 @@ function venuecheck_check_venues() {
 	$venuecheck_conflicts = array();
 
 	$defaultTimezone = get_option( 'timezone_string' );
-	$gmt_offset      = get_option( 'gmt_offset' );
-
-	$offset = (float) '8.75';
-
-	// Calculate seconds from offset
-	$seconds = $offset * 60 * 60;
-	// Get timezone name from seconds
-	$tz = timezone_name_from_abbr( '', $seconds, 1 );
-	// Workaround for bug #44780
-	if ( $tz === false ) { // phpcs:ignore WordPress.PHP.YodaConditions.NotYoda
-		$tz = timezone_name_from_abbr( '', $seconds, 0 );
-	}
-	$tz = timezone_name_from_abbr( '', 16200, 0 );
-
-	$defaultTimezoneMode = tribe_get_option( 'tribe_events_timezone_mode' );
 
 	//event confict checking
 
@@ -280,12 +265,12 @@ function venuecheck_check_venues() {
 			$startA = new DateTime( $event_recurrence['eventStart'], new DateTimeZone( $timezone ) );
 			$endA   = new DateTime( $event_recurrence['eventEnd'], new DateTimeZone( $timezone ) );
 
-			//subtract offset from start
+			// subtract offset from start (a.k.a "setup time")
 			if ( ! empty( $event_recurrence['eventOffsetStart'] ) ) {
 				$eventOffsetStart = 'PT' . $event_recurrence['eventOffsetStart'] . 'M';
 				$startA->sub( new DateInterval( $eventOffsetStart ) );
 			}
-			//add offset to end
+			// add offset to end (a.k.a. "cleanup time")
 			if ( ! empty( $event_recurrence['eventOffsetEnd'] ) ) {
 				$eventOffsetEnd = 'PT' . $event_recurrence['eventOffsetEnd'] . 'M';
 				$endA->add( new DateInterval( $eventOffsetEnd ) );
@@ -297,17 +282,9 @@ function venuecheck_check_venues() {
 				} else {
 					$timezone = $defaultTimezone;
 				}
-				//create date objects including timezone
-				$startB = new DateTime( $upcomingEvent->EventStartDate );
-				$endB   = new DateTime( $upcomingEvent->EventEndDate );
 
-				if ( 'site' === $defaultTimezoneMode ) {
-					date_timezone_set( $startB, timezone_open( $timezone ) );
-					date_timezone_set( $endB, timezone_open( $timezone ) );
-				} else {
-					$startB = new DateTime( $upcomingEvent->EventStartDate, new DateTimeZone( $timezone ) );
-					$endB   = new DateTime( $upcomingEvent->EventEndDate, new DateTimeZone( $timezone ) );
-				}
+				$startB = new DateTime( $upcomingEvent->_EventStartDate, new DateTimeZone( $timezone ) );
+				$endB   = new DateTime( $upcomingEvent->_EventEndDate, new DateTimeZone( $timezone ) );
 
 				//subtract offset from start
 				if ( ! empty( $upcomingEvent->_venuecheck_event_offset_start ) ) {
