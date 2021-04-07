@@ -12,7 +12,11 @@ function venuecheck_scripts_styles( $hook ) {
 	}
 
 	/* REGISTER JS */
-	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.0-rc2', true );
+	if ( defined( 'WP_DEBUG' ) ? WP_DEBUG : false ) {
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.2.0-rc2', true );
+	} else {
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.0-rc2', true );
+	}
 
 	/* LOCALIZE AJAX URL */
 	wp_localize_script(
