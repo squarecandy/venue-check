@@ -193,7 +193,7 @@ function venuecheck_check_venues() {
 	}
 
 	//get all upcoming events
-	$now  = gmdate( 'Y-m-d H:i:s' );
+	$now  = wp_date( 'Y-m-d ' ) . '00:00:01';
 	$args = array(
 		'post_type'      => 'tribe_events',
 		'posts_per_page' => '-1',
@@ -209,23 +209,10 @@ function venuecheck_check_venues() {
 			'inherit',
 		),
 		'meta_query'     => array(
-			'relation' => 'AND',
 			array(
 				'key'     => '_EventEndDate',
 				'value'   => $now,
 				'compare' => '>=',
-			),
-			array(
-				'relation' => 'OR',
-				array(
-					'key'     => '_EventHideFromUpcoming',
-					'compare' => 'NOT EXISTS',
-				),
-				array(
-					'key'     => '_EventHideFromUpcoming',
-					'value'   => 'yes',
-					'compare' => '=',
-				),
 			),
 		),
 	);
