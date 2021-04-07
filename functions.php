@@ -245,10 +245,20 @@ function venuecheck_check_venues() {
 
 	if ( isset( $_POST ) ) {
 
-		// CONFLICT: (StartA <= EndB)  and  (EndA >= StartB)
-		// arrray
-		// {eventStart: "2018-05-14 8:00:00", eventEnd: "2018-05-14 17:00:00", eventTimezone: "America/New_York", eventOffsetStart: "0", eventOffsetEnd: "0"}
-		//new event dates
+		/*
+		 * CONFLICT: (StartA < EndB) and (EndA > StartB)
+		 *
+		 * A conflict occurs if:
+		 * the start of the new event is before the end of the existing event
+		 * AND the end of the new event is after the start of the existing event
+		 *
+		 * This accounts for overlaps at the beginning of the existing event; overlaps at the end of the existing event; complete overlap.
+		 *
+		 * data format:
+		 * {eventStart: "2018-05-14 8:00:00", eventEnd: "2018-05-14 17:00:00", eventTimezone: "America/New_York", eventOffsetStart: "0", eventOffsetEnd: "0"}
+		 */
+
+		// new event dates
 
 		$event_recurrences = $_POST['event_recurrences'];
 		$postID            = $_POST['postID'];
