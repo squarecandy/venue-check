@@ -240,9 +240,6 @@ function venuecheck_check_venues() {
 
 	//event confict checking
 
-	// @TODO - add nonce verification security
-	// phpcs:disable WordPress.Security.NonceVerification
-
 	if ( isset( $_POST ) ) {
 
 		/*
@@ -347,13 +344,19 @@ function venuecheck_check_venues() {
 //append html section for offset controls
 add_action( 'tribe_events_date_display', 'venuecheck_offsets_html' );
 function venuecheck_offsets_html() {
-	if ( isset( $_GET['post'] ) ) {
-		$eventOffsetStart = get_post_meta( $_GET['post'], '_venuecheck_event_offset_start', true );
-		$eventOffsetEnd   = get_post_meta( $_GET['post'], '_venuecheck_event_offset_end', true );
-	} else {
+
+	global $post;
+	$post_id = $post->ID;
+	$screen  = get_current_screen();
+
+	if ( 'add' === $screen->action || ! $post_id ) {
 		$eventOffsetStart = 0;
 		$eventOffsetEnd   = 0;
-	}?>
+	} else {
+		$eventOffsetStart = get_post_meta( $post_id, '_venuecheck_event_offset_start', true );
+		$eventOffsetEnd   = get_post_meta( $post_id, '_venuecheck_event_offset_end', true );
+	}
+	?>
 
 	<table id="venuecheck-offsets">
 		<colgroup>
@@ -367,7 +370,7 @@ function venuecheck_offsets_html() {
 			<tr>
 				<td class="venuecheck-label">Setup Time:</td>
 				<td class="venuecheck-block">
-					<input type="hidden" name="venuecheck_nonce" id="venuecheck_nonce" value="<?php echo wp_create_nonce( 'venuecheck_nonce' ); ?>">
+				<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>">
 
 					<select tabindex="2003" name="_venuecheck_event_offset_start" id="_venuecheck_event_offset_start">
 						<option value="0" <?php selected( $eventOffsetStart, '0' ); ?>>None</option>
@@ -430,6 +433,16 @@ add_action( 'save_post', 'venuecheck_save_offsets' );
 function venuecheck_save_offsets( $post_id ) {
 	// check autosave
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	// check post type
+	if ( 'tribe_events' !== get_post_type( $post_id ) ) {
+		return;
+	}
+
+	// check nonce
+	if ( ! isset( $_POST['venuecheck_meta_nonce'] ) || ! wp_verify_nonce( $_POST['venuecheck_meta_nonce'], 'venuecheck-meta-nonce' ) ) {
 		return;
 	}
 
