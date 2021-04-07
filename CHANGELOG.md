@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0-rc3](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc2...v2.2.0-rc3) (2021-04-07)
+
+
+### Bug Fixes
+
+* add nonce security to all ajax calls ([1628700](https://github.com/squarecandy/venue-check/commit/162870026c8879271af48910e65015d6292c4e0b))
+* force classic editor for now ([c1848b3](https://github.com/squarecandy/venue-check/commit/c1848b3ca357c3e4eac59dac7c276da1089c7bde))
+* more nonce checking ([0181685](https://github.com/squarecandy/venue-check/commit/0181685b7063dc7be9deb880ef3d1277685e85f9))
+* update timezone and start/endtime handling ([9a794ff](https://github.com/squarecandy/venue-check/commit/9a794ffe6333e248b160026af70774c974d66dd1))
+
 ## [2.2.0-rc2](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc1...v2.2.0-rc2) (2021-01-19)
 
 
