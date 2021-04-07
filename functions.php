@@ -47,6 +47,18 @@ function venuecheck_include_hidden_events( $ids ) {
 	return $ids;
 }
 
+// Turn off Gutenberg for Events
+// @TODO - create support for the block editor
+// for now we're only supporting the classic editor, so force it for the tribe_events post type
+add_filter( 'use_block_editor_for_post_type', 'prefix_disable_gutenberg', 20, 2 );
+function prefix_disable_gutenberg( $current_status, $post_type ) {
+	if ( 'tribe_events' === $post_type ) {
+		return false;
+	}
+	return $current_status;
+}
+
+
 function venuecheck_get_event_recurrences() {
 	check_ajax_referer( 'venuecheck_nonce', 'security', false );
 	include 'src/venuecheck_get_recurrence_parameters.php';
