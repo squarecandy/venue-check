@@ -533,37 +533,48 @@
 			}
 		}
 
+		// Setup additional required HTML elements and classes
+		// It would be great to do this in PHP instead, but there is no way to modify the form
+
+		const $eventDetails = $( '#tribe_events_event_details' );
+		const $venuecheckVenueSection = $( '#event_tribe_venue tbody' ).first();
+		const $venueDropdown = $venuecheckVenueSection.find( 'tr.saved-linked-post > td' ).last();
 		//add venuecheck
-		$( '#tribe_events_event_details' ).addClass( 'venuecheck-update' );
+		$eventDetails.addClass( 'venuecheck-update' );
 
 		//add section
-		$( '#event_tribe_venue tbody:first' ).addClass( 'venuecheck-section' );
+		$venuecheckVenueSection.addClass( 'venuecheck-section' );
 
 		//add section label
-		$( '#event_tribe_venue > tbody > tr:first' ).before(
-			'<tr>' +
-				'<td colspan="2" class="venuecheck-section-label">' +
-				'Venue Check<i class="fas fa-spinner fa-pulse venuecheck-preload"></i>' +
-				'</td>' +
-				'</tr>'
-		);
+		$venuecheckVenueSection
+			.children( 'tr' )
+			.first()
+			.before(
+				'<tr>' +
+					'<td colspan="2" class="venuecheck-section-label">' +
+					'Venue Check<i class="fas fa-spinner fa-pulse venuecheck-preload"></i>' +
+					'</td>' +
+					'</tr>'
+			);
 
 		//add conflicts button
-		$( '#event_tribe_venue .venuecheck-section tr:nth-child(2) td:nth-child(2)' ).wrapInner(
-			'<div id="venuecheck-venue-select"></div>'
-		);
-		$( '#event_tribe_venue .venuecheck-section tr:nth-child(2) td:nth-child(2)' ).append(
-			'<a id="venuecheck-conflicts-button" class="button">Find available venues</a>'
-		);
+		$venueDropdown.wrapInner( '<div id="venuecheck-venue-select"></div>' );
+
+		$venueDropdown.append( '<a id="venuecheck-conflicts-button" class="button">Find available venues</a>' );
 
 		//add messages
-		$( '#event_tribe_venue .venuecheck-section tr:nth-child(2) td:nth-child(2)' ).append(
+		$venueDropdown.append(
 			'<div id="venuecheck-messages-container" style="display: none;"><div id="venuecheck-messages"></div></div>'
 		);
-		$( '#event_tribe_venue .venuecheck-section tr:nth-child(3)' ).after(
-			'<tr id="venuecheck-report-container" style="display: none;"><td colspan="2" id="venuecheck-report"></td>/tr>'
-		);
-		$( '#event_tribe_venue .venuecheck-section tr:nth-child(4)' ).after( '<tr class="venuecheck-spacer"><td></td><td></td></tr>' );
+
+		$venuecheckVenueSection
+			.find( 'tr.linked-post.venue' )
+			.after(
+				'<tr id="venuecheck-report-container" style="display: none;">' +
+					'<td colspan="2" id="venuecheck-report"></td>' +
+					'</tr>' +
+					'<tr class="venuecheck-spacer"><td></td><td></td></tr>'
+			);
 
 		//add conflicts link
 		$( '#event_tribe_venue .edit-linked-post-link' ).after(
