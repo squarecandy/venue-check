@@ -351,10 +351,10 @@ function venuecheck_offsets_html() {
 				<col style="width:85%">
 		</colgroup>
 		<tbody class="venuecheck-section tribe-datetime-block">
-			<tr>
+			<tr class="venue-check-title-bar">
 				<td colspan="2" class="venuecheck-section-label">Venue Check</td>
 			</tr>
-			<tr>
+			<tr class="setup-time">
 				<td class="venuecheck-label">Setup Time:</td>
 				<td class="venuecheck-block">
 				<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>">
@@ -379,7 +379,7 @@ function venuecheck_offsets_html() {
 					</select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="cleanup-time">
 				<td class="venuecheck-label">Cleanup Time:</td>
 				<td class="venuecheck-block">
 
@@ -403,7 +403,7 @@ function venuecheck_offsets_html() {
 					</select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="helper-text">
 				<td>
 				</td>
 				<td>
