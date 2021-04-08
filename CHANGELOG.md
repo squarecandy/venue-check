@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0-rc4](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc3...v2.2.0-rc4) (2021-04-08)
+
+
+### Bug Fixes
+
+* add more classes to html ([4036f2a](https://github.com/squarecandy/venue-check/commit/4036f2a5aa606edc9a78bed234678b4bf9eb6dfa))
+* check for events today ([1d0f143](https://github.com/squarecandy/venue-check/commit/1d0f143cfe5872c1190cbec47d3e931777a61ffc))
+* show details broken on firefox; refactor jQuery that adds extra markup ([2cf8f7a](https://github.com/squarecandy/venue-check/commit/2cf8f7ac221b7c6ae25d0669a072eef300873389))
+* warning near publish button was squished ([f286925](https://github.com/squarecandy/venue-check/commit/f286925b7d73484394ff293367ded08e58910179))
+
 ## [2.2.0-rc3](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc2...v2.2.0-rc3) (2021-04-07)
 
 
