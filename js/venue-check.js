@@ -1,8 +1,10 @@
+/* venue-check.js v2.2.0-rc5 */
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
 /* global venuecheck */
-( function( $ ) {
-	window.addEventListener( 'load', function() {
+jQuery( function( $ ) {
+	window.addEventListener( 'load', ( e ) => {
+		if ( venuecheck.debug ) console.log( 'load event fire', e );
 		//=====FORM MODIFIED=====//
 
 		//only trigger modified message on updating events
@@ -194,9 +196,9 @@
 								if ( batchArray.length > 1 ) {
 									venuecheck_check_venues_progress( percent_current, percent_end );
 								}
-								$( '#saved_tribe_venue' ).select2( {
-									disabled: true,
-								} );
+								$( '#saved_tribe_venue' )
+									.prop( 'readonly', true )
+									.addClass( 'readonly' );
 							},
 						} ).then( function( data ) {
 							venuecheck_conflicts = venuecheck_conflicts.concat( data );
@@ -381,9 +383,9 @@
 
 			$( '#venuecheck-conflicts-link' ).removeClass( 'venuecheck-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
-			$( '#saved_tribe_venue' ).select2( {
-				disabled: false,
-			} );
+			$( '#saved_tribe_venue' )
+				.prop( 'readonly', false )
+				.removeClass( 'readonly' );
 			$( '#venuecheck-change-venue' ).hide();
 			$( 'body' ).addClass( 'venuecheck-venues' );
 			venuecheck_enable_form();
@@ -439,9 +441,9 @@
 			$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' ).show();
 			$( '#venuecheck-report-container, #venuecheck-conflicts-report-count, #venuecheck-progress' ).hide();
 			$( '#publish' ).prop( 'disabled', true );
-			$( '#saved_tribe_venue' ).select2( {
-				disabled: true,
-			} );
+			$( '#saved_tribe_venue' )
+				.prop( 'readonly', true )
+				.addClass( 'readonly' );
 			$( '#venuecheck-change-venue' ).show();
 		}
 
@@ -456,9 +458,9 @@
 				$( '#venuecheck-report-container' ).hide();
 				$( '#venuecheck-conflicts-report-link' ).text( 'Show Details' );
 				//here
-				$( '#saved_tribe_venue' ).select2( {
-					disabled: false,
-				} );
+				$( '#saved_tribe_venue' )
+					.prop( 'readonly', false )
+					.removeClass( 'readonly' );
 			}
 		}
 
@@ -487,11 +489,9 @@
 		function venuecheck_disable_form() {
 			$( '#saved_tribe_venue' )
 				.prop( 'readonly', true )
+				.addClass( 'readonly' )
 				.addClass( 'venuecheck-preserve-disabled' );
 			$( '.tribe-datetime-block :input:disabled' ).addClass( 'venuecheck-preserve-disabled' );
-			$( '#saved_tribe_venue' ).select2( {
-				disabled: true,
-			} );
 			$( '#publish' ).prop( 'disabled', true );
 			$( '.tribe-datetime-block :input' ).prop( 'disabled', true );
 			$( '#tribe_events_event_details a' )
@@ -502,7 +502,9 @@
 		}
 
 		function venuecheck_enable_form() {
-			$( '#saved_tribe_venue:not(.venuecheck-preserve-disabled)' ).select2( 'readonly', false );
+			$( '#saved_tribe_venue:not(.venuecheck-preserve-disabled)' )
+				.prop( 'readonly', false )
+				.removeClass( 'readonly' );
 			$( '.tribe-datetime-block :input:not(.venuecheck-preserve-disabled)' ).prop( 'disabled', false );
 			$( '#saved_tribe_venue, .tribe-datetime-block :input' ).removeClass( 'venuecheck-preserve-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
@@ -569,6 +571,7 @@
 
 		$venuecheckVenueSection
 			.find( 'tr.linked-post.venue' )
+			.first()
 			.after(
 				'<tr id="venuecheck-report-container" style="display: none;">' +
 					'<td colspan="2" id="venuecheck-report"></td>' +
@@ -656,9 +659,9 @@
 		*/
 
 		//disable venues dropdown
-		$( '#saved_tribe_venue' ).select2( {
-			disabled: true,
-		} );
+		$( '#saved_tribe_venue' )
+			.prop( 'readonly', true )
+			.addClass( 'readonly' );
 
 		// empty out the link to edit the venue item
 		$( '.edit-linked-post-link' ).html( '' );
@@ -669,4 +672,4 @@
 		venuecheck_show_hide_offsets();
 		venuecheck_show_hide_divider();
 	} ); //load
-} )( jQuery );
+} );
