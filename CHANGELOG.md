@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0-rc5](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc4...v2.2.0-rc5) (2021-04-12)
+
+## [2.2.0-rc4](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc3...v2.2.0-rc4) (2021-04-08)
+
+
+### Bug Fixes
+
+* add more classes to html ([4036f2a](https://github.com/squarecandy/venue-check/commit/4036f2a5aa606edc9a78bed234678b4bf9eb6dfa))
+* check for events today ([1d0f143](https://github.com/squarecandy/venue-check/commit/1d0f143cfe5872c1190cbec47d3e931777a61ffc))
+* show details broken on firefox; refactor jQuery that adds extra markup ([2cf8f7a](https://github.com/squarecandy/venue-check/commit/2cf8f7ac221b7c6ae25d0669a072eef300873389))
+* warning near publish button was squished ([f286925](https://github.com/squarecandy/venue-check/commit/f286925b7d73484394ff293367ded08e58910179))
+
+## [2.2.0-rc3](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc2...v2.2.0-rc3) (2021-04-07)
+
+
+### Bug Fixes
+
+* add nonce security to all ajax calls ([1628700](https://github.com/squarecandy/venue-check/commit/162870026c8879271af48910e65015d6292c4e0b))
+* force classic editor for now ([c1848b3](https://github.com/squarecandy/venue-check/commit/c1848b3ca357c3e4eac59dac7c276da1089c7bde))
+* more nonce checking ([0181685](https://github.com/squarecandy/venue-check/commit/0181685b7063dc7be9deb880ef3d1277685e85f9))
+* update timezone and start/endtime handling ([9a794ff](https://github.com/squarecandy/venue-check/commit/9a794ffe6333e248b160026af70774c974d66dd1))
+
 ## [2.2.0-rc2](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc1...v2.2.0-rc2) (2021-01-19)
 
 

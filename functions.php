@@ -12,7 +12,11 @@ function venuecheck_scripts_styles( $hook ) {
 	}
 
 	/* REGISTER JS */
-	wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.0-rc2', true );
+	if ( defined( 'WP_DEBUG' ) ? WP_DEBUG : false ) {
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.2.0-rc5', true );
+	} else {
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.0-rc5', true );
+	}
 
 	/* LOCALIZE AJAX URL */
 	wp_localize_script(
@@ -20,13 +24,14 @@ function venuecheck_scripts_styles( $hook ) {
 		'venuecheck',
 		array(
 			'ajax_url'    => admin_url( 'admin-ajax.php' ),
+			'nonce'       => wp_create_nonce( 'venuecheck-nonce' ),
 			'plugins_url' => plugin_dir_url( __FILE__ ),
 			'debug'       => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
 		)
 	);
 
 	/* REGISTER CSS */
-	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.2.0-rc2' );
+	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.2.0-rc5' );
 	wp_enqueue_style( 'fontawesome', '//use.fontawesome.com/releases/v5.2.0/css/all.css', array(), '5.2.0' );
 
 }
@@ -43,8 +48,26 @@ function venuecheck_include_hidden_events( $ids ) {
 	return $ids;
 }
 
+// Turn off Gutenberg for Events
+// @TODO - create support for the block editor
+// for now we're only supporting the classic editor, so force it for the tribe_events post type
+add_filter( 'use_block_editor_for_post_type', 'prefix_disable_gutenberg', 20, 2 );
+function prefix_disable_gutenberg( $current_status, $post_type ) {
+	if ( 'tribe_events' === $post_type ) {
+		return false;
+	}
+	return $current_status;
+}
+
+
 function venuecheck_get_event_recurrences() {
-	check_ajax_referer( 'venuecheck_nonce', 'security', false );
+
+	// Check for nonce security
+	if ( ! wp_verify_nonce( $_POST['nonce'], 'venuecheck-nonce' ) ) {
+		echo wp_json_encode( array( 'error' => 'error: wordpress nonce security check failed' ) );
+		die();
+	}
+
 	include 'src/venuecheck_get_recurrence_parameters.php';
 	if ( isset( $_POST ) ) {
 		$postData = $_POST['post_data'];
@@ -162,8 +185,15 @@ function venuecheck_get_event_recurrences() {
 }
 
 function venuecheck_check_venues() {
+
+	// Check for nonce security
+	if ( ! wp_verify_nonce( $_POST['nonce'], 'venuecheck-nonce' ) ) {
+		echo wp_json_encode( array( 'error' => 'error: wordpress nonce security check failed - ' . $_POST['nonce'] ) );
+		die();
+	}
+
 	//get all upcoming events
-	$now  = gmdate( 'Y-m-d H:i:s' );
+	$now  = wp_date( 'Y-m-d ' ) . '00:00:01';
 	$args = array(
 		'post_type'      => 'tribe_events',
 		'posts_per_page' => '-1',
@@ -179,23 +209,10 @@ function venuecheck_check_venues() {
 			'inherit',
 		),
 		'meta_query'     => array(
-			'relation' => 'AND',
 			array(
 				'key'     => '_EventEndDate',
 				'value'   => $now,
 				'compare' => '>=',
-			),
-			array(
-				'relation' => 'OR',
-				array(
-					'key'     => '_EventHideFromUpcoming',
-					'compare' => 'NOT EXISTS',
-				),
-				array(
-					'key'     => '_EventHideFromUpcoming',
-					'value'   => 'yes',
-					'compare' => '=',
-				),
 			),
 		),
 	);
@@ -207,33 +224,25 @@ function venuecheck_check_venues() {
 	$venuecheck_conflicts = array();
 
 	$defaultTimezone = get_option( 'timezone_string' );
-	$gmt_offset      = get_option( 'gmt_offset' );
-
-	$offset = (float) '8.75';
-
-	// Calculate seconds from offset
-	$seconds = $offset * 60 * 60;
-	// Get timezone name from seconds
-	$tz = timezone_name_from_abbr( '', $seconds, 1 );
-	// Workaround for bug #44780
-	if ( $tz === false ) { // phpcs:ignore WordPress.PHP.YodaConditions.NotYoda
-		$tz = timezone_name_from_abbr( '', $seconds, 0 );
-	}
-	$tz = timezone_name_from_abbr( '', 16200, 0 );
-
-	$defaultTimezoneMode = tribe_get_option( 'tribe_events_timezone_mode' );
 
 	//event confict checking
 
-	// @TODO - add nonce verification security
-	// phpcs:disable WordPress.Security.NonceVerification
-
 	if ( isset( $_POST ) ) {
 
-		// CONFLICT: (StartA <= EndB)  and  (EndA >= StartB)
-		// arrray
-		// {eventStart: "2018-05-14 8:00:00", eventEnd: "2018-05-14 17:00:00", eventTimezone: "America/New_York", eventOffsetStart: "0", eventOffsetEnd: "0"}
-		//new event dates
+		/*
+		 * CONFLICT: (StartA < EndB) and (EndA > StartB)
+		 *
+		 * A conflict occurs if:
+		 * the start of the new event is before the end of the existing event
+		 * AND the end of the new event is after the start of the existing event
+		 *
+		 * This accounts for overlaps at the beginning of the existing event; overlaps at the end of the existing event; complete overlap.
+		 *
+		 * data format:
+		 * {eventStart: "2018-05-14 8:00:00", eventEnd: "2018-05-14 17:00:00", eventTimezone: "America/New_York", eventOffsetStart: "0", eventOffsetEnd: "0"}
+		 */
+
+		// new event dates
 
 		$event_recurrences = $_POST['event_recurrences'];
 		$postID            = $_POST['postID'];
@@ -250,12 +259,12 @@ function venuecheck_check_venues() {
 			$startA = new DateTime( $event_recurrence['eventStart'], new DateTimeZone( $timezone ) );
 			$endA   = new DateTime( $event_recurrence['eventEnd'], new DateTimeZone( $timezone ) );
 
-			//subtract offset from start
+			// subtract offset from start (a.k.a "setup time")
 			if ( ! empty( $event_recurrence['eventOffsetStart'] ) ) {
 				$eventOffsetStart = 'PT' . $event_recurrence['eventOffsetStart'] . 'M';
 				$startA->sub( new DateInterval( $eventOffsetStart ) );
 			}
-			//add offset to end
+			// add offset to end (a.k.a. "cleanup time")
 			if ( ! empty( $event_recurrence['eventOffsetEnd'] ) ) {
 				$eventOffsetEnd = 'PT' . $event_recurrence['eventOffsetEnd'] . 'M';
 				$endA->add( new DateInterval( $eventOffsetEnd ) );
@@ -267,17 +276,9 @@ function venuecheck_check_venues() {
 				} else {
 					$timezone = $defaultTimezone;
 				}
-				//create date objects including timezone
-				$startB = new DateTime( $upcomingEvent->EventStartDate );
-				$endB   = new DateTime( $upcomingEvent->EventEndDate );
 
-				if ( 'site' === $defaultTimezoneMode ) {
-					date_timezone_set( $startB, timezone_open( $timezone ) );
-					date_timezone_set( $endB, timezone_open( $timezone ) );
-				} else {
-					$startB = new DateTime( $upcomingEvent->EventStartDate, new DateTimeZone( $timezone ) );
-					$endB   = new DateTime( $upcomingEvent->EventEndDate, new DateTimeZone( $timezone ) );
-				}
+				$startB = new DateTime( $upcomingEvent->_EventStartDate, new DateTimeZone( $timezone ) );
+				$endB   = new DateTime( $upcomingEvent->_EventEndDate, new DateTimeZone( $timezone ) );
 
 				//subtract offset from start
 				if ( ! empty( $upcomingEvent->_venuecheck_event_offset_start ) ) {
@@ -330,13 +331,19 @@ function venuecheck_check_venues() {
 //append html section for offset controls
 add_action( 'tribe_events_date_display', 'venuecheck_offsets_html' );
 function venuecheck_offsets_html() {
-	if ( isset( $_GET['post'] ) ) {
-		$eventOffsetStart = get_post_meta( $_GET['post'], '_venuecheck_event_offset_start', true );
-		$eventOffsetEnd   = get_post_meta( $_GET['post'], '_venuecheck_event_offset_end', true );
-	} else {
+
+	global $post;
+	$post_id = $post->ID;
+	$screen  = get_current_screen();
+
+	if ( 'add' === $screen->action || ! $post_id ) {
 		$eventOffsetStart = 0;
 		$eventOffsetEnd   = 0;
-	}?>
+	} else {
+		$eventOffsetStart = get_post_meta( $post_id, '_venuecheck_event_offset_start', true );
+		$eventOffsetEnd   = get_post_meta( $post_id, '_venuecheck_event_offset_end', true );
+	}
+	?>
 
 	<table id="venuecheck-offsets">
 		<colgroup>
@@ -344,13 +351,13 @@ function venuecheck_offsets_html() {
 				<col style="width:85%">
 		</colgroup>
 		<tbody class="venuecheck-section tribe-datetime-block">
-			<tr>
+			<tr class="venue-check-title-bar">
 				<td colspan="2" class="venuecheck-section-label">Venue Check</td>
 			</tr>
-			<tr>
+			<tr class="setup-time">
 				<td class="venuecheck-label">Setup Time:</td>
 				<td class="venuecheck-block">
-					<input type="hidden" name="venuecheck_nonce" id="venuecheck_nonce" value="<?php echo wp_create_nonce( 'venuecheck_nonce' ); ?>">
+				<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>">
 
 					<select tabindex="2003" name="_venuecheck_event_offset_start" id="_venuecheck_event_offset_start">
 						<option value="0" <?php selected( $eventOffsetStart, '0' ); ?>>None</option>
@@ -372,7 +379,7 @@ function venuecheck_offsets_html() {
 					</select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="cleanup-time">
 				<td class="venuecheck-label">Cleanup Time:</td>
 				<td class="venuecheck-block">
 
@@ -396,7 +403,7 @@ function venuecheck_offsets_html() {
 					</select>
 				</td>
 			</tr>
-			<tr>
+			<tr class="helper-text">
 				<td>
 				</td>
 				<td>
@@ -413,6 +420,16 @@ add_action( 'save_post', 'venuecheck_save_offsets' );
 function venuecheck_save_offsets( $post_id ) {
 	// check autosave
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	// check post type
+	if ( 'tribe_events' !== get_post_type( $post_id ) ) {
+		return;
+	}
+
+	// check nonce
+	if ( ! isset( $_POST['venuecheck_meta_nonce'] ) || ! wp_verify_nonce( $_POST['venuecheck_meta_nonce'], 'venuecheck-meta-nonce' ) ) {
 		return;
 	}
 
