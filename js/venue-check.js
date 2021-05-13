@@ -679,16 +679,3 @@ jQuery( function( $ ) {
 		venuecheck_show_hide_divider();
 	} ); //load
 } );
-
-( function( $ ) {
-	$.fn.refreshDataSelect2 = function( data ) {
-		this.select2( 'data', data );
-
-		// Update options
-		const $select = $( this[ 0 ] );
-		const options = data.map( function( item ) {
-			return '<option value="' + item.id + '">' + item.text + '</option>';
-		} );
-		$select.html( options.join( '' ) ).change();
-	};
-} )( jQuery );
