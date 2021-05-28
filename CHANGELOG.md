@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.2](https://github.com/squarecandy/venue-check/compare/v2.2.1...v2.2.2) (2021-05-28)
+
+
+### Bug Fixes
+
+* git-updater primary branch header ([2d5469b](https://github.com/squarecandy/venue-check/commit/2d5469b2185334d9fee31b92bde95aabc8023a72))
+
+### [2.2.1](https://github.com/squarecandy/venue-check/compare/v2.2.0...v2.2.1) (2021-05-13)
+
+
+### Bug Fixes
+
+* unselect new conflicts that are already selected, reenable items that are no longer conflicts after date/time change ([73ebc0c](https://github.com/squarecandy/venue-check/commit/73ebc0cfbc813c701567da210ad23b3113925782))
+
+## [2.2.0](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc5...v2.2.0) (2021-05-04)
+
+
+### Bug Fixes
+
+* resaving event without changing venue can delete venue value ([6ddce00](https://github.com/squarecandy/venue-check/commit/6ddce0090b289b2c9e12e2b72379ceb45f3d9fdd))
+
 ## [2.2.0-rc5](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc4...v2.2.0-rc5) (2021-04-12)
 
 ## [2.2.0-rc4](https://github.com/squarecandy/venue-check/compare/v2.2.0-rc3...v2.2.0-rc4) (2021-04-08)

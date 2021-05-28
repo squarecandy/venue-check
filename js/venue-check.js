@@ -332,7 +332,9 @@ jQuery( function( $ ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
 
 					// disable the option
-					$( '#saved_tribe_venue option[value="' + venue.venueID + '"]' ).attr( 'disabled', 'disabled' );
+					$( '#saved_tribe_venue option[value="' + venue.venueID + '"]' )
+						.attr( 'disabled', 'disabled' )
+						.removeAttr( 'selected' );
 
 					//prepare venue report
 					venuecheck_venue_report +=
@@ -352,6 +354,9 @@ jQuery( function( $ ) {
 							'</span><i class="fas fa-external-link-alt" aria-hidden="true"></i></a></td></tr>';
 					} );
 				} );
+
+				$( '#saved_tribe_venue' ).select2();
+
 				venuecheck_venue_report += '</tbody></table></div>';
 			} else if ( venuecheck_conflicts.length === 0 ) {
 				// there are no conflicts found
@@ -363,6 +368,7 @@ jQuery( function( $ ) {
 
 				// re-enable any previously diabled options
 				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
+				$( '#saved_tribe_venue' ).select2();
 			}
 
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
