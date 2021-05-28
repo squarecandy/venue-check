@@ -449,3 +449,9 @@ function venuecheck_save_offsets( $post_id ) {
 		);
 	}
 }
+
+// make sure not to try to grab the WPORG version
+add_filter( 'gu_override_dot_org', 'venue_check_gu_override_dot_org' );
+function venue_check_gu_override_dot_org() {
+	return array( 'venue-check/plugin.php' );
+}
