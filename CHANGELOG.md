@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.3](https://github.com/squarecandy/venue-check/compare/v2.2.2...v2.2.3) (2021-06-24)
+
+
+### Bug Fixes
+
+* ignore the WPORG version with the same slug ([29e7f92](https://github.com/squarecandy/venue-check/commit/29e7f92c467e9c258386f575914e4b88f5dd2752))
+* venue field customization not load in firefox ([7f42415](https://github.com/squarecandy/venue-check/commit/7f4241539cd816ddd2f67076fa80d0075eaf62e7))
+
 ### [2.2.2](https://github.com/squarecandy/venue-check/compare/v2.2.1...v2.2.2) (2021-05-28)
 
 
