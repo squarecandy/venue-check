@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.4](https://github.com/squarecandy/venue-check/compare/v2.2.3...v2.2.4) (2021-10-27)
+
+
+### Bug Fixes
+
+* make future events query more efficient to avoid php memory errors ([774531a](https://github.com/squarecandy/venue-check/commit/774531a2245aa2ec0a68b27364d5e94daa06fdda))
+
 ### [2.2.3](https://github.com/squarecandy/venue-check/compare/v2.2.2...v2.2.3) (2021-06-24)
 
 
