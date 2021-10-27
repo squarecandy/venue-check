@@ -195,11 +195,9 @@ function venuecheck_check_venues() {
 	//get all upcoming events
 	$now  = wp_date( 'Y-m-d ' ) . '00:00:01';
 	$args = array(
-		'post_type'      => 'tribe_events',
-		'posts_per_page' => '-1',
-		'orderby'        => 'ID',
-		'order'          => 'ASC',
-		'post_status'    => array(
+		'post_type'              => 'tribe_events',
+		'posts_per_page'         => -1, // @TODO - this is still a danger of overloading the server memory. Should be changed for a paginated ajax recursion that runs until done.
+		'post_status'            => array(
 			'publish',
 			'pending',
 			'draft',
@@ -208,13 +206,18 @@ function venuecheck_check_venues() {
 			'private',
 			'inherit',
 		),
-		'meta_query'     => array(
+		'meta_query'             => array(
 			array(
 				'key'     => '_EventEndDate',
 				'value'   => $now,
 				'compare' => '>=',
 			),
 		),
+		// make query more efficient - https://10up.github.io/Engineering-Best-Practices/php/
+		'no_found_rows'          => true,
+		'update_post_term_cache' => false,
+		'update_post_meta_cache' => false,
+
 	);
 
 	$upcomingEvents = new WP_Query( $args );

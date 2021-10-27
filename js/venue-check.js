@@ -372,6 +372,7 @@ jQuery( function( $ ) {
 								.addClass( 'readonly' );
 						},
 					} ).then( function( data ) {
+						if ( venuecheck.debug ) console.log( 'venuecheck_check_venues ajax return data:', data );
 						venuecheck_conflicts = venuecheck_conflicts.concat( data );
 					} );
 				} );
