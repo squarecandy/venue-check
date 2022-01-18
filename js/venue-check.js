@@ -75,6 +75,10 @@ jQuery( function( $ ) {
 		9000
 	);
 
+	$( '#allDayCheckbox' ).click( function() {
+		venuecheck_show_hide_offsets();
+	} );
+
 	function tribeEventsEventDetailsLoaded() {
 		const $eventDetails = $( '#tribe_events_event_details' );
 		//add venuecheck
@@ -608,10 +612,6 @@ jQuery( function( $ ) {
 			$( '#venuecheck-offsets' ).show();
 		}
 	}
-
-	$( '#allDayCheckbox' ).click( function() {
-		venuecheck_show_hide_offsets();
-	} );
 
 	function venuecheck_show_modified_msg() {
 		$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' ).show();
