@@ -3,8 +3,14 @@
 /* eslint-disable camelcase */
 /* global venuecheck */
 jQuery( function( $ ) {
+	const venueCheck = {
+		progress: null, // for progress bar percentage
+		venueSelect: '#saved_tribe_venue',
+		init() {
+
 	window.addEventListener( 'load', ( e ) => {
 		if ( venuecheck.debug ) console.log( 'load event fire', e );
+
 		//=====FORM MODIFIED=====//
 
 		//only trigger modified message on updating events
@@ -33,9 +39,9 @@ jQuery( function( $ ) {
 					'body.venuecheck-update #EventInfo .tribe-button-field',
 				function() {
 					if ( $form.serialize() !== origForm ) {
-						venuecheck_show_modified_msg();
+						venueCheck.venuecheck_show_modified_msg();
 					} else {
-						venuecheck_hide_modified_msg();
+						venueCheck.venuecheck_hide_modified_msg();
 					}
 				}
 			);
@@ -45,7 +51,7 @@ jQuery( function( $ ) {
 				'click',
 				'body.venuecheck-update .tribe-row-delete-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .button-red',
 				function() {
-					venuecheck_show_modified_msg();
+					venueCheck.venuecheck_show_modified_msg();
 				}
 			);
 		}, 3000 );
@@ -55,37 +61,38 @@ jQuery( function( $ ) {
 	// It would be great to do this in PHP instead, but there is no way to modify the form
 
 	// Call the below function
-	waitForElementToDisplay(
+	venueCheck.waitForElementToDisplay(
 		'#saved_tribe_venue',
 		function() {
 			console.log( '#saved_tribe_venue is loaded' );
-			eventTribeVenueLoaded();
+			venueCheck.eventTribeVenueLoaded();
 		},
 		1000,
 		9000
 	);
 
-	waitForElementToDisplay(
+	venueCheck.waitForElementToDisplay(
 		'#tribe_events_event_details',
 		function() {
 			console.log( '#tribe_events_event_details is loaded' );
-			tribeEventsEventDetailsLoaded();
+			venueCheck.tribeEventsEventDetailsLoaded();
 		},
 		1000,
 		9000
 	);
 
 	$( '#allDayCheckbox' ).click( function() {
-		venuecheck_show_hide_offsets();
+		venueCheck.venuecheck_show_hide_offsets();
 	} );
+},
 
-	function tribeEventsEventDetailsLoaded() {
+	tribeEventsEventDetailsLoaded() {
 		const $eventDetails = $( '#tribe_events_event_details' );
 		//add venuecheck
 		$eventDetails.addClass( 'venuecheck-update' );
-	}
+	},
 
-	function eventTribeVenueLoaded() {
+	eventTribeVenueLoaded() {
 		//only trigger modified message on updating events
 		const loc = window.location.href;
 		if ( /post-new.php/.test( loc ) ) {
@@ -100,7 +107,7 @@ jQuery( function( $ ) {
 			'click',
 			'#venuecheck-conflicts-button, #venuecheck-conflicts-link, #venuecheck-report-conflicts-link, #venuecheck-modified',
 			function() {
-				venuecheck_find_available_venues();
+				venueCheck.venuecheck_find_available_venues();
 			}
 		);
 
@@ -152,7 +159,7 @@ jQuery( function( $ ) {
 		);
 
 		$( '#saved_tribe_venue' ).on( 'change', function() {
-			venuecheck_show_hide_divider();
+			venueCheck.venuecheck_show_hide_divider();
 		} );
 
 		if ( $( 'body' ).hasClass( 'venuecheck-new' ) ) {
@@ -204,10 +211,8 @@ jQuery( function( $ ) {
 		$( '#venuecheck-report-container td' ).append( report );
 
 		//disable venues dropdown
-		$( '#saved_tribe_venue' )
-			.prop( 'readonly', true )
-			.prop( 'autocomplete', 'off' ) // *
-			.addClass( 'readonly' );
+		venueCheck.venuecheck_toggle_readonly( true );
+		$( '#saved_tribe_venue' ).prop( 'autocomplete', 'off' ); // not sure why, we aren't reenabling this anywhere
 
 		// * firefox select refresh caching bugfix
 		// https://stackoverflow.com/a/8258154/947370
@@ -218,13 +223,13 @@ jQuery( function( $ ) {
 		// show the change venue button
 		$( '#venuecheck-change-venue' ).show();
 
-		venuecheck_show_hide_offsets();
-		venuecheck_show_hide_divider();
-	}
+		venueCheck.venuecheck_show_hide_offsets();
+		venueCheck.venuecheck_show_hide_divider();
+	},
 
 	//=====FORM MODIFIED=====//
 
-	function venuecheck_get_event_recurrences() {
+	venuecheck_get_event_recurrences() {
 		const batchsize = 25;
 		const recurrence_warning_limit = 50;
 		const formVars = {};
@@ -240,8 +245,8 @@ jQuery( function( $ ) {
 		const start = formVars.EventStartTime;
 		if ( venuecheck.debug ) console.log( 'start', start );
 		const end = formVars.EventEndTime;
-		const startTime = venuecheck_convert_time( start );
-		const endTime = venuecheck_convert_time( end );
+		const startTime = venueCheck.venuecheck_convert_time( start );
+		const endTime = venueCheck.venuecheck_convert_time( end );
 
 		const event_recurrences = [];
 		const event_recurrence = {
@@ -254,7 +259,7 @@ jQuery( function( $ ) {
 
 		event_recurrences.push( event_recurrence );
 		const post_data = $( 'form#post' ).serialize();
-		venuecheck_disable_form();
+		venueCheck.venuecheck_disable_form();
 		if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
 		if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
 			if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
@@ -276,7 +281,7 @@ jQuery( function( $ ) {
 						console.log( '=====/////RECURRENCES-RECURRING/////=====' );
 					}
 					if ( event_recurrences.length > recurrence_warning_limit ) {
-						venuecheck_hide_wait();
+						venueCheck.venuecheck_hide_wait();
 						const recurrrences_num = event_recurrences.length;
 						$( '#venuecheck-messages-container' ).addClass( 'has-messages' );
 						$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).show();
@@ -285,7 +290,7 @@ jQuery( function( $ ) {
 							.unbind()
 							.click( function() {
 								$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-								venuecheck_enable_form();
+								venueCheck.venuecheck_enable_form();
 								return false;
 							} );
 						$( '#venuecheck-recurrence-warning-continue' )
@@ -293,12 +298,12 @@ jQuery( function( $ ) {
 							.click( function() {
 								$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
 								if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 1' );
-								venuecheck_check_venues( event_recurrences, batchsize );
+								venueCheck.venuecheck_check_venues( event_recurrences, batchsize );
 							} );
 					} else {
-						venuecheck_hide_wait();
+						venueCheck.venuecheck_hide_wait();
 						if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 2' );
-						venuecheck_check_venues( event_recurrences, batchsize );
+						venueCheck.venuecheck_check_venues( event_recurrences, batchsize );
 					}
 				} )
 				.fail( function( jqXHR, textStatus, error ) {
@@ -312,12 +317,12 @@ jQuery( function( $ ) {
 			console.log( '=====/////RECURRENCES/////=====' );
 		}
 
-		venuecheck_hide_wait();
+		venueCheck.venuecheck_hide_wait();
 
 		if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 3' );
 
-		venuecheck_check_venues( event_recurrences, batchsize );
-	} // end venuecheck_get_event_recurrences
+		venueCheck.venuecheck_check_venues( event_recurrences, batchsize );
+	}, // end venuecheck_get_event_recurrences
 
 	/**
 	 *
@@ -328,8 +333,8 @@ jQuery( function( $ ) {
 	 *
 	 */
 
-	function venuecheck_check_venues( event_recurrences, batch_size ) {
-		venuecheck_show_progress_bar();
+	venuecheck_check_venues( event_recurrences, batch_size ) {
+		venueCheck.venuecheck_show_progress_bar();
 
 		const postID = $( '#post_ID' ).val();
 		// pre-split array into batchs
@@ -369,11 +374,9 @@ jQuery( function( $ ) {
 								( ( ( batch_count + 1 ) * batch_size - batch_remainder ) / total_count ) * 100
 							);
 							if ( batchArray.length > 1 ) {
-								venuecheck_check_venues_progress( percent_current, percent_end );
+								venueCheck.venuecheck_check_venues_progress( percent_current, percent_end );
 							}
-							$( '#saved_tribe_venue' )
-								.prop( 'readonly', true )
-								.addClass( 'readonly' );
+							venueCheck.venuecheck_toggle_readonly( true );
 						},
 					} ).then( function( data ) {
 						if ( venuecheck.debug ) console.log( 'venuecheck_check_venues ajax return data:', data );
@@ -399,20 +402,21 @@ jQuery( function( $ ) {
 				if ( venuecheck.debug ) console.log( 'CONFLICTS', venuecheck_conflicts );
 
 				venuecheck_conflicts = result;
+				window.venueConflicts = venuecheck_conflicts;
 
-				if ( venuecheck.debug ) console.log( 'CONFLCTS MERGED', venuecheck_conflicts );
+				if ( venuecheck.debug ) console.log( 'CONFLICTS MERGED', venuecheck_conflicts );
 
-				clearTimeout( progress );
+				clearTimeout( venueCheck.progress );
 				$( '#venuecheck-progress .progress-bar span' ).css( {
 					width: '100%',
 				} );
 				$( '.venuecheck-progress-percent-done' ).text( '100%' );
 
 				setTimeout( function() {
-					venuecheck_check_venues_handler( venuecheck_conflicts );
+					venueCheck.venuecheck_check_venues_handler( venuecheck_conflicts );
 				}, 500 );
 			} );
-	} //venuecheck_check_venues
+	}, //venuecheck_check_venues
 
 	/**
 	 *
@@ -420,10 +424,10 @@ jQuery( function( $ ) {
 	 *
 	 */
 
-	let progress;
+	//let progress;
 
-	function venuecheck_check_venues_progress( percent_current, percent_end ) {
-		clearTimeout( progress );
+	venuecheck_check_venues_progress( percent_current, percent_end ) {
+		clearTimeout( venueCheck.progress );
 
 		if ( venuecheck.debug ) console.log( 'check_venues_progress percent: ' + percent_current );
 
@@ -434,8 +438,8 @@ jQuery( function( $ ) {
 		percent_current += Math.floor( Math.random() * 5 + 1 ); //randomize step size
 		if ( percent_current <= percent_end ) {
 			const timeout = Math.floor( Math.random() * 1500 + 300 ); //randomize step duration
-			progress = setTimeout( function() {
-				venuecheck_check_venues_progress( percent_current, percent_end );
+			venueCheck.progress = setTimeout( function() {
+				venueCheck.venuecheck_check_venues_progress( percent_current, percent_end );
 			}, timeout );
 		} else if ( percent_end === 100 ) {
 			$( '#venuecheck-progress .progress-bar span' ).css( {
@@ -443,7 +447,7 @@ jQuery( function( $ ) {
 			} );
 			$( '.venuecheck-progress-percent-done' ).text( '100%' );
 		}
-	}
+	},
 
 	/**
 	 * disables venue conflicts in venues menu
@@ -451,7 +455,7 @@ jQuery( function( $ ) {
 	 *
 	 * @param {Array} venuecheck_conflicts
 	 */
-	function venuecheck_check_venues_handler( venuecheck_conflicts ) {
+	venuecheck_check_venues_handler( venuecheck_conflicts ) {
 		$( 'body' ).addClass( 'venuecheck-update' );
 
 		if ( venuecheck.debug ) console.log( 'starting venuecheck_check_venues_handler' );
@@ -503,6 +507,8 @@ jQuery( function( $ ) {
 
 			// reset all options to enabled by default before we loop through.
 			$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
+			const venuecheckAdditionalVenueFieldId = '#acf-' + window.venuecheck.additional_venue_settings.acf_field_key;
+			$( venuecheckAdditionalVenueFieldId + ' option' ).removeAttr( 'disabled' );
 
 			$.each( venuecheck_conflicts, function( index, venue ) {
 				if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
@@ -514,7 +520,9 @@ jQuery( function( $ ) {
 
 				//prepare venue report
 				venuecheck_venue_report +=
-					'<thead class="venuecheck-conflicts-report-venue-title"><tr><td colspan="2">' + venue.venueTitle + '</td></tr></thead>';
+					'<thead class="venuecheck-conflicts-report-venue-title"><tr><td colspan="2">' +
+					venue.venueTitle +
+					'</td></tr></thead>';
 				venuecheck_venue_report +=
 					'<thead class="venuecheck-conflicts-report-venue-heading"><tr><td>Date</td><td>Event</td></tr></thead><tbody>';
 				$.each( venue.events, function( index2, event ) {
@@ -540,7 +548,7 @@ jQuery( function( $ ) {
 				'<div id="venuecheck-conflicts-report-count" class="notice notice-info">All venues are available.</div>';
 			venuecheck_venue_report += '';
 
-			// re-enable any previously diabled options
+			// re-enable any previously disabled options
 			$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
 			$( '#saved_tribe_venue' ).select2();
 		}
@@ -563,15 +571,13 @@ jQuery( function( $ ) {
 
 		$( '#venuecheck-conflicts-link' ).removeClass( 'venuecheck-disabled' );
 		$( '#publish' ).prop( 'disabled', false );
-		$( '#saved_tribe_venue' )
-			.prop( 'readonly', false )
-			.removeClass( 'readonly' );
+		venueCheck.venuecheck_toggle_readonly( false );
 		$( '#venuecheck-change-venue' ).hide();
 		$( 'body' ).addClass( 'venuecheck-venues' );
-		venuecheck_enable_form();
-	} // end venuecheck_handle_check_venues
+		venueCheck.venuecheck_enable_form();
+	}, // end venuecheck_handle_check_venues
 
-	function venuecheck_convert_time( time ) {
+	venuecheck_convert_time( time ) {
 		if ( ! time ) {
 			// fallback default
 			return '00:00:00';
@@ -601,9 +607,9 @@ jQuery( function( $ ) {
 		if ( minutes < 10 ) sMinutes = '0' + sMinutes;
 
 		return sHours + ':' + sMinutes + ':00';
-	}
+	},
 
-	function venuecheck_show_hide_offsets() {
+	venuecheck_show_hide_offsets() {
 		if ( $( '#allDayCheckbox' ).prop( 'checked' ) === true ) {
 			$( '#venuecheck-offsets' ).hide();
 			$( '#_venuecheck_event_offset_start' ).val( '0' );
@@ -611,19 +617,17 @@ jQuery( function( $ ) {
 		} else {
 			$( '#venuecheck-offsets' ).show();
 		}
-	}
+	},
 
-	function venuecheck_show_modified_msg() {
+	venuecheck_show_modified_msg() {
 		$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' ).show();
 		$( '#venuecheck-report-container, #venuecheck-conflicts-report-count, #venuecheck-progress' ).hide();
 		$( '#publish' ).prop( 'disabled', true );
-		$( '#saved_tribe_venue' )
-			.prop( 'readonly', true )
-			.addClass( 'readonly' );
+		venueCheck.venuecheck_toggle_readonly( true );
 		$( '#venuecheck-change-venue' ).show();
-	}
+	},
 
-	function venuecheck_hide_modified_msg() {
+	venuecheck_hide_modified_msg() {
 		$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' )
 			.not( '.active' )
 			.hide();
@@ -634,23 +638,35 @@ jQuery( function( $ ) {
 			$( '#venuecheck-report-container' ).hide();
 			$( '#venuecheck-conflicts-report-link' ).text( 'Show Details' );
 			//here
-			$( '#saved_tribe_venue' )
+			venueCheck.venuecheck_toggle_readonly( false );
+		}
+	},
+
+	venuecheck_toggle_readonly( readonly ) {
+		console.log( 'readonly' );
+		console.log( venueCheck.venueSelect );
+		if ( readonly ) {
+			$( venueCheck.venueSelect )
+				.prop( 'readonly', true )
+				.addClass( 'readonly' );
+		} else {
+			$( venueCheck.venueSelect )
 				.prop( 'readonly', false )
 				.removeClass( 'readonly' );
 		}
-	}
+	},
 
-	function venuecheck_show_wait() {
+	venuecheck_show_wait() {
 		$( '#venuecheck-messages-container' ).addClass( 'has-messages' );
 		$( '#venuecheck-messages-container, #venuecheck-wait' ).show();
-	}
+	},
 
-	function venuecheck_hide_wait() {
+	venuecheck_hide_wait() {
 		$( '#venuecheck-messages-container' ).removeClass( 'has-messages' );
 		$( '#venuecheck-messages-container, #venuecheck-wait' ).hide();
-	}
+	},
 
-	function venuecheck_hide_messages() {
+	venuecheck_hide_messages() {
 		$( '#venuecheck-conflicts-report-count, #venuecheck-conflicts-report-container' ).remove();
 		$(
 			'#venuecheck-report-container,' +
@@ -660,10 +676,10 @@ jQuery( function( $ ) {
 				'#venuecheck-conflicts-report'
 		).hide();
 		$( '#venuecheck-messages-container' ).removeClass( 'has-messages' );
-	}
+	},
 
-	function venuecheck_disable_form() {
-		$( '#saved_tribe_venue' )
+	venuecheck_disable_form() {
+		$( venueCheck.venueSelect )
 			.prop( 'readonly', true )
 			.addClass( 'readonly' )
 			.addClass( 'venuecheck-preserve-disabled' );
@@ -673,9 +689,11 @@ jQuery( function( $ ) {
 		$( '#tribe_events_event_details a' )
 			.not( '#venuecheck-cancel, #venuecheck-recurrence-warning-continue, #venuecheck-recurrence-warning-cancel, .select2-choice' )
 			.addClass( 'venuecheck-disabled' );
-	}
+	},
 
-	function venuecheck_enable_form() {
+	venuecheck_enable_form() {
+		// sometimes we re-enable the form (e.g. after canceling the available venue lookup )
+		// but the venue select should remain disabled, this is what .venuecheck-preserve-disabled is for
 		$( '#saved_tribe_venue:not(.venuecheck-preserve-disabled)' )
 			.prop( 'readonly', false )
 			.removeClass( 'readonly' );
@@ -684,33 +702,32 @@ jQuery( function( $ ) {
 		$( '#publish' ).prop( 'disabled', false );
 		$( '#tribe_events_event_details a' ).removeClass( 'venuecheck-disabled' );
 		// const origForm = $( 'form#post' ).serialize();
-	}
+	},
 
-	function venuecheck_show_progress_bar() {
+	venuecheck_show_progress_bar() {
 		$( '#venuecheck-progress .progress-bar span' ).css( {
 			width: '0%',
 		} );
 		$( '.venuecheck-progress-percent-done' ).text( '0%' );
 		$( '#venuecheck-messages-container, #venuecheck-progress' ).show();
 		// venuecheck_check_venues_progress();
-	}
+	},
 
-	function venuecheck_find_available_venues() {
-		venuecheck_hide_messages();
-		venuecheck_show_wait();
-		venuecheck_get_event_recurrences();
-	}
+	venuecheck_find_available_venues() {
+		venueCheck.venuecheck_hide_messages();
+		venueCheck.venuecheck_show_wait();
+		venueCheck.venuecheck_get_event_recurrences();
+	},
 
-	function venuecheck_show_hide_divider() {
+	venuecheck_show_hide_divider() {
 		if ( $( '#saved_tribe_venue' ).val() === '' ) {
 			$( '#venuecheck-change-venue .venuecheck-divider' ).hide();
 		} else {
 			$( '#venuecheck-change-venue .venuecheck-divider' ).show();
 		}
-	}
-} );
+	},
 
-function waitForElementToDisplay( selector, callback, checkFrequencyInMs, timeoutInMs ) {
+waitForElementToDisplay( selector, callback, checkFrequencyInMs, timeoutInMs ) {
 	const startTimeInMs = Date.now();
 	( function loopSearch() {
 		if ( document.querySelector( selector ) !== null ) {
@@ -722,4 +739,7 @@ function waitForElementToDisplay( selector, callback, checkFrequencyInMs, timeou
 			}, checkFrequencyInMs );
 		}
 	} )();
-}
+},
+};
+	venueCheck.init();
+} );
