@@ -224,6 +224,11 @@ function venuecheck_check_venues() {
 	$upcomingEvents = $upcomingEvents->get_posts();
 	//end events query
 
+	if ( WP_DEBUG ) {
+		error_log( '**************************************************************************' );
+		error_log( 'Venue Check upcoming events: ' . count( $upcomingEvents ) );
+	}
+
 	$venuecheck_conflicts = array();
 
 	$defaultTimezone = get_option( 'timezone_string' );
@@ -254,6 +259,11 @@ function venuecheck_check_venues() {
 		$batch_count       = $_POST['batch_count'];
 		$loop_count        = 0;
 
+		if ( WP_DEBUG ) {
+			error_log( '* Venue Check event recurrences for post id ' . $postID . ': ' . $total_count );
+			error_log( '* Venue Check batch: ' . $batch_count . ' of ' . $batch_size );
+		}
+
 		foreach ( $event_recurrences as $k => $event_recurrence ) {
 			$loop_count++;
 			$current_count = ( $batch_count * $batch_size ) + $loop_count;
@@ -272,6 +282,11 @@ function venuecheck_check_venues() {
 				$eventOffsetEnd = 'PT' . $event_recurrence['eventOffsetEnd'] . 'M';
 				$endA->add( new DateInterval( $eventOffsetEnd ) );
 			}
+
+			if ( WP_DEBUG ) {
+				error_log( '* * Venue Check event recurrence: ' . $event_recurrence['eventStart'] . ' to ' . $event_recurrence['eventEnd'] );
+			}
+
 			//upcoming event dates
 			foreach ( $upcomingEvents as $k => $upcomingEvent ) {
 				if ( ! empty( $upcomingEvent->_EventTimezone ) ) {
@@ -293,6 +308,11 @@ function venuecheck_check_venues() {
 					$eventOffsetEnd = 'PT' . $upcomingEvent->_venuecheck_event_offset_end . 'M';
 					$endB->add( new DateInterval( $eventOffsetEnd ) );
 				}
+
+				if ( WP_DEBUG ) {
+					error_log( '* * * Upcoming event ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
+				}
+
 				//compare dates to find conflicts
 				if ( $startA < $endB && $endA > $startB ) {
 					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
@@ -301,6 +321,7 @@ function venuecheck_check_venues() {
 						$venuecheck_eventDisplay .= ' &ndash; ';
 						$venuecheck_eventDisplay .= $endB->format( 'g:i a m/d/Y T' );
 						$EventVenueTitle          = get_the_title( $EventVenueID );
+						$venuecheck_conflicts[ $EventVenueID ]['events'] = array();
 						if ( $EventVenueTitle ) {
 							$venuecheck_conflicts[ $EventVenueID ]['venueID']    = $EventVenueID;
 							$venuecheck_conflicts[ $EventVenueID ]['venueTitle'] = $EventVenueTitle;
@@ -326,6 +347,12 @@ function venuecheck_check_venues() {
 				}
 			);
 		}
+
+		if ( WP_DEBUG ) {
+			error_log( '* Venuecheck batch done.' );
+			error_log( '**********************************************************************************' );
+		}
+
 		echo wp_json_encode( $venuecheck_conflicts );
 	}
 	wp_die();
