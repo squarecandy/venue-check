@@ -184,13 +184,14 @@ function venuecheck_get_event_recurrences() {
 	}
 }
 
-function venuecheck_check_venues() {
 
-	// Check for nonce security
-	if ( ! wp_verify_nonce( $_POST['nonce'], 'venuecheck-nonce' ) ) {
-		echo wp_json_encode( array( 'error' => 'error: wordpress nonce security check failed - ' . $_POST['nonce'] ) );
-		die();
-	}
+/**
+ * Internal function to get upcoming events 
+ * so we can check if they overlap with the event being edited
+ * @TODO: currently we're getting all events starting after "now"
+ * however we should be getting all events ENDING after now to avoid missing long events that have already started
+ */
+function venuecheck_get_upcoming_events() {
 
 	//get all upcoming events
 	$now  = wp_date( 'Y-m-d ' ) . '00:00:01';
@@ -222,6 +223,68 @@ function venuecheck_check_venues() {
 
 	$upcomingEvents = new WP_Query( $args );
 	$upcomingEvents = $upcomingEvents->get_posts();
+	return $upcomingEvents;
+
+}
+
+
+/**
+ * Calculate the padded start & end times for an event
+ *
+ * @param array|object $event with start/end date and start/end offset
+ * @param string $imezone
+ * @return array|false False on failure.
+ *      $OffsetStart DateTime object
+ *      $OffsetStart DateTime object                    
+ */
+function venuecheck_get_offset_dates( $event, $timezone ) {
+
+	if ( is_object( $event ) ) {
+		$start_date   = $event->_EventStartDate;
+		$end_date     = $event->_EventEndDate;
+		$offset_start = $event->_venuecheck_event_offset_start;
+		$offset_end   = $event->_venuecheck_event_offset_end;
+	} elseif ( is_array( $event ) ) {
+		$start_date        = $event['eventStart'];
+		$end_date          = $event['eventEnd'];
+		$offset_start = $event['eventOffsetStart'];
+		$offset_end   = $event['eventOffsetEnd'];
+	} else {
+		return;
+	}
+
+	$start = new DateTime( $start_date, new DateTimeZone( $timezone ) );
+	$end   = new DateTime( $end_date, new DateTimeZone( $timezone ) );
+
+	// subtract offset from start (a.k.a "setup time")
+	if ( ! empty( $offset_start ) ) {
+		$eventOffsetStart = 'PT' . $offset_start . 'M';
+		$start->sub( new DateInterval( $eventOffsetStart ) );
+	}
+	// add offset to end (a.k.a. "cleanup time")
+	if ( ! empty( $offset_end ) ) {
+		$eventOffsetEnd = 'PT' . $offset_end . 'M';
+		$end->add( new DateInterval( $eventOffsetEnd ) );
+	}
+
+	$offset_array = array(
+		'OffsetStart' => $start,
+		'OffsetEnd'   => $end,
+	);
+
+	return $offset_array;
+
+}
+
+function venuecheck_check_venues() {
+
+	// Check for nonce security
+	if ( ! wp_verify_nonce( $_POST['nonce'], 'venuecheck-nonce' ) ) {
+		echo wp_json_encode( array( 'error' => 'error: wordpress nonce security check failed - ' . $_POST['nonce'] ) );
+		die();
+	}
+
+	$upcomingEvents = venuecheck_get_upcoming_events();
 	//end events query
 
 	if ( WP_DEBUG ) {
@@ -269,19 +332,9 @@ function venuecheck_check_venues() {
 			$current_count = ( $batch_count * $batch_size ) + $loop_count;
 			$timezone      = $event_recurrence['eventTimezone'];
 
-			$startA = new DateTime( $event_recurrence['eventStart'], new DateTimeZone( $timezone ) );
-			$endA   = new DateTime( $event_recurrence['eventEnd'], new DateTimeZone( $timezone ) );
-
-			// subtract offset from start (a.k.a "setup time")
-			if ( ! empty( $event_recurrence['eventOffsetStart'] ) ) {
-				$eventOffsetStart = 'PT' . $event_recurrence['eventOffsetStart'] . 'M';
-				$startA->sub( new DateInterval( $eventOffsetStart ) );
-			}
-			// add offset to end (a.k.a. "cleanup time")
-			if ( ! empty( $event_recurrence['eventOffsetEnd'] ) ) {
-				$eventOffsetEnd = 'PT' . $event_recurrence['eventOffsetEnd'] . 'M';
-				$endA->add( new DateInterval( $eventOffsetEnd ) );
-			}
+			$offsetDatesA = venuecheck_get_offset_dates( $event_recurrence, $timezone );
+			$startA       = $offsetDatesA['OffsetStart'];
+			$endA         = $offsetDatesA['OffsetEnd'];
 
 			if ( WP_DEBUG ) {
 				error_log( '* * Venue Check event recurrence: ' . $event_recurrence['eventStart'] . ' to ' . $event_recurrence['eventEnd'] );
@@ -295,43 +348,43 @@ function venuecheck_check_venues() {
 					$timezone = $defaultTimezone;
 				}
 
-				$startB = new DateTime( $upcomingEvent->_EventStartDate, new DateTimeZone( $timezone ) );
-				$endB   = new DateTime( $upcomingEvent->_EventEndDate, new DateTimeZone( $timezone ) );
-
-				//subtract offset from start
-				if ( ! empty( $upcomingEvent->_venuecheck_event_offset_start ) ) {
-					$eventOffsetStart = 'PT' . $upcomingEvent->_venuecheck_event_offset_start . 'M';
-					$startB->sub( new DateInterval( $eventOffsetStart ) );
-				}
-				//add offset to end
-				if ( ! empty( $upcomingEvent->_venuecheck_event_offset_end ) ) {
-					$eventOffsetEnd = 'PT' . $upcomingEvent->_venuecheck_event_offset_end . 'M';
-					$endB->add( new DateInterval( $eventOffsetEnd ) );
-				}
+				$offsetDatesB = venuecheck_get_offset_dates( $upcomingEvent, $timezone );
+				$startB       = $offsetDatesB['OffsetStart'];
+				$endB         = $offsetDatesB['OffsetEnd'];
 
 				if ( WP_DEBUG ) {
-					error_log( '* * * Upcoming event ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
+					error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
 				}
 
-				//compare dates to find conflicts
+				// compare dates to find conflicts
 				if ( $startA < $endB && $endA > $startB ) {
+
+					// check that the upcoming event isn't our event, or a recurrence of our event
 					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
+
 						$EventVenueID             = (int) $upcomingEvent->_EventVenueID;
+						$EventVenueTitle          = get_the_title( $EventVenueID );
+
 						$venuecheck_eventDisplay  = $startB->format( 'm/d/Y g:i a' );
 						$venuecheck_eventDisplay .= ' &ndash; ';
 						$venuecheck_eventDisplay .= $endB->format( 'g:i a m/d/Y T' );
-						$EventVenueTitle          = get_the_title( $EventVenueID );
-						$venuecheck_conflicts[ $EventVenueID ]['events'] = array();
+						
 						if ( $EventVenueTitle ) {
+							// add id & title to index for the venue id ( it may already exist, but id/title shouldn't change, so that's ok )
 							$venuecheck_conflicts[ $EventVenueID ]['venueID']    = $EventVenueID;
 							$venuecheck_conflicts[ $EventVenueID ]['venueTitle'] = $EventVenueTitle;
+
+							// add this event to an array of events for this venue
 							$venuecheck_conflicts[ $EventVenueID ]['events'][]   = array(
 								'eventLink'  => get_edit_post_link( $upcomingEvent->ID ),
 								'eventTitle' => $upcomingEvent->post_title,
 								'eventDate'  => $venuecheck_eventDisplay,
 							);
 						}
-						$venuecheck_conflicts[ $EventVenueID ]['events'] = array_unique( $venuecheck_conflicts[ $EventVenueID ]['events'], SORT_REGULAR );
+						// if we've added to the array of events, or it already exists, filter out duplicates ( we might have flagged them as conflicting with an earlier recurrence? )
+						if ( isset( $venuecheck_conflicts[ $EventVenueID ]['events'] ) ) {
+							$venuecheck_conflicts[ $EventVenueID ]['events'] = array_unique( $venuecheck_conflicts[ $EventVenueID ]['events'], SORT_REGULAR );
+						}						
 					}
 				}
 			} //end foreach $upcomingEvents
@@ -350,7 +403,7 @@ function venuecheck_check_venues() {
 
 		if ( WP_DEBUG ) {
 			error_log( '* Venuecheck batch done.' );
-			error_log( '**********************************************************************************' );
+			error_log( '**************************************************************************' );
 		}
 
 		echo wp_json_encode( $venuecheck_conflicts );
