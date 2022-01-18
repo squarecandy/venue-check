@@ -7,7 +7,6 @@ jQuery( function( $ ) {
 		progress: null, // for progress bar percentage
 		venueSelect: '#saved_tribe_venue',
 		init() {
-
 			window.addEventListener( 'load', ( e ) => {
 				if ( venuecheck.debug ) console.log( 'load event fire', e );
 
@@ -508,8 +507,6 @@ jQuery( function( $ ) {
 
 				// reset all options to enabled by default before we loop through.
 				$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
-				const venuecheckAdditionalVenueFieldId = '#acf-' + window.venuecheck.additional_venue_settings.acf_field_key;
-				$( venuecheckAdditionalVenueFieldId + ' option' ).removeAttr( 'disabled' );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
