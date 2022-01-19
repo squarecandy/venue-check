@@ -4,6 +4,8 @@
 define( 'VENUE_CHECK_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
 
+// ACF Options page for this theme
+require VENUE_CHECK_DIR_PATH . '/inc/class-venue-conflicts.php';
 
 function venuecheck_scripts_styles( $hook ) {
 	global $post_type;
