@@ -69,6 +69,15 @@ function prefix_disable_gutenberg( $current_status, $post_type ) {
 }
 
 
+add_filter( 'venuecheck_upcoming_events_meta', 'venue_check_sqc_multi_venue_meta' );
+function venue_check_sqc_multi_venue_meta( $meta_pivot ){
+	if ( class_exists( 'SQC_Multi_Venue' ) && SQC_Multi_Venue::is_enabled() ) {
+		$meta_pivot['multiVenue'] = SQC_Multi_Venue::get_field_name();
+	}
+	return $meta_pivot;
+}
+
+
 function venuecheck_get_event_recurrences() {
 
 	// Check for nonce security
@@ -340,12 +349,23 @@ function venuecheck_get_upcoming_events() {
 			//METHOD 2b, sql, use mysql pivot technique to ouput an object with the postmeta we need, withdate check
 
 			$now  = wp_date( 'Y-m-d ' ) . '00:00:01';
-			$pivot_meta = array( '_EventTimezone', '_EventStartDate', '_EventEndDate', '_venuecheck_event_offset_start', '_venuecheck_event_offset_end', '_EventVenueID' );
+			$pivot_meta = array( 
+				// column name                   => meta_key
+				'_EventTimezone'                 => '_EventTimezone',
+				'_EventStartDate'                => '_EventStartDate',
+				'_EventEndDate'                  => '_EventEndDate',
+				'_venuecheck_event_offset_start' => '_venuecheck_event_offset_start',
+				'_venuecheck_event_offset_end'   => '_venuecheck_event_offset_end',
+				'_EventVenueID'                  => '_EventVenueID',
+				'multiVenue'                     => 'multiVenue',
+			);
+
+			$pivot_meta = apply_filters( 'venuecheck_upcoming_events_meta', $pivot_meta );
 			$pivot_meta_case = array();
 			foreach ($pivot_meta as $key => $meta_key) {
-				$pivot_meta_case[] = "MAX(CASE WHEN m.meta_key='$meta_key' then m.meta_value end) $meta_key";
+				$pivot_meta_case[] = "MAX(CASE WHEN m.meta_key='$meta_key' then m.meta_value end) $key";
 			}
-			$pivot_meta = implode( "', '", $pivot_meta );
+			$pivot_meta = implode( "', '", array_values( $pivot_meta ) );
 			$pivot_meta_case = implode( ', ', $pivot_meta_case );
 			$pivot_sql = "SELECT p.ID, p.post_parent, p.post_title, q.* FROM $wpdb->posts p JOIN ( SELECT m.post_id, $pivot_meta_case FROM $wpdb->postmeta m WHERE m.meta_key IN ( '$pivot_meta' )  GROUP by post_id ) q ON p.ID = q.post_id AND p.post_type = 'tribe_events' AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') AND q._EventStartDate >= '$now'";
 
@@ -516,7 +536,7 @@ function venuecheck_check_venues() {
 				$endB         = $offsetDatesB['OffsetEnd'];
 
 				if ( WP_DEBUG ) {
-					error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
+					//error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
 				}
 
 				// compare dates to find conflicts
@@ -525,8 +545,17 @@ function venuecheck_check_venues() {
 					// check that the upcoming event isn't our event, or a recurrence of our event
 					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
 
-						$EventVenueID = (int) $upcomingEvent->_EventVenueID;
-						$venuecheck_conflicts->add_venue( $upcomingEvent, $startB, $endB, $EventVenueID );
+						if ( WP_DEBUG ) {
+							error_log( '* * * * * MULTIVENUE ' . $upcomingEvent->multiVenue );
+							error_log( print_r( maybe_unserialize( $upcomingEvent->multiVenue ),true) );
+						}
+
+						$venues = $upcomingEvent->multiVenue ? maybe_unserialize( $upcomingEvent->multiVenue ) : array( $upcomingEvent->_EventVenueID );
+
+						foreach ( $venues as $venue_id ) {
+							$EventVenueID = (int) $venue_id;
+							$venuecheck_conflicts->add_venue( $upcomingEvent, $startB, $endB, $EventVenueID );
+						}
 		
 					}
 				}

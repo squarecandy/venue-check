@@ -47,29 +47,16 @@ class Venue_Conflicts {
 					// if the parent event of the recurring series preceded us, it wouldn't have triggered the above check, so flag it as first
 					if ( isset( $this->conflicts[ $EventVenueID ]['events'][ $event->post_parent ] ) ) {
 						$this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] = $event->post_parent;
-						$this->conflicts[ $EventVenueID ]['events'][ $event->post_parent ]['recurrence'] = tribe_get_recurrence_text( $event->post_parent );
+						$parent_key = array_search( $event->post_parent, array_column( $this->conflicts[ $EventVenueID ]['events'], 'eventID' ) );
+						$this->conflicts[ $EventVenueID ]['events'][ $parent_key ]['recurrence'] = tribe_get_recurrence_text( $event->post_parent );
 					} else {
 						$this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] = $event->ID;
 						$event_item['recurrence'] = tribe_get_recurrence_text( $event->post_parent );
 					}
 				}
-				
-				// and add this event to the parents array
-				$this->parents[ $EventVenueID ][ $event->post_parent ]['events'][ $event->ID ] = $event->ID;
-
-				error_log( '* * * series count ' . count( $this->parents[ $EventVenueID ][ $event->post_parent ]['events'] ) );
-				// if we're over the max events to show, we're going to hide the subsequent recurrences
-				/*if ( count( $this->parents[ $EventVenueID ][ $event->post_parent ] ) > $this->max_recurring_events_to_show ) {
-					error_log( '* * * over max, add extra first flag to ' . $this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] );
-					//$first_recurring_event = $this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'];
-					//$this->conflicts[ $EventVenueID ]['events'][ $first_recurring_event ]['eventDate'] .= ' ' . tribe_get_recurrence_text( $event->post_parent );
-
-					$event_item['recurrence'] = 'recurring hide';
-
-				}*/
 			}
 
-			$this->conflicts[ $EventVenueID ]['events'][ $event->ID ] = $event_item;
+			$this->conflicts[ $EventVenueID ]['events'][] = $event_item;
 		}
 		// if we've added to the array of events, or it already exists, filter out duplicates ( we might have flagged them as conflicting with an earlier recurrence? )
 		if ( isset( $this->conflicts[ $EventVenueID ]['events'] ) ) {
