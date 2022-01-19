@@ -78,6 +78,12 @@ select.readonly + .select2-container {
 	}
 }
 
+#venuecheck-venue-select .tribe-dropdown,
+#venuecheck-venue-select .select2-container {
+	width: 75% !important;
+	font-size: 14px;
+}
+
 .tribe-dropdown .disabled {
 	opacity: 1;
 }
@@ -212,19 +218,23 @@ table#venuecheck-offsets {
 	border: 0;
 }
 
-#venuecheck-venue-select {
-	margin: 0 0 10px 0;
-}
-
-.venuecheck-section tr:nth-child(2) td {
-	position: relative;
-	padding: 10px 0 0 0;
+.venuecheck-section tr {
 	background-color: #f4fdef;
 }
 
-.venuecheck-section tr:nth-child(2) td.saved-venue-table-cell {
-	padding: 10px 0 0 10px;
+.venuecheck-section tr td {
+	position: relative;
+	padding: 10px 10px 10px 0;
+}
+
+.venuecheck-section tr td:first-child {
+	width: 20%;
+	padding: 10px 0 10px 10px;
 	vertical-align: top;
+}
+
+#venuecheck-conflicts-report-count {
+	padding: 0;
 }
 
 #venuecheck-offsets .venuecheck-section tr td.venuecheck-section-label,
@@ -350,5 +360,66 @@ table#venuecheck-offsets {
 
 	100% {
 		background-position: -60px 0;
+	}
+}
+
+#venuecheck-additional-venues {
+
+	.acf-postbox {
+		width: 75%;
+		margin: 0;
+
+		select,
+		.wp-core-ui select:hover {
+			color: #444;
+		}
+
+		select option {
+			padding: 6px;
+			font-size: 13px;
+		}
+	}
+
+	.acf-fields > .acf-field {
+		padding: 0 12px;
+	}
+
+	.acf-field .acf-label {
+		margin: 0;
+	}
+
+	.select2-container.-acf .select2-selection { /* stylelint-disable-line selector-class-pattern */
+		border-color: #aaa;
+	}
+
+	.select2-selection__rendered {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		font-size: 14px;
+	}
+
+}
+
+#select2-acf-field_61dgdie0eee3e-results .select2-results__option,
+#select2-acf-field_61dgdie0eee3e-results .select2-results__option--highlighted[aria-selected] {
+	color: #222;
+}
+
+#select2-acf-field_61dgdie0eee3e-results .select2-results__option[aria-disabled="true"],
+#venuecheck-additional-venues select option:disabled {
+	color: #222;
+	text-decoration: line-through;
+	background-color: #bbb;
+}
+
+#venuecheck-venue-select {
+
+	span.select2.select2-container.select2-container--default {
+
+		&.select2-container--below.select2-container--open,
+		&.select2-container--below {
+			min-width: 300px;
+		}
 	}
 }

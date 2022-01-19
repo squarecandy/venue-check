@@ -1,7 +1,7 @@
 <?php
 class Venue_Conflicts {
 
-	public $conflicts = array()
+	public $conflicts = array();
 
 	public function add_venue( $event, $start, $end, $venue_id ) {
 		$EventVenueID             = $venue_id;
@@ -25,7 +25,7 @@ class Venue_Conflicts {
 		}
 		// if we've added to the array of events, or it already exists, filter out duplicates ( we might have flagged them as conflicting with an earlier recurrence? )
 		if ( isset( $this->conflicts[ $EventVenueID ]['events'] ) ) {
-			$this->conflicts[ $EventVenueID ]['events'] = array_unique( $venuecheck_conflicts[ $EventVenueID ]['events'], SORT_REGULAR );
+			$this->conflicts[ $EventVenueID ]['events'] = array_unique( $this->conflicts[ $EventVenueID ]['events'], SORT_REGULAR );
 		}
 	}
 

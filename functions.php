@@ -20,17 +20,24 @@ function venuecheck_scripts_styles( $hook ) {
 		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.2.4', true );
 	}
 
-	/* LOCALIZE AJAX URL */
-	wp_localize_script(
-		'venuecheck-scripts',
-		'venuecheck',
-		array(
-			'ajax_url'    => admin_url( 'admin-ajax.php' ),
-			'nonce'       => wp_create_nonce( 'venuecheck-nonce' ),
-			'plugins_url' => plugin_dir_url( __FILE__ ),
-			'debug'       => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
-		)
+	$localization = array(
+		'ajax_url'    => admin_url( 'admin-ajax.php' ),
+		'nonce'       => wp_create_nonce( 'venuecheck-nonce' ),
+		'plugins_url' => plugin_dir_url( __FILE__ ),
+		'debug'       => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
+		'multivenue'  => false,
 	);
+
+	if ( class_exists( 'SQC_Multi_Venue' ) && SQC_Multi_Venue::is_enabled() ) {
+		$localization['multivenue']  = true;
+		$localization['fieldkey']   = SQC_Multi_Venue::get_field_key();
+		$localization['field_group'] = SQC_Multi_Venue::get_group_key();
+		$localization['container_id'] = '#multi-venue-container';
+		$localization['use_tec_fields'] = false; 
+	}
+
+	/* LOCALIZE AJAX URL */
+	wp_localize_script( 'venuecheck-scripts', 'venuecheck', $localization );
 
 	/* REGISTER CSS */
 	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.2.4' );
