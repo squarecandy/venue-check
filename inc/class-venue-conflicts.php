@@ -2,26 +2,74 @@
 class Venue_Conflicts {
 
 	public $conflicts = array();
+	private $max_recurring_events_to_show = 1;
+	public $parents = array();
 
 	public function add_venue( $event, $start, $end, $venue_id ) {
 		$EventVenueID             = $venue_id;
 		$EventVenueTitle          = get_the_title( $EventVenueID );
 
-		$venuecheck_eventDisplay  = $start->format( 'm/d/Y g:i a' );
+		$startDay = $start->format( 'm/d/Y' );
+		$endDay   = $end->format( 'm/d/Y' );
+
+		$venuecheck_eventDisplay  = $startDay . ' ' . $start->format( 'g:i a' );
 		$venuecheck_eventDisplay .= ' &ndash; ';
-		$venuecheck_eventDisplay .= $end->format( 'g:i a m/d/Y T' );
+		$venuecheck_eventDisplay .= $end->format( 'g:i a' );
+		if ( $startDay != $endDay ) {
+			$venuecheck_eventDisplay .= ' ' . $endDay;
+		}
+		$venuecheck_eventDisplay .= $end->format( ' T' );
 		
 		if ( $EventVenueTitle ) {
 			// add id & title to index for the venue id ( it may already exist, but id/title shouldn't change, so that's ok )
 			$this->conflicts[ $EventVenueID ]['venueID']    = $EventVenueID;
 			$this->conflicts[ $EventVenueID ]['venueTitle'] = $EventVenueTitle;
 
-			// add this event to an array of events for this venue
-			$this->conflicts[ $EventVenueID ]['events'][]   = array(
-				'eventLink'  => get_edit_post_link( $event->ID ),
-				'eventTitle' => $event->post_title,
-				'eventDate'  => $venuecheck_eventDisplay,
+			// set up and add this event to an array of events for this venue
+			$event_item = array(
+				'eventID'     => $event->ID,
+				'eventLink'   => get_edit_post_link( $event->ID ),
+				'eventTitle'  => $event->post_title,
+				'eventDate'   => $venuecheck_eventDisplay,
+				'eventParent' => $event->post_parent,
+				'eventClass'  => '',
+				'recurrence'  => '',
 			);
+			
+			// if this is a recurring event
+			if ( $event->post_parent ) {
+				error_log( $event->ID . ' is recurring ' );
+				$event_item['eventClass'] = 'recurring';
+				
+				// if this is the first of this series that we are processing, flag that in the parents array
+				if ( ! isset( $this->parents[ $EventVenueID ][ $event->post_parent ] ) ) {
+					error_log( '* * * is first in series ' );
+					// if the parent event of the recurring series preceded us, it wouldn't have triggered the above check, so flag it as first
+					if ( isset( $this->conflicts[ $EventVenueID ]['events'][ $event->post_parent ] ) ) {
+						$this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] = $event->post_parent;
+						$this->conflicts[ $EventVenueID ]['events'][ $event->post_parent ]['recurrence'] = tribe_get_recurrence_text( $event->post_parent );
+					} else {
+						$this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] = $event->ID;
+						$event_item['recurrence'] = tribe_get_recurrence_text( $event->post_parent );
+					}
+				}
+				
+				// and add this event to the parents array
+				$this->parents[ $EventVenueID ][ $event->post_parent ]['events'][ $event->ID ] = $event->ID;
+
+				error_log( '* * * series count ' . count( $this->parents[ $EventVenueID ][ $event->post_parent ]['events'] ) );
+				// if we're over the max events to show, we're going to hide the subsequent recurrences
+				/*if ( count( $this->parents[ $EventVenueID ][ $event->post_parent ] ) > $this->max_recurring_events_to_show ) {
+					error_log( '* * * over max, add extra first flag to ' . $this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] );
+					//$first_recurring_event = $this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'];
+					//$this->conflicts[ $EventVenueID ]['events'][ $first_recurring_event ]['eventDate'] .= ' ' . tribe_get_recurrence_text( $event->post_parent );
+
+					$event_item['recurrence'] = 'recurring hide';
+
+				}*/
+			}
+
+			$this->conflicts[ $EventVenueID ]['events'][ $event->ID ] = $event_item;
 		}
 		// if we've added to the array of events, or it already exists, filter out duplicates ( we might have flagged them as conflicting with an earlier recurrence? )
 		if ( isset( $this->conflicts[ $EventVenueID ]['events'] ) ) {

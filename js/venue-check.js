@@ -565,6 +565,9 @@ jQuery( function( $ ) {
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
 
+					const eventList = [];
+					const parentList = [];
+
 					// disable the option
 					$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
 						.attr( 'disabled', 'disabled' )
@@ -577,15 +580,39 @@ jQuery( function( $ ) {
 						'</td></tr></thead>';
 					venuecheck_venue_report +=
 						'<thead class="venuecheck-conflicts-report-venue-heading"><tr><td>Date</td><td>Event</td></tr></thead><tbody>';
+
+					// loop through events attached to a venue
 					$.each( venue.events, function( index2, event ) {
-						venuecheck_venue_report +=
-							'<tr><td class="venuecheck-conflicts-report-venue-date">' +
-							event.eventDate +
-							'</td><td class="venuecheck-conflicts-report-venue-event"><a href="' +
-							event.eventLink +
-							'" target="_blank" class="venuecheck-report-link"><span>' +
-							event.eventTitle +
-							'</span><i class="fas fa-external-link-alt" aria-hidden="true"></i></a></td></tr>';
+						// in extreme edge cases we could end up with duplicate events due to recurrence & batchin, so filter for those
+						console.log( 'eventList', eventList );
+						console.log( 'parentList', parentList );
+						console.log( 'includes ' + event.eventParent, parentList.includes( event.eventParent ) );
+						let recurrenceText = '';
+						let prefixIcon = '';
+						if ( ! eventList.includes( event.eventID ) ) {
+							eventList.push( event.eventID );
+
+							if ( event.recurrence && ! parentList.includes( event.eventParent ) ) {
+								recurrenceText = '<span class="recurrence">' + event.recurrence + '</span>';
+								event.eventClass = 'recurring first';
+								parentList.push( event.eventParent );
+								prefixIcon = '<i class="fa-sync-alt fas" aria-hidden="true"></i>';
+							}
+
+							venuecheck_venue_report +=
+								'<tr class="' +
+								event.eventClass +
+								'"><td class="venuecheck-conflicts-report-venue-date">' +
+								prefixIcon +
+								event.eventDate +
+								'</td><td class="venuecheck-conflicts-report-venue-event"><a href="' +
+								event.eventLink +
+								'" target="_blank" class="venuecheck-report-link"><span class="name">' +
+								event.eventTitle +
+								'</span><i class="fas fa-external-link-alt" aria-hidden="true"></i></a>' +
+								recurrenceText +
+								'</td></tr>';
+						}
 					} );
 				} );
 
@@ -619,6 +646,13 @@ jQuery( function( $ ) {
 				$( '#venuecheck-conflicts-report-link' ).html(
 					$( '#venuecheck-conflicts-report-link' ).text() === 'Show Details' ? 'Hide Details' : 'Show Details'
 				);
+			} );
+
+			$( '.venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas' ).on( 'click', function() {
+				$( this )
+					.parents( '#venuecheck-conflicts-report-table tbody' )
+					.find( 'tr.recurring:not(.first)' )
+					.toggle();
 			} );
 
 			$( '#venuecheck-venue-select' ).show();

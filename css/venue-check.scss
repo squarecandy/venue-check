@@ -116,49 +116,70 @@ select.readonly + .select2-container {
 #venuecheck-conflicts-report-table {
 	width: 100%;
 	border-collapse: collapse;
-}
 
-#venuecheck-conflicts-report-table td {
-	padding: 3px 5px;
-	vertical-align: top;
-	background: #fff;
-}
+	.venuecheck-conflicts-report-venue-title {
+		border-top: 15px solid #fff;
 
-#venuecheck-conflicts-report-table tr {
-	border-bottom: 1px solid #ccc;
-}
+		td {
+			margin-top: 15px;
+			color: #fff;
+			font-weight: 400;
+			background-color: #444;
+		}
+	}
 
-#venuecheck-conflicts-report-table tr:last-child {
-	border-bottom: none;
-}
+	.venuecheck-conflicts-report-venue-heading td {
+		background-color: #ddd;
+		border-bottom: 1px solid #444;
+	}
 
-#venuecheck-conflicts-report-table thead {
-	font-weight: 700;
-}
+	thead {
+		font-weight: 700;
+	}
 
-#venuecheck-conflicts-report-table .venuecheck-conflicts-report-venue-title {
-	border-top: 15px solid #fff;
-}
+	tr:last-child {
+		border-bottom: none;
+	}
 
-#venuecheck-conflicts-report-table .venuecheck-conflicts-report-venue-title td {
-	margin-top: 15px;
-	color: #fff;
-	font-weight: 400;
-	background-color: #444;
-}
+	tr:not(:first-child) {
+		border-top: 1px solid #ccc;
+	}
 
-#venuecheck-conflicts-report-table .venuecheck-conflicts-report-venue-heading td {
-	background-color: #ddd;
-	border-bottom: 1px solid #444;
-}
+	tr.recurring:not(.first) {
+		display: none;
+	}
 
-#venuecheck-conflicts-report-table .venuecheck-conflicts-report-venue-date,
-#venuecheck-conflicts-report-table .venuecheck-conflicts-report-venue-event {
-	background: transparent;
-}
+	td {
+		padding: 3px 5px;
+		vertical-align: top;
+		background: #fff;
+	}
 
-#venuecheck-conflicts-report-table .venuecheck-conflicts-report-venue-date {
-	white-space: nowrap;
+	.venuecheck-conflicts-report-venue-date,
+	.venuecheck-conflicts-report-venue-event {
+		background: transparent;
+	}
+
+	.venuecheck-conflicts-report-venue-date {
+		white-space: nowrap;
+	}
+
+	.venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas {
+		margin-right: 5px;
+		color: #0973aa;
+		cursor: pointer;
+	}
+
+	span.recurrence {
+		display: block;
+		color: #3c434a;
+		font-style: italic;
+		text-decoration: none;
+
+		p {
+			display: inline;
+		}
+	}
 }
 
 #venuecheck-modified-publish.notice,
@@ -423,3 +444,4 @@ table#venuecheck-offsets {
 		}
 	}
 }
+
