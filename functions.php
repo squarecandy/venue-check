@@ -445,7 +445,7 @@ function venuecheck_check_venues() {
 		error_log( 'Venue Check upcoming events: ' . count( $upcomingEvents ) );
 	}
 
-	$venuecheck_conflicts = array();
+	$venuecheck_conflicts = new Venue_Conflicts;
 
 	$defaultTimezone = get_option( 'timezone_string' );
 
@@ -490,6 +490,7 @@ function venuecheck_check_venues() {
 			$endA         = $offsetDatesA['OffsetEnd'];
 
 			if ( WP_DEBUG ) {
+				error_log( '*********************************' );
 				error_log( '* * Venue Check event recurrence: ' . $event_recurrence['eventStart'] . ' to ' . $event_recurrence['eventEnd'] );
 			}
 
@@ -515,51 +516,24 @@ function venuecheck_check_venues() {
 					// check that the upcoming event isn't our event, or a recurrence of our event
 					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
 
-						$EventVenueID             = (int) $upcomingEvent->_EventVenueID;
-						$EventVenueTitle          = get_the_title( $EventVenueID );
-
-						$venuecheck_eventDisplay  = $startB->format( 'm/d/Y g:i a' );
-						$venuecheck_eventDisplay .= ' &ndash; ';
-						$venuecheck_eventDisplay .= $endB->format( 'g:i a m/d/Y T' );
-						
-						if ( $EventVenueTitle ) {
-							// add id & title to index for the venue id ( it may already exist, but id/title shouldn't change, so that's ok )
-							$venuecheck_conflicts[ $EventVenueID ]['venueID']    = $EventVenueID;
-							$venuecheck_conflicts[ $EventVenueID ]['venueTitle'] = $EventVenueTitle;
-
-							// add this event to an array of events for this venue
-							$venuecheck_conflicts[ $EventVenueID ]['events'][]   = array(
-								'eventLink'  => get_edit_post_link( $upcomingEvent->ID ),
-								'eventTitle' => $upcomingEvent->post_title,
-								'eventDate'  => $venuecheck_eventDisplay,
-							);
-						}
-						// if we've added to the array of events, or it already exists, filter out duplicates ( we might have flagged them as conflicting with an earlier recurrence? )
-						if ( isset( $venuecheck_conflicts[ $EventVenueID ]['events'] ) ) {
-							$venuecheck_conflicts[ $EventVenueID ]['events'] = array_unique( $venuecheck_conflicts[ $EventVenueID ]['events'], SORT_REGULAR );
-						}						
+						$EventVenueID = (int) $upcomingEvent->_EventVenueID;
+						$venuecheck_conflicts->add_venue( $upcomingEvent, $startB, $endB, $EventVenueID );
+		
 					}
 				}
 			} //end foreach $upcomingEvents
 		} //end foreach $event_recurrences
-		$venuecheck_conflicts = array_map( 'array_filter', $venuecheck_conflicts ); //remove empty array elements
-		$venuecheck_conflicts = array_filter( $venuecheck_conflicts ); //remove empty array elements
-		//sort by venue title
-		if ( ! empty( $venuecheck_conflicts ) ) {
-			usort(
-				$venuecheck_conflicts,
-				function ( $a, $b ) {
-					return strcmp( strtolower( $a['venueTitle'] ), strtolower( $b['venueTitle'] ) );
-				}
-			);
-		}
+
+		$venuecheck_conflicts->filter();
 
 		if ( WP_DEBUG ) {
 			error_log( '* Venuecheck batch done.' );
 			error_log( '**************************************************************************' );
+			error_log( '**************************************************************************' );
+			error_log( print_r($venuecheck_conflicts,true) );
 		}
 
-		echo wp_json_encode( $venuecheck_conflicts );
+		echo wp_json_encode( $venuecheck_conflicts->conflicts );
 	}
 	wp_die();
 }
