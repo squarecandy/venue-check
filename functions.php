@@ -466,7 +466,8 @@ function venuecheck_check_venues() {
 		die();
 	}
 
-	$upcomingEvents = venuecheck_get_upcoming_events();
+	//$upcomingEvents = venuecheck_get_upcoming_events();
+	$upcomingEvents = get_cached_upcoming_events();
 	//end events query
 
 	if ( WP_DEBUG ) {
@@ -535,12 +536,12 @@ function venuecheck_check_venues() {
 				$startB       = $offsetDatesB['OffsetStart'];
 				$endB         = $offsetDatesB['OffsetEnd'];
 
-				if ( WP_DEBUG ) {
-					//error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
-				}
-
 				// compare dates to find conflicts
 				if ( $startA < $endB && $endA > $startB ) {
+
+					if ( WP_DEBUG ) {
+						error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
+					}
 
 					// check that the upcoming event isn't our event, or a recurrence of our event
 					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
@@ -704,6 +705,39 @@ function venue_check_gu_override_dot_org() {
 	return array( 'venue-check/plugin.php' );
 }
 
+
+function get_cached_upcoming_events(){
+
+
+	// Record the start time before the query is executed.
+	$started = microtime(true);
+	$mem_baseline = print_mem( 'PRE CACHE CHECK' );
+
+	$cache    = tribe( 'cache' );
+	$u_events = $cache->get_transient( 'venue_check_upcoming_events', 'save_post' );
+	if ( is_array( $u_events ) ) {
+		error_log('USING CACHE');
+		//Print out the seconds it took for the query to execute.
+		print_mem( 'POST QUERY', $mem_baseline );	//Record the end time after the query has finished running.
+		$end = microtime(true);
+
+		//Calculate the difference in microseconds.
+		$difference = $end - $started;
+
+		//Format the time so that it only shows 10 decimal places.
+		$queryTime = number_format($difference, 10);
+		error_log( "SQL: $queryTime seconds. Returned " . count($u_events) . ' rows.');
+		return $u_events;
+	} 
+
+	$u_events = venuecheck_get_upcoming_events();
+	error_log('SETTING CACHE');
+	$cache->set_transient( 'venue_check_upcoming_events', $u_events, Tribe__Cache::NO_EXPIRATION, 'save_post' );
+	error_log(print_r($cache->get_transient( 'venue_check_upcoming_events', 'save_post' ),true));
+
+
+	return $u_events;
+}
 
 
 function print_mem( $message, $compare = array() ) {
