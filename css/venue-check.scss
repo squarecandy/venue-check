@@ -179,7 +179,7 @@ select.readonly + .select2-container {
 }
 
 #venuecheck-modified-publish.notice,
-#tribe_events_event_details.venuecheck-update .notice {
+#tribe_events_event_details.venuecheck-updated .notice {
 	display: inline-block;
 	margin: 0 10px 10px 0;
 	padding: 10px 15px;
@@ -223,7 +223,8 @@ table.venuecheck {
 }
 
 table#event_tribe_venue,
-table#venuecheck-offsets {
+table#venuecheck-offsets,
+table.multi-venue-container {
 	border-collapse: collapse;
 }
 

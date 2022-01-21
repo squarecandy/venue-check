@@ -116,7 +116,7 @@ jQuery( function( $ ) {
 		tribeEventsEventDetailsLoaded() {
 			const $eventDetails = $( '#tribe_events_event_details' );
 			//add venuecheck
-			$eventDetails.addClass( 'venuecheck-update' );
+			$eventDetails.addClass( 'venuecheck-updated' );
 		},
 
 		eventTribeVenueLoaded() {
@@ -817,7 +817,7 @@ jQuery( function( $ ) {
 
 		venuecheck_toggle_readonly( readonly ) {
 			console.log( 'readonly' );
-			console.log( vcObject.venueSelect );
+			//console.log( vcObject.venueSelect );
 			if ( readonly ) {
 				$( vcObject.venueSelect )
 					.prop( 'readonly', true )
