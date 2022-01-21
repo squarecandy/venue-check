@@ -10,6 +10,7 @@ jQuery( function( $ ) {
 		venueSelect: '#saved_tribe_venue',
 		batchsize: venuecheck.batchsize,
 		recurrence_warning_limit: venuecheck.recurrence_warning_limit,
+		storedRecurrences: { origForm: null, recurrences: null },
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
@@ -282,6 +283,44 @@ jQuery( function( $ ) {
 
 		//=====FORM MODIFIED=====//
 
+		venuecheck_check_stored_recurrences() {
+			console.log( 'checking storedRecurrences', vcObject.storedRecurrences );
+			if (
+				vcObject.storedRecurrences &&
+				vcObject.storedRecurrences.recurrences &&
+				vcObject.storedRecurrences.origForm === vcObject.get_recurrence_form_data()
+			) {
+				vcObject.venuecheck_disable_form();
+				vcObject.venuecheck_hide_wait();
+				if ( venuecheck.debug ) console.log( 'venuecheck_check_stored_recurrences have not changed' );
+				vcObject.venuecheck_check_venues( vcObject.storedRecurrences.recurrences, vcObject.batchsize );
+			} else {
+				if ( venuecheck.debug )
+					console.log(
+						'recurrences stored but recurrence changed?',
+						vcObject.storedRecurrences &&
+							vcObject.storedRecurrences.origForm &&
+							vcObject.storedRecurrences.origForm !== vcObject.get_recurrence_form_data()
+					);
+
+				const recurrenceFormData = vcObject.get_recurrence_form_data();
+				console.log( 'recurrenceFormData', recurrenceFormData );
+				vcObject.storedRecurrences.recurrences = null;
+				vcObject.storedRecurrences.origForm = recurrenceFormData;
+				console.log( 'storing Recurrences', vcObject.storedRecurrences.origForm );
+				vcObject.venuecheck_get_event_recurrences();
+			}
+		},
+
+		get_recurrence_form_data() {
+			//@TODO check for date change too, but not for offsets, those don't change the recurrence
+			const recurrenceFormElements =
+				'.recurrence-row input, .custom-recurrence-row input, .recurrence-row select, .custom-recurrence-row select';
+			const origForm = $( recurrenceFormElements ).serialize();
+			console.log( 'getting recurrence form', origForm );
+			return origForm;
+		},
+
 		venuecheck_get_event_recurrences() {
 			const formVars = {};
 			$.each( $( 'form#post' ).serializeArray(), function( i, field ) {
@@ -388,6 +427,8 @@ jQuery( function( $ ) {
 
 		venuecheck_check_venues( event_recurrences, batch_size ) {
 			vcObject.venuecheck_show_progress_bar();
+
+			vcObject.storedRecurrences.recurrences = event_recurrences;
 
 			const postID = $( '#post_ID' ).val();
 			// pre-split array into batchs
@@ -858,7 +899,8 @@ jQuery( function( $ ) {
 		venuecheck_find_available_venues() {
 			vcObject.venuecheck_hide_messages();
 			vcObject.venuecheck_show_wait();
-			vcObject.venuecheck_get_event_recurrences();
+			//vcObject.venuecheck_get_event_recurrences();
+			vcObject.venuecheck_check_stored_recurrences();
 		},
 
 		venuecheck_show_hide_divider() {
