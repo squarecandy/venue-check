@@ -12,8 +12,10 @@ jQuery( function( $ ) {
 		recurrence_warning_limit: venuecheck.recurrence_warning_limit,
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
-			console.log( 'multivenue? ' + vcObject.multiVenueEnabled );
-			console.log( venuecheck );
+
+			vcObject.debugLog( 'multivenue? ' + vcObject.multiVenueEnabled );
+			vcObject.debugLog( venuecheck );
+			vcObject.debugLog( 'batchsize', vcObject.batchsize );
 
 			if ( vcObject.multiVenueEnabled ) {
 				if ( ! venuecheck.use_tec_fields ) {
@@ -864,6 +866,12 @@ jQuery( function( $ ) {
 				$( '#venuecheck-change-venue .venuecheck-divider' ).hide();
 			} else {
 				$( '#venuecheck-change-venue .venuecheck-divider' ).show();
+			}
+		},
+
+		debugLog( $a, $b = '' ) {
+			if ( venuecheck.debug ) {
+				console.log( $a, $b );
 			}
 		},
 
