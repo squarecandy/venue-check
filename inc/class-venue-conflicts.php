@@ -37,13 +37,22 @@ class Venue_Conflicts {
 			);
 			
 			// if this is a recurring event
-			if ( $event->post_parent ) {
-				error_log( $event->ID . ' is recurring ' );
+			if ( $event->post_parent || tribe_is_recurring_event( $event->ID ) ) {
+				error_log( $event->ID . ' is recurring in series ' . $event->post_parent );
 				$event_item['eventClass'] = 'recurring';
 				
 				// if this is the first of this series that we are processing, flag that in the parents array
-				if ( ! isset( $this->parents[ $EventVenueID ][ $event->post_parent ] ) ) {
+				//if ( ! isset( $this->parents[ $EventVenueID ][ $event->post_parent ] ) ) {
+				if ( ! isset( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] ) ) {
+
 					error_log( '* * * is first in series ' );
+					$this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] = array(
+						'id' => $event->post_parent,
+						'recurrence' => tribe_get_recurrence_text( $event->post_parent ),
+					);
+					error_log(print_r($this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ],true));
+
+					/*
 					// if the parent event of the recurring series preceded us, it wouldn't have triggered the above check, so flag it as first
 					if ( isset( $this->conflicts[ $EventVenueID ]['events'][ $event->post_parent ] ) ) {
 						$this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] = $event->post_parent;
@@ -53,6 +62,7 @@ class Venue_Conflicts {
 						$this->parents[ $EventVenueID ][ $event->post_parent ]['first_event'] = $event->ID;
 						$event_item['recurrence'] = tribe_get_recurrence_text( $event->post_parent );
 					}
+					*/
 				}
 			}
 
