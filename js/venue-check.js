@@ -8,6 +8,8 @@ jQuery( function( $ ) {
 		multiVenueEnabled: false,
 		venueSelectArray: [ '#saved_tribe_venue' ], //allow for reversion to primary + additional fields
 		venueSelect: '#saved_tribe_venue',
+		batchsize: venuecheck.batchsize,
+		recurrence_warning_limit: venuecheck.recurrence_warning_limit,
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 			console.log( 'multivenue? ' + vcObject.multiVenueEnabled );
@@ -279,8 +281,6 @@ jQuery( function( $ ) {
 		//=====FORM MODIFIED=====//
 
 		venuecheck_get_event_recurrences() {
-			const batchsize = 25;
-			const recurrence_warning_limit = 50;
 			const formVars = {};
 			$.each( $( 'form#post' ).serializeArray(), function( i, field ) {
 				formVars[ field.name ] = field.value;
@@ -308,7 +308,9 @@ jQuery( function( $ ) {
 
 			event_recurrences.push( event_recurrence );
 			const post_data = $( 'form#post' ).serialize();
+
 			vcObject.venuecheck_disable_form();
+
 			if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
 			if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
 				if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
@@ -329,7 +331,7 @@ jQuery( function( $ ) {
 							console.log( event_recurrences );
 							console.log( '=====/////RECURRENCES-RECURRING/////=====' );
 						}
-						if ( event_recurrences.length > recurrence_warning_limit ) {
+						if ( event_recurrences.length > vcObject.recurrence_warning_limit ) {
 							vcObject.venuecheck_hide_wait();
 							const recurrrences_num = event_recurrences.length;
 							$( '#venuecheck-messages-container' ).addClass( 'has-messages' );
@@ -347,12 +349,12 @@ jQuery( function( $ ) {
 								.click( function() {
 									$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
 									if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 1' );
-									vcObject.venuecheck_check_venues( event_recurrences, batchsize );
+									vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 								} );
 						} else {
 							vcObject.venuecheck_hide_wait();
 							if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 2' );
-							vcObject.venuecheck_check_venues( event_recurrences, batchsize );
+							vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 						}
 					} )
 					.fail( function( jqXHR, textStatus, error ) {
@@ -370,7 +372,7 @@ jQuery( function( $ ) {
 
 			if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 3' );
 
-			vcObject.venuecheck_check_venues( event_recurrences, batchsize );
+			vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 		}, // end venuecheck_get_event_recurrences
 
 		/**

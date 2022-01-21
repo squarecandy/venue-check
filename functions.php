@@ -34,7 +34,11 @@ function venuecheck_scripts_styles( $hook ) {
 		$localization['field_group'] = SQC_Multi_Venue::get_group_key();
 		$localization['container_id'] = '#multi-venue-container';
 		$localization['use_tec_fields'] = false; 
+		$localization['batchsize'] = 50;
+		$localization['recurrence_warning_limit'] = 100;
 	}
+
+	$localization = apply_filters( 'venuecheck_js_values', $localization );
 
 	/* LOCALIZE AJAX URL */
 	wp_localize_script( 'venuecheck-scripts', 'venuecheck', $localization );
