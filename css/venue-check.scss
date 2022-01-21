@@ -145,10 +145,6 @@ select.readonly + .select2-container {
 		border-top: 1px solid #ccc;
 	}
 
-	tr.recurring:not(.first) {
-		display: none;
-	}
-
 	td {
 		padding: 3px 5px;
 		vertical-align: top;
@@ -177,7 +173,7 @@ select.readonly + .select2-container {
 		text-decoration: none;
 
 		p {
-			display: inline;
+			margin: 0;
 		}
 	}
 }

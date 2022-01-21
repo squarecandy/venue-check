@@ -443,6 +443,12 @@ jQuery( function( $ ) {
 							} else {
 								// if room exist than simply concat the reservations array of map and current element
 								a[ curr.venueTitle ].events = a[ curr.venueTitle ].events.concat( curr.events );
+								// add or merge the series listing
+								if ( ! a[ curr.venueTitle ].series && curr.series ) {
+									a[ curr.venueTitle ].series = curr.series;
+								} else if ( a[ curr.venueTitle ].series && curr.series ) {
+									a[ curr.venueTitle ].series = Object.assign( a[ curr.venueTitle ].series, curr.series );
+								}
 							}
 							return a;
 						}, {} )
@@ -566,7 +572,6 @@ jQuery( function( $ ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
 
 					const eventList = [];
-					const parentList = [];
 
 					// disable the option
 					$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
@@ -584,23 +589,25 @@ jQuery( function( $ ) {
 					// loop through events attached to a venue
 					$.each( venue.events, function( index2, event ) {
 						// in extreme edge cases we could end up with duplicate events due to recurrence & batchin, so filter for those
-						console.log( 'eventList', eventList );
-						console.log( 'parentList', parentList );
-						console.log( 'includes ' + event.eventParent, parentList.includes( event.eventParent ) );
-						let recurrenceText = '';
-						let prefixIcon = '';
+						const recurrenceText = '';
+						const prefixIcon = '';
+						const id = 'event-' + venue.venueID + '-' + event.eventID;
 						if ( ! eventList.includes( event.eventID ) ) {
 							eventList.push( event.eventID );
+							const eventID = event.eventID;
 
-							if ( event.recurrence && ! parentList.includes( event.eventParent ) ) {
-								recurrenceText = '<span class="recurrence">' + event.recurrence + '</span>';
-								event.eventClass = 'recurring first';
-								parentList.push( event.eventParent );
-								prefixIcon = '<i class="fa-sync-alt fas" aria-hidden="true"></i>';
+							if ( event.eventParent ) {
+								event.eventClass = 'recurring';
+								event.eventClass += ' series-' + venue.venueID + '-' + event.eventParent;
+							} else if ( venue.series && venue.series.eventID ) {
+								event.eventClass = 'recurring';
+								event.eventClass += ' series-' + venue.venueID + '-' + eventID;
 							}
 
 							venuecheck_venue_report +=
-								'<tr class="' +
+								'<tr id="' +
+								id +
+								'"class="' +
 								event.eventClass +
 								'"><td class="venuecheck-conflicts-report-venue-date">' +
 								prefixIcon +
@@ -624,7 +631,7 @@ jQuery( function( $ ) {
 			} else if ( venuecheck_conflicts.length === 0 ) {
 				// there are no conflicts found
 
-				// notificaiton
+				// notification
 				venuecheck_venue_report_count +=
 					'<div id="venuecheck-conflicts-report-count" class="notice notice-info">All venues are available.</div>';
 				venuecheck_venue_report += '';
@@ -641,6 +648,33 @@ jQuery( function( $ ) {
 				.append( venuecheck_venue_report )
 				.show();
 
+			// loop through the venues again to sort series of recurring events
+			$.each( venuecheck_conflicts, function() {
+				console.log( 'SERIES1', this );
+				if ( this.series ) {
+					const seriesVenueID = this.venueID;
+					$.each( this.series, function() {
+						console.log( 'SERIES', this );
+						const seriesClass = 'series-' + seriesVenueID + '-' + this.id;
+						console.log( 'SERIES CLASS', seriesClass );
+						const $firstEvent = $( '.' + seriesClass ).first();
+						console.log( $firstEvent );
+						$firstEvent.addClass( 'first' );
+
+						const $otherEvents = $( '.' + seriesClass + ':not(.first)' );
+						$firstEvent.attr( 'data-series', seriesClass );
+						$firstEvent
+							.find( '.venuecheck-conflicts-report-venue-date' )
+							.prepend( '<i class="fa-sync-alt fas" aria-hidden="true"></i>' );
+						$firstEvent
+							.find( '.venuecheck-conflicts-report-venue-event a' )
+							.after( '<span class="recurrence">' + this.recurrence + '</span>' );
+						$firstEvent.after( $otherEvents );
+						$otherEvents.hide();
+					} );
+				}
+			} );
+
 			$( '#venuecheck-conflicts-report-link, #venuecheck-conflicts-report-close' ).on( 'click', function() {
 				$( '#venuecheck-report-container' ).slideToggle( 'fast' );
 				$( '#venuecheck-conflicts-report-link' ).html(
@@ -649,9 +683,13 @@ jQuery( function( $ ) {
 			} );
 
 			$( '.venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas' ).on( 'click', function() {
+				const seriesClass = $( this )
+					.parents( 'tr.recurring.first' )
+					.attr( 'data-series' );
+				console.log( 'others', 'tr.recurring.' + seriesClass + ':not(.first)' );
 				$( this )
 					.parents( '#venuecheck-conflicts-report-table tbody' )
-					.find( 'tr.recurring:not(.first)' )
+					.find( 'tr.recurring.' + seriesClass + ':not(.first)' )
 					.toggle();
 			} );
 
