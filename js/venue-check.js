@@ -501,22 +501,18 @@ jQuery( function( $ ) {
 			let venuecheck_venue_report_count = '';
 			let venuecheck_venue_report = '';
 			let $venuecheck_venue_report = null;
+			let $venuecheck_venue_report_exclusions = null;
+			let count_exclusions = 0;
 
 			if ( typeof venuecheck_conflicts !== 'undefined' && venuecheck_conflicts.length !== 0 ) {
-				let venuecheck_conflicts_count = Object.keys( venuecheck_conflicts ).length;
-				venuecheck_conflicts_count =
-					venuecheck_conflicts_count + ( venuecheck_conflicts_count === 1 ? ' unavailable venue.' : ' unavailable venues.' );
-				venuecheck_venue_report_count +=
-					'<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">' + venuecheck_conflicts_count;
-				venuecheck_venue_report_count += '&nbsp;<a id="venuecheck-conflicts-report-link">Show Details</a></div>';
-
+				// create the report container
 				venuecheck_venue_report += '<div id="venuecheck-conflicts-report-container">';
 				venuecheck_venue_report += '<div id="venuecheck-report-links">';
 				venuecheck_venue_report += '<a id="venuecheck-report-conflicts-link">Recheck for Venue Conflicts</a>';
 				venuecheck_venue_report += '<span class="venuecheck-divider">&nbsp;|&nbsp;</span>';
 				venuecheck_venue_report += '<a id="venuecheck-conflicts-report-close">Close</a>';
 				venuecheck_venue_report += '</div>';
-				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table">';
+				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table" class="venuecheck-conflicts-report-table">';
 				venuecheck_venue_report += '</table></div>';
 
 				$venuecheck_venue_report = $( venuecheck_venue_report );
@@ -530,7 +526,7 @@ jQuery( function( $ ) {
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
 
-					// disable the option
+					// disable the option in the dropdown
 					$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
 						.attr( 'disabled', 'disabled' )
 						.removeAttr( 'selected' );
@@ -538,7 +534,7 @@ jQuery( function( $ ) {
 					// prepare venue report
 					const $venuecheck_venue_report_entry = $( vcObject.generate_venue_report( venue ) );
 
-					// sort series of recurring events & add recurring icon and info to first
+					// now we have the complete report, sort series of recurring events & add recurring icon and info to first
 					if ( this.series ) {
 						const seriesVenueID = this.venueID;
 						$.each( this.series, function() {
@@ -568,15 +564,53 @@ jQuery( function( $ ) {
 						} );
 					}
 
-					$venuecheck_venue_report.find( '#venuecheck-conflicts-report-table' ).append( $venuecheck_venue_report_entry );
+					// if venues that are excluded from check, add them to separate report instead of main report
+					if ( this.excluded ) {
+						// create the exclusions report if we haven't previously
+						if ( ! $venuecheck_venue_report_exclusions ) {
+							$venuecheck_venue_report_exclusions = $(
+								// eslint-disable-next-line max-len
+								'<table id="venuecheck-exclusions-report-table" class="venuecheck-conflicts-report-table" style="display:none"></table>'
+							);
+						}
+						$venuecheck_venue_report_exclusions.append( $venuecheck_venue_report_entry );
+						count_exclusions++;
+					} else {
+						$venuecheck_venue_report.find( '#venuecheck-conflicts-report-table' ).append( $venuecheck_venue_report_entry );
+					}
 				} );
 
 				if ( ! vcObject.multiVenueEnabled ) {
 					$( '#saved_tribe_venue' ).select2();
+				} else {
+					$( vcObject.venueSelect ).trigger( 'change' ); //@TODO maybe this would work the same as select2()
 				}
-			} else if ( venuecheck_conflicts.length === 0 ) {
-				// there are no conflicts found
 
+				// calculate the count of unavailable and excluded venues & add to top of the report
+				const venuecheck_conflicts_count = Object.keys( venuecheck_conflicts ).length - count_exclusions;
+
+				venuecheck_venue_report_count += '<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">';
+
+				venuecheck_venue_report_count += '<div><span>';
+				if ( venuecheck_conflicts_count ) {
+					venuecheck_venue_report_count +=
+						venuecheck_conflicts_count + ( venuecheck_conflicts_count === 1 ? ' unavailable venue.' : ' unavailable venues.' );
+				} else {
+					venuecheck_venue_report_count += 'All venues are available.';
+				}
+				venuecheck_venue_report_count += '</span><a id="venuecheck-conflicts-report-link">Show Details</a>';
+
+				if ( count_exclusions ) {
+					venuecheck_venue_report_count += '<span class="count-exclusions">';
+					venuecheck_venue_report_count += count_exclusions;
+					venuecheck_venue_report_count +=
+						count_exclusions === 1 ? ' venue is available but has ' : ' venues are available but have ';
+					venuecheck_venue_report_count += 'overlapping bookings.</span>';
+				}
+				venuecheck_venue_report_count += '</div>';
+
+				// if there are no conflicts found
+			} else if ( venuecheck_conflicts.length === 0 ) {
 				// notification
 				venuecheck_venue_report_count +=
 					'<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">All venues are available.</div>';
@@ -586,14 +620,26 @@ jQuery( function( $ ) {
 				$( vcObject.venueSelect + ' option' ).removeAttr( 'disabled' );
 				if ( ! vcObject.multiVenueEnabled ) {
 					$( '#saved_tribe_venue' ).select2();
+				} else {
+					$( vcObject.venueSelect ).trigger( 'change' ); //@TODO maybe this would work the same as select2()
 				}
 			}
 
+			// add the report to the page
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
-			$( '#venuecheck-conflicts-report' )
-				.append( $venuecheck_venue_report )
-				.show();
+			$( '#venuecheck-conflicts-report' ).append( $venuecheck_venue_report );
 
+			if ( count_exclusions ) {
+				$( '#venuecheck-conflicts-report-container' ).append(
+					'<div id="venuecheck-show-exclusions"><a href="#">' +
+						'<span>Show</span> available venues with overlapping bookings</a></div>'
+				);
+				$( '#venuecheck-conflicts-report-container' ).append( $venuecheck_venue_report_exclusions );
+			}
+
+			$( '#venuecheck-conflicts-report' ).show();
+
+			// bind click events on the report
 			$( '#venuecheck-conflicts-report-link, #venuecheck-conflicts-report-close' ).on( 'click', function() {
 				$( '#venuecheck-report-container' ).slideToggle( 'fast' );
 				$( '#venuecheck-conflicts-report-link' ).html(
@@ -612,6 +658,20 @@ jQuery( function( $ ) {
 					.toggle();
 			} );
 
+			$( '#venuecheck-show-exclusions a' ).on( 'click', function( e ) {
+				e.preventDefault();
+				const $exclusionsTable = $( '#venuecheck-exclusions-report-table' );
+				const $this = $( this );
+				if ( $exclusionsTable.is( ':visible' ) ) {
+					$this.find( 'span' ).text( 'Show' );
+					$exclusionsTable.hide();
+				} else {
+					$this.find( 'span' ).text( 'Hide' );
+					$exclusionsTable.show();
+				}
+			} );
+
+			// adjust the page state
 			$( '#venuecheck-venue-select' ).show();
 
 			$( '#venuecheck-processing, #venuecheck-progress' ).hide();

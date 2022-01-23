@@ -127,7 +127,7 @@ select.readonly + .select2-container {
 	border-radius: 3px;
 }
 
-#venuecheck-conflicts-report-table {
+.venuecheck-conflicts-report-table {
 	width: 100%;
 	border-collapse: collapse;
 
@@ -195,6 +195,33 @@ select.readonly + .select2-container {
 	}
 }
 
+#venuecheck-conflicts-report-count div {
+	display: grid;
+	grid-row-gap: 0.5em;
+
+	a {
+		text-align: right;
+	}
+
+	.count-exclusions {
+		grid-column-end: 3;
+		grid-column-start: 1;
+	}
+}
+
+#venuecheck-show-exclusions {
+	margin-top: 30px;
+	font-size: 13px;
+}
+
+#venuecheck-exclusions-report-table {
+
+	.venuecheck-conflicts-report-venue-title td {
+		color: #3f454c;
+		background-color: #bfc1c3;
+	}
+}
+
 .venuecheck-notice {
 	display: inline-block;
 	margin: 0 10px 10px 0;
@@ -254,14 +281,6 @@ table.venuecheck-section {
 	border-collapse: collapse;
 }
 
-#venuecheck-offsets td {
-	position: relative;
-	margin: 0;
-	padding: 10px;
-	background-color: #f4fdef;
-	border: 0;
-}
-
 .venuecheck-section tr {
 	background-color: #f4fdef;
 }
@@ -288,6 +307,18 @@ table.venuecheck-section {
 
 #venuecheck-offsets {
 	margin-top: 20px;
+
+	td {
+		position: relative;
+		margin: 0;
+		padding: 10px;
+		background-color: #f4fdef;
+		border: 0;
+	}
+
+	td:first-child {
+		width: 15%;
+	}
 }
 
 #with-venuecheck {
