@@ -157,10 +157,10 @@ add_action( 'tribe_after_location_details', 'venuecheck_tribe_after_location_det
 function venuecheck_tribe_after_location_details( $event_id ){
 	?>
 	<table class="eventtable venuecheck-section">
-		<tr id="venuecheck-messages-container-row">
+		<tr id="venuecheck-messages-container" style="display: none;">
 			<td></td>
 			<td>
-				<div id="venuecheck-messages-container" style="display: none;">
+				<div id="venuecheck-messages-container-inner">
 					<div id="venuecheck-messages">
 						<div id="venuecheck-wait" style="display: none;">
 							<span class="venuecheck-message"><i class="fas fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Loading...</span>Getting event recurrences...</span>

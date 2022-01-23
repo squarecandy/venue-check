@@ -43,6 +43,21 @@ body.venuecheck-update #venuecheck-conflicts-button {
 	display: none;
 }
 
+table.venuecheck {
+	width: 100%;
+}
+
+.venuecheck-section tr,
+#event_tribe_venue tbody tr,
+.multi-venue-container tr {
+	background-color: #f4fdef;
+}
+
+.venuecheck-section tr td {
+	position: relative;
+	padding: 0 10px;
+}
+
 .venuecheck-section a:not(.select2-choice) {
 	color: #0073aa;
 	font-size: 12px;
@@ -94,7 +109,7 @@ select.readonly + .select2-container {
 
 #venuecheck-venue-select .tribe-dropdown,
 #venuecheck-venue-select .select2-container {
-	width: 75% !important;
+	width: 90% !important;
 	font-size: 14px;
 }
 
@@ -131,6 +146,10 @@ select.readonly + .select2-container {
 	width: 100%;
 	border-collapse: collapse;
 
+	tr {
+		background-color: transparent;
+	}
+
 	.venuecheck-conflicts-report-venue-title {
 		border-top: 15px solid #fff;
 
@@ -159,7 +178,7 @@ select.readonly + .select2-container {
 		border-top: 1px solid #ccc;
 	}
 
-	td {
+	tr td {
 		padding: 3px 5px;
 		vertical-align: top;
 		background: #fff;
@@ -236,6 +255,14 @@ select.readonly + .select2-container {
 	&.notice-error {
 		border-left-color: #d63638;
 	}
+
+	&.notice-info {
+		border-left-color: #72aee6;
+	}
+
+	&.notice-warning {
+		border-left-color: #dba617;
+	}
 }
 
 #venuecheck-modified-publish {
@@ -270,9 +297,6 @@ select.readonly + .select2-container {
 	font-style: italic;
 }
 
-table.venuecheck {
-	width: 100%;
-}
 
 table#event_tribe_venue,
 table#venuecheck-offsets,
@@ -281,19 +305,16 @@ table.venuecheck-section {
 	border-collapse: collapse;
 }
 
-.venuecheck-section tr {
-	background-color: #f4fdef;
-}
 
-.venuecheck-section tr td {
-	position: relative;
-	padding: 10px 10px 10px 0;
-}
+#venuecheck-messages-container,
+#event_tribe_venue .saved-linked-post,
+.multi-venue-container .saved-linked-post {
 
-.venuecheck-section tr td:first-child {
-	width: 20%;
-	padding: 10px 0 10px 10px;
-	vertical-align: top;
+	td:first-child {
+		width: 10%;
+		padding-top: 10px;
+		vertical-align: top;
+	}
 }
 
 #venuecheck-offsets .venuecheck-section tr td.venuecheck-section-label,
