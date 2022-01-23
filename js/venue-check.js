@@ -14,9 +14,8 @@ jQuery( function( $ ) {
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
-			vcObject.debugLog( 'multivenue? ' + vcObject.multiVenueEnabled );
-			vcObject.debugLog( venuecheck );
-			vcObject.debugLog( 'batchsize', vcObject.batchsize );
+			vcObject.debugLog( 'In Multivenue mode? ' + vcObject.multiVenueEnabled );
+			vcObject.debugLog( 'venuecheck variables', venuecheck );
 
 			if ( vcObject.multiVenueEnabled ) {
 				if ( ! venuecheck.use_tec_fields ) {
@@ -26,26 +25,12 @@ jQuery( function( $ ) {
 					vcObject.venueSelectArray = [ '#saved_tribe_venue', '#venuecheck-additional-venues select' ];
 					vcObject.venueSelect = vcObject.venueSelectArray.join( ', ' );
 				}
-
-				console.log( 'venueSelect' );
-				console.log( '#acf-' + vcObject.fieldkey );
-				console.log( vcObject.venueSelect );
-				console.log( vcObject.venueSelectArray );
 			}
 
 			window.addEventListener( 'load', ( e ) => {
 				if ( venuecheck.debug ) console.log( 'load event fire', e );
 
 				//=====FORM MODIFIED=====//
-
-				//only trigger modified message on updating events
-				const loc = window.location.href;
-				if ( /post-new.php/.test( loc ) ) {
-					$( 'body' ).addClass( 'venuecheck-new' );
-				}
-				if ( /post.php/.test( loc ) ) {
-					$( 'body' ).addClass( 'venuecheck-update' );
-				}
 
 				// run 3s after load
 				setTimeout( function() {
@@ -121,16 +106,6 @@ jQuery( function( $ ) {
 
 		eventTribeVenueLoaded() {
 			console.log( 'eventTribeVenueLoaded' );
-			//only trigger modified message on updating events
-			const loc = window.location.href;
-			if ( /post-new.php/.test( loc ) ) {
-				// new event post page
-				$( 'body' ).addClass( 'venuecheck-new' );
-			}
-			if ( /post.php/.test( loc ) ) {
-				// edit existing post page
-				$( 'body' ).addClass( 'venuecheck-update' );
-			}
 
 			// handle venue check link
 			$( document ).on(
@@ -175,39 +150,6 @@ jQuery( function( $ ) {
 			// add conflicts button at end of dropdown cell, after our wrapper div
 			$venueDropdown.append( '<a id="venuecheck-conflicts-button" class="button">Find available venues</a>' );
 
-			// add report container after the 2nd td in the tribe tbody, but before the hidden new venue form
-			if ( ! vcObject.multiVenueEnabled ) {
-				$venuecheckVenueSection
-					.find( 'tr.linked-post.venue' )
-					.first()
-					.after(
-						'<tr id="venuecheck-report-container" style="display: none;">' +
-							'<td colspan="2" id="venuecheck-report"></td>' +
-							'</tr>' +
-							'<tr class="venuecheck-spacer"><td></td><td></td></tr>'
-					);
-			} else {
-				$venuecheckVenueSection
-					.find( 'tr.saved-linked-post' )
-					.after(
-						'<tr id="venuecheck-report-container" style="display: none;">' +
-							'<td colspan="2" id="venuecheck-report"></td>' +
-							'</tr>' +
-							'<tr class="venuecheck-spacer"><td></td><td></td></tr>'
-					);
-			} //@TODO add some vars for this
-
-			// change messages to have a whole row by itself
-			$( '#venuecheck-report-container' ).before(
-				'<tr id="venuecheck-messages-container-row" ">' +
-					'<td></td><td>' +
-					'<div id="venuecheck-messages-container" style="display: none;"><div id="venuecheck-messages"></div></div>' +
-					'</td>' +
-					'</tr>'
-			);
-
-			//add conflicts link
-			//$( '#event_tribe_venue .edit-linked-post-link' ).after(
 			$venuecheckVenueSection
 				.find( '.edit-linked-post-link' )
 				.after(
@@ -221,48 +163,6 @@ jQuery( function( $ ) {
 			} else {
 				$( '#venuecheck-conflicts-button' ).hide();
 			}
-
-			const wait =
-				'<div id="venuecheck-wait" style="display: none;">' +
-				'<span class="venuecheck-message">' +
-				'<i class="fas fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Loading...</span>' +
-				'Getting event recurrences...' +
-				'</span>' +
-				'</div>';
-			const venue_modified_publish =
-				'<div id="venuecheck-modified-publish" style="display: none;" class="notice notice-error">' +
-				'Because the date/time of this event was modified, the currently selected venue may not be available. ' +
-				'See venue selection below for more information.' +
-				'</div>';
-			const venue_modified =
-				'<div id="venuecheck-modified" style="display: none;" class="notice notice-error">' +
-				'Because the date/time of this event was modified, you need to ' +
-				'<a id="modified-conflicts">recheck for venue conflicts</a> before you can save changes.' +
-				'</div>';
-			const progress_message =
-				'<div id="venuecheck-progress" style="display: none;">' +
-				'<span class="venuecheck-message">' +
-				'<i class="fas fa-spinner fa-pulse fa-fw"></i>' +
-				'<span class="sr-only">Loading...</span>' +
-				'Finding available venues...' +
-				'</span> ' +
-				'<span class="venuecheck-message venuecheck-progress-percent-done">0%</span>' +
-				'<div id="venuecheck-progress-bar" class="progress-bar green stripes"><span style="width: 0%"></span></div>' +
-				'</div>';
-			const report = '<div id="venuecheck-conflicts-report"></div>';
-			const recurrence_warning =
-				'<div id="venuecheck-recurrence-warning" style="display: none;" class="notice notice-warning">' +
-				'It may take up to a minute or more to find available venues for all ' +
-				'<span id="venuecheck-recurrence-count"></span> events in this series.<br>' +
-				'<em>Note: this system is only able to check conflicts up to 2 years into the future.</em><br>' +
-				'Would you like to continue? <a id="venuecheck-recurrence-warning-continue">Continue</a>' +
-				'<span class="venuecheck-divider">&nbsp;|&nbsp;</span>' +
-				'<a id="venuecheck-recurrence-warning-cancel">Cancel</a>' +
-				'</div>';
-
-			$( '#major-publishing-actions' ).append( venue_modified_publish );
-			$( '#venuecheck-messages' ).append( [ wait, venue_modified, progress_message, recurrence_warning ] );
-			$( '#venuecheck-report-container td' ).append( report );
 
 			//disable venues dropdown
 			vcObject.venuecheck_toggle_readonly( true );
