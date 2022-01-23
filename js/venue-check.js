@@ -172,7 +172,8 @@ jQuery( function( $ ) {
 			// https://stackoverflow.com/a/8258154/947370
 
 			// empty out the link to edit the venue item
-			$( '.edit-linked-post-link' ).html( '' );
+			//$( '.edit-linked-post-link' ).html( '' );
+			$( '.edit-linked-post-link' ).hide();
 
 			// show the change venue button
 			$( '#venuecheck-change-venue' ).show();
@@ -213,9 +214,10 @@ jQuery( function( $ ) {
 		},
 
 		get_recurrence_form_data() {
-			//@TODO check for date change too, but not for offsets, those don't change the recurrence
+			// get the form values from the date/time & recurrence sections
 			const recurrenceFormElements =
-				'.recurrence-row input, .custom-recurrence-row input, .recurrence-row select, .custom-recurrence-row select';
+				'.recurrence-row input, .custom-recurrence-row input, .recurrence-row select, .custom-recurrence-row select,' +
+				'.tribe-datetime-block input';
 			const origForm = $( recurrenceFormElements ).serialize();
 			console.log( 'getting recurrence form', origForm );
 			return origForm;
