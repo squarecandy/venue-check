@@ -6,6 +6,7 @@ class Venue_Conflicts {
 	public $parents = array();
 
 	public function add_venue( $event, $start, $end, $venue_id ) {
+
 		$EventVenueID             = $venue_id;
 		$EventVenueTitle          = get_the_title( $EventVenueID );
 
@@ -24,6 +25,11 @@ class Venue_Conflicts {
 			// add id & title to index for the venue id ( it may already exist, but id/title shouldn't change, so that's ok )
 			$this->conflicts[ $EventVenueID ]['venueID']    = $EventVenueID;
 			$this->conflicts[ $EventVenueID ]['venueTitle'] = $EventVenueTitle;
+
+			if ( venuecheck_exclude_venues() && venuecheck_is_excluded_venue( $venue_id ) ) {
+				error_log( $EventVenueID . ' is excluded' );
+				$this->conflicts[ $EventVenueID ]['excluded'] = 1;
+			}
 
 			// set up and add this event to an array of events for this venue
 			$event_item = array(

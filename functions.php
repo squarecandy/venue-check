@@ -7,6 +7,9 @@ define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
 // set up for event edit admin page
 require VENUE_CHECK_DIR_PATH . 'inc/event-edit.php';
 
+// set up for event edit admin page
+require VENUE_CHECK_DIR_PATH . 'inc/venue-edit.php';
+
 // class for calculating venue conflicts
 require VENUE_CHECK_DIR_PATH . '/inc/class-venue-conflicts.php';
 
@@ -650,3 +653,17 @@ function print_mem( $message, $compare = array() ) {
 	error_log($output);
 	return $values;
 }
+
+
+function venuecheck_exclude_venues(){
+	error_log( 'exclude_venues ' . apply_filters( 'venuecheck_exclude_venues', false ) );
+	return apply_filters( 'venuecheck_exclude_venues', false );
+}
+
+function venuecheck_is_excluded_venue( $venue_id ) {
+	error_log( 'is_excluded_venue ' . $venue_id . get_the_title( $venue_id ) . '? ' . get_post_meta( $venue_id, 'venuecheck_exclude_venue', true ) );
+	return get_post_meta( $venue_id, 'venuecheck_exclude_venue', true );
+}
+
+//turn on exclusions
+add_filter( 'venuecheck_exclude_venues', function(){ return true; } );
