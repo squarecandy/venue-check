@@ -497,8 +497,9 @@ jQuery( function( $ ) {
 				venuecheck_conflicts_count =
 					venuecheck_conflicts_count + ( venuecheck_conflicts_count === 1 ? ' unavailable venue.' : ' unavailable venues.' );
 				venuecheck_venue_report_count +=
-					'<div id="venuecheck-conflicts-report-count" class="notice notice-info">' + venuecheck_conflicts_count;
+					'<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">' + venuecheck_conflicts_count;
 				venuecheck_venue_report_count += '&nbsp;<a id="venuecheck-conflicts-report-link">Show Details</a></div>';
+
 				venuecheck_venue_report += '<div id="venuecheck-conflicts-report-container">';
 				venuecheck_venue_report += '<div id="venuecheck-report-links">';
 				venuecheck_venue_report += '<a id="venuecheck-report-conflicts-link">Recheck for Venue Conflicts</a>';
@@ -580,7 +581,7 @@ jQuery( function( $ ) {
 
 				// notification
 				venuecheck_venue_report_count +=
-					'<div id="venuecheck-conflicts-report-count" class="notice notice-info">All venues are available.</div>';
+					'<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">All venues are available.</div>';
 				venuecheck_venue_report += '';
 
 				// re-enable any previously disabled options
