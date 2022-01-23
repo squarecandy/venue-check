@@ -57,6 +57,14 @@ jQuery( function( $ ) {
 						}
 					);
 
+					$( document ).on(
+						'change',
+						'.recurrence-row input, .custom-recurrence-row input, .recurrence-row select, .custom-recurrence-row select',
+						function() {
+							console.log( 'recurrence changed' );
+						}
+					);
+
 					//does not remove modified message for new events
 					$( document ).on(
 						'click',
@@ -492,6 +500,8 @@ jQuery( function( $ ) {
 			//disable and message any venue venuecheck_conflicts
 			let venuecheck_venue_report_count = '';
 			let venuecheck_venue_report = '';
+			let $venuecheck_venue_report = null;
+
 			if ( typeof venuecheck_conflicts !== 'undefined' && venuecheck_conflicts.length !== 0 ) {
 				let venuecheck_conflicts_count = Object.keys( venuecheck_conflicts ).length;
 				venuecheck_conflicts_count =
@@ -507,75 +517,63 @@ jQuery( function( $ ) {
 				venuecheck_venue_report += '<a id="venuecheck-conflicts-report-close">Close</a>';
 				venuecheck_venue_report += '</div>';
 				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table">';
+				venuecheck_venue_report += '</table></div>';
+
+				$venuecheck_venue_report = $( venuecheck_venue_report );
 
 				if ( venuecheck.debug ) console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
 				if ( venuecheck.debug ) console.log( 'venuecheck_venue_options', venuecheck_venue_options );
 
 				// reset all options to enabled by default before we loop through.
-				//$( '#saved_tribe_venue option' ).removeAttr( 'disabled' );
-
-				$( vcObject.venueSelect + ' option' ).removeAttr( 'disabled' ); //@TODO wont work with repeaters
+				$( vcObject.venueSelect + ' option' ).removeAttr( 'disabled' );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
-
-					const eventList = [];
 
 					// disable the option
 					$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
 						.attr( 'disabled', 'disabled' )
 						.removeAttr( 'selected' );
 
-					//prepare venue report
-					venuecheck_venue_report +=
-						'<thead class="venuecheck-conflicts-report-venue-title"><tr><td colspan="2">' +
-						venue.venueTitle +
-						'</td></tr></thead>';
-					venuecheck_venue_report +=
-						'<thead class="venuecheck-conflicts-report-venue-heading"><tr><td>Date</td><td>Event</td></tr></thead><tbody>';
+					// prepare venue report
+					const $venuecheck_venue_report_entry = $( vcObject.generate_venue_report( venue ) );
 
-					// loop through events attached to a venue
-					$.each( venue.events, function( index2, event ) {
-						// in extreme edge cases we could end up with duplicate events due to recurrence & batchin, so filter for those
-						const recurrenceText = '';
-						const prefixIcon = '';
-						const id = 'event-' + venue.venueID + '-' + event.eventID;
-						if ( ! eventList.includes( event.eventID ) ) {
-							eventList.push( event.eventID );
-							const eventID = event.eventID;
+					// sort series of recurring events & add recurring icon and info to first
+					if ( this.series ) {
+						const seriesVenueID = this.venueID;
+						$.each( this.series, function() {
+							const seriesClass = 'series-' + seriesVenueID + '-' + this.id;
+							const $firstEvent = $venuecheck_venue_report_entry.find( '.' + seriesClass ).first();
 
-							if ( event.eventParent ) {
-								event.eventClass = 'recurring';
-								event.eventClass += ' series-' + venue.venueID + '-' + event.eventParent;
-							} else if ( venue.series && venue.series.eventID ) {
-								event.eventClass = 'recurring';
-								event.eventClass += ' series-' + venue.venueID + '-' + eventID;
+							$firstEvent.addClass( 'first' );
+
+							// if more than one event in the series, make an accordion
+							const $otherEvents = $venuecheck_venue_report_entry.find( '.' + seriesClass + ':not(.first)' );
+							if ( $otherEvents.length ) {
+								$firstEvent.addClass( 'accordion' );
 							}
+							$firstEvent.attr( 'data-series', seriesClass );
 
-							venuecheck_venue_report +=
-								'<tr id="' +
-								id +
-								'"class="' +
-								event.eventClass +
-								'"><td class="venuecheck-conflicts-report-venue-date">' +
-								prefixIcon +
-								event.eventDate +
-								'</td><td class="venuecheck-conflicts-report-venue-event"><a href="' +
-								event.eventLink +
-								'" target="_blank" class="venuecheck-report-link"><span class="name">' +
-								event.eventTitle +
-								'</span><i class="fas fa-external-link-alt" aria-hidden="true"></i></a>' +
-								recurrenceText +
-								'</td></tr>';
-						}
-					} );
+							// add the recurring icon & recurrence info to the first in the series
+							$firstEvent
+								.find( '.venuecheck-conflicts-report-venue-date' )
+								.prepend( '<i class="fa-sync-alt fas" aria-hidden="true"></i>' );
+							$firstEvent
+								.find( '.venuecheck-conflicts-report-venue-event a' )
+								.after( '<span class="recurrence">' + this.recurrence + '</span>' );
+							$firstEvent.after( $otherEvents );
+
+							// hide the later events in the series
+							$otherEvents.hide();
+						} );
+					}
+
+					$venuecheck_venue_report.find( '#venuecheck-conflicts-report-table' ).append( $venuecheck_venue_report_entry );
 				} );
 
 				if ( ! vcObject.multiVenueEnabled ) {
 					$( '#saved_tribe_venue' ).select2();
 				}
-
-				venuecheck_venue_report += '</tbody></table></div>';
 			} else if ( venuecheck_conflicts.length === 0 ) {
 				// there are no conflicts found
 
@@ -593,35 +591,8 @@ jQuery( function( $ ) {
 
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
 			$( '#venuecheck-conflicts-report' )
-				.append( venuecheck_venue_report )
+				.append( $venuecheck_venue_report )
 				.show();
-
-			// loop through the venues again to sort series of recurring events
-			$.each( venuecheck_conflicts, function() {
-				console.log( 'SERIES1', this );
-				if ( this.series ) {
-					const seriesVenueID = this.venueID;
-					$.each( this.series, function() {
-						console.log( 'SERIES', this );
-						const seriesClass = 'series-' + seriesVenueID + '-' + this.id;
-						console.log( 'SERIES CLASS', seriesClass );
-						const $firstEvent = $( '.' + seriesClass ).first();
-						console.log( $firstEvent );
-						$firstEvent.addClass( 'first' );
-
-						const $otherEvents = $( '.' + seriesClass + ':not(.first)' );
-						$firstEvent.attr( 'data-series', seriesClass );
-						$firstEvent
-							.find( '.venuecheck-conflicts-report-venue-date' )
-							.prepend( '<i class="fa-sync-alt fas" aria-hidden="true"></i>' );
-						$firstEvent
-							.find( '.venuecheck-conflicts-report-venue-event a' )
-							.after( '<span class="recurrence">' + this.recurrence + '</span>' );
-						$firstEvent.after( $otherEvents );
-						$otherEvents.hide();
-					} );
-				}
-			} );
 
 			$( '#venuecheck-conflicts-report-link, #venuecheck-conflicts-report-close' ).on( 'click', function() {
 				$( '#venuecheck-report-container' ).slideToggle( 'fast' );
@@ -630,7 +601,7 @@ jQuery( function( $ ) {
 				);
 			} );
 
-			$( '.venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas' ).on( 'click', function() {
+			$( 'tr.accordion .venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas' ).on( 'click', function() {
 				const seriesClass = $( this )
 					.parents( 'tr.recurring.first' )
 					.attr( 'data-series' );
@@ -652,6 +623,53 @@ jQuery( function( $ ) {
 			$( 'body' ).addClass( 'venuecheck-venues' );
 			vcObject.venuecheck_enable_form();
 		}, // end venuecheck_handle_check_venues
+
+		generate_venue_report( venue ) {
+			const eventList = [];
+			//prepare venue report
+			let venuecheck_venue_report_entry =
+				'<thead class="venuecheck-conflicts-report-venue-title"><tr><td colspan="2">' + venue.venueTitle + '</td></tr></thead>';
+			venuecheck_venue_report_entry +=
+				'<thead class="venuecheck-conflicts-report-venue-heading"><tr><td>Date</td><td>Event</td></tr></thead><tbody>';
+
+			// loop through events attached to a venue
+			$.each( venue.events, function( index2, event ) {
+				// in extreme edge cases we could end up with duplicate events due to recurrence & batchin, so filter for those
+				const recurrenceText = '';
+				const prefixIcon = '';
+				const id = 'event-' + venue.venueID + '-' + event.eventID;
+				if ( ! eventList.includes( event.eventID ) ) {
+					eventList.push( event.eventID );
+					const eventID = event.eventID;
+
+					if ( event.eventParent ) {
+						event.eventClass = 'recurring';
+						event.eventClass += ' series-' + venue.venueID + '-' + event.eventParent;
+					} else if ( venue.series && venue.series.eventID ) {
+						event.eventClass = 'recurring';
+						event.eventClass += ' series-' + venue.venueID + '-' + eventID;
+					}
+
+					venuecheck_venue_report_entry +=
+						'<tr id="' +
+						id +
+						'"class="' +
+						event.eventClass +
+						'"><td class="venuecheck-conflicts-report-venue-date">' +
+						prefixIcon +
+						event.eventDate +
+						'</td><td class="venuecheck-conflicts-report-venue-event"><a href="' +
+						event.eventLink +
+						'" target="_blank" class="venuecheck-report-link"><span class="name">' +
+						event.eventTitle +
+						'</span><i class="fas fa-external-link-alt" aria-hidden="true"></i></a>' +
+						recurrenceText +
+						'</td></tr>';
+				}
+			} );
+
+			return venuecheck_venue_report_entry;
+		},
 
 		venuecheck_convert_time( time ) {
 			if ( ! time ) {
