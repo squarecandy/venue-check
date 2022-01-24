@@ -4,8 +4,6 @@
 define( 'VENUE_CHECK_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
 
-define ( 'VENUE_CHECK_COMBINE_AJAX', false );
-
 // set up for event edit admin page
 require VENUE_CHECK_DIR_PATH . 'inc/event-edit.php';
 
@@ -41,7 +39,7 @@ function venuecheck_scripts_styles( $hook ) {
 		'batchsize'   => 50,
 		'recurrence_warning_limit' => 100,
 		'multivenue'  => false,
-		'combine_ajax' => VENUE_CHECK_COMBINE_AJAX,
+		'combine_ajax' => venuecheck_combine_ajax_calls(),
 	);
 
 	if ( class_exists( 'SQC_Multi_Venue' ) && SQC_Multi_Venue::is_enabled() ) {
@@ -213,7 +211,7 @@ function venuecheck_get_event_recurrences() {
 			unset( $to_create[ $key ]['duration'] );
 		}
 
-		if ( VENUE_CHECK_COMBINE_AJAX ) {
+		if ( venuecheck_combine_ajax_calls() ) {
 			venuecheck_check_venues_no_ajax( $to_create, $event_id );
 		} else {
 			echo wp_json_encode( $to_create );
@@ -793,5 +791,38 @@ function venuecheck_is_excluded_venue( $venue_id ) {
 	return get_post_meta( $venue_id, 'venuecheck_exclude_venue', true );
 }
 
+function venuecheck_combine_ajax_calls(){
+	return get_option( 'options_venuecheck_combine_ajax_calls' );
+}
+
 //turn on exclusions
 //add_filter( 'venuecheck_exclude_venues', function(){ return true; } );
+
+add_filter( 'theoryone_options_event_tab', 'venuecheck_venue_check_options', 11 );
+function venuecheck_venue_check_options(	$tab2_events ) {
+	if ( is_plugin_active_squarecandy( 'venue-check/plugin.php' ) && function_exists( 'acf_add_local_field_group' ) ) {
+		$acf_option_field = array(
+			array(
+				'key'               => 'field_sb6lbc0sn80e0',
+				'label'             => 'TESTING: Combine ajax calls',
+				'name'              => 'venuecheck_combine_ajax_calls',
+				'type'              => 'true_false',
+				'instructions'      => '',
+				'required'          => 0,
+				'conditional_logic' => 0,
+				'wrapper'           => array(
+					'width' => '',
+					'class' => '',
+					'id'    => '',
+				),
+				'message'           => '',
+				'default_value'     => 0,
+				'ui'                => 0,
+				'ui_on_text'        => '',
+				'ui_off_text'       => '',
+			),
+		);
+		$tab2_events = array_merge( $tab2_events, $acf_option_field );
+	}
+	return $tab2_events;
+}
