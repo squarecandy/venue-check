@@ -4,6 +4,8 @@
 define( 'VENUE_CHECK_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
 
+define ( 'VENUE_CHECK_COMBINE_AJAX', false );
+
 // set up for event edit admin page
 require VENUE_CHECK_DIR_PATH . 'inc/event-edit.php';
 
@@ -39,6 +41,7 @@ function venuecheck_scripts_styles( $hook ) {
 		'batchsize'   => 50,
 		'recurrence_warning_limit' => 100,
 		'multivenue'  => false,
+		'combine_ajax' => VENUE_CHECK_COMBINE_AJAX,
 	);
 
 	if ( class_exists( 'SQC_Multi_Venue' ) && SQC_Multi_Venue::is_enabled() ) {
@@ -209,8 +212,14 @@ function venuecheck_get_event_recurrences() {
 			unset( $to_create[ $key ]['timestamp'] );
 			unset( $to_create[ $key ]['duration'] );
 		}
-		echo wp_json_encode( $to_create );
-		wp_die();
+
+		if ( VENUE_CHECK_COMBINE_AJAX ) {
+			venuecheck_check_venues_no_ajax( $to_create, $event_id );
+		} else {
+			echo wp_json_encode( $to_create );
+			wp_die();
+		}
+		
 	} else {
 		add_action( 'admin_notices', 'events_calendar_pro_not_loaded' );
 	}
@@ -472,6 +481,121 @@ function venuecheck_get_offset_dates( $event, $timezone ) {
 
 }
 
+function venuecheck_check_venues_no_ajax( $event_recurrences, $postID ) {
+
+	//$upcomingEvents = venuecheck_get_upcoming_events();
+	$upcomingEvents = get_cached_upcoming_events();
+	//end events query
+
+	if ( WP_DEBUG ) {
+		error_log( '**************************************************************************' );
+		error_log( 'Venue Check upcoming events: ' . count( $upcomingEvents ) );
+	}
+
+	$venuecheck_conflicts = new Venue_Conflicts;
+
+	$defaultTimezone = get_option( 'timezone_string' );
+
+	//event confict checking
+
+	//if ( isset( $_POST ) ) {
+
+		/*
+		 * CONFLICT: (StartA < EndB) and (EndA > StartB)
+		 *
+		 * A conflict occurs if:
+		 * the start of the new event is before the end of the existing event
+		 * AND the end of the new event is after the start of the existing event
+		 *
+		 * This accounts for overlaps at the beginning of the existing event; overlaps at the end of the existing event; complete overlap.
+		 *
+		 * data format:
+		 * {eventStart: "2018-05-14 8:00:00", eventEnd: "2018-05-14 17:00:00", eventTimezone: "America/New_York", eventOffsetStart: "0", eventOffsetEnd: "0"}
+		 */
+
+		// new event dates
+
+		//$event_recurrences = $_POST['event_recurrences'];
+		//$postID            = $_POST['postID'];
+		//$total_count       = $_POST['total_count'];
+		//$batch_size        = $_POST['batch_size'];
+		//$batch_count       = $_POST['batch_count'];
+		//$loop_count        = 0;
+
+		if ( WP_DEBUG ) {
+			error_log( '* Venue Check event recurrences for post id ' . $postID );
+			//error_log( '* Venue Check batch: ' . $batch_count . ' of ' . $batch_size );
+			error_log(print_r($event_recurrences,true));
+		}
+
+		foreach ( $event_recurrences as $k => $event_recurrence ) {
+			//$loop_count++;
+			//$current_count = ( $batch_count * $batch_size ) + $loop_count;
+			$timezone      = $event_recurrence['eventTimezone'];
+
+			$offsetDatesA = venuecheck_get_offset_dates( $event_recurrence, $timezone );
+			$startA       = $offsetDatesA['OffsetStart'];
+			$endA         = $offsetDatesA['OffsetEnd'];
+
+			if ( WP_DEBUG ) {
+				error_log( '*********************************' );
+				error_log( '* * Venue Check event recurrence: ' . $event_recurrence['eventStart'] . ' to ' . $event_recurrence['eventEnd'] );
+			}
+
+			//upcoming event dates
+			foreach ( $upcomingEvents as $k => $upcomingEvent ) {
+				if ( ! empty( $upcomingEvent->_EventTimezone ) ) {
+					$timezone = $upcomingEvent->_EventTimezone;
+				} else {
+					$timezone = $defaultTimezone;
+				}
+
+				$offsetDatesB = venuecheck_get_offset_dates( $upcomingEvent, $timezone );
+				$startB       = $offsetDatesB['OffsetStart'];
+				$endB         = $offsetDatesB['OffsetEnd'];
+
+				// compare dates to find conflicts
+				if ( $startA < $endB && $endA > $startB ) {
+
+					if ( WP_DEBUG ) {
+						error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate  . ' to ' . $upcomingEvent->_EventEndDate );
+					}
+
+					// check that the upcoming event isn't our event, or a recurrence of our event
+					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
+
+						if ( WP_DEBUG ) {
+							error_log( '* * * * * MULTIVENUE ' . $upcomingEvent->multiVenue );
+							error_log( print_r( maybe_unserialize( $upcomingEvent->multiVenue ),true) );
+						}
+
+						$venues = $upcomingEvent->multiVenue ? maybe_unserialize( $upcomingEvent->multiVenue ) : array( $upcomingEvent->_EventVenueID );
+
+						foreach ( $venues as $venue_id ) {
+							$EventVenueID = (int) $venue_id;
+							$venuecheck_conflicts->add_venue( $upcomingEvent, $startB, $endB, $EventVenueID );
+						}
+		
+					}
+				}
+			} //end foreach $upcomingEvents
+		} //end foreach $event_recurrences
+
+		$venuecheck_conflicts->filter();
+
+		if ( WP_DEBUG ) {
+			error_log( '* Venuecheck batch done.' );
+			error_log( '**************************************************************************' );
+			error_log( '**************************************************************************' );
+			error_log( print_r($venuecheck_conflicts,true) );
+		}
+
+		echo wp_json_encode( $venuecheck_conflicts->conflicts );
+	//}
+	wp_die();
+}
+
+
 function venuecheck_check_venues() {
 
 	// Check for nonce security
@@ -670,4 +794,4 @@ function venuecheck_is_excluded_venue( $venue_id ) {
 }
 
 //turn on exclusions
-add_filter( 'venuecheck_exclude_venues', function(){ return true; } );
+//add_filter( 'venuecheck_exclude_venues', function(){ return true; } );
