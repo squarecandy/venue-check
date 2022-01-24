@@ -521,7 +521,7 @@ jQuery( function( $ ) {
 				if ( venuecheck.debug ) console.log( 'venuecheck_venue_options', venuecheck_venue_options );
 
 				// reset all options to enabled by default before we loop through.
-				$( vcObject.venueSelect + ' option' ).removeAttr( 'disabled' );
+				$( vcObject.venueSelect + ' option' ).attr( 'disabled', false );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
 					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
@@ -529,7 +529,7 @@ jQuery( function( $ ) {
 					// disable the option in the dropdown
 					$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
 						.attr( 'disabled', 'disabled' )
-						.removeAttr( 'selected' );
+						.attr( 'selected', false );
 
 					// prepare venue report
 					const $venuecheck_venue_report_entry = $( vcObject.generate_venue_report( venue ) );
@@ -617,7 +617,7 @@ jQuery( function( $ ) {
 				venuecheck_venue_report += '';
 
 				// re-enable any previously disabled options
-				$( vcObject.venueSelect + ' option' ).removeAttr( 'disabled' );
+				$( vcObject.venueSelect + ' option' ).attr( 'disabled', false );
 				if ( ! vcObject.multiVenueEnabled ) {
 					$( '#saved_tribe_venue' ).select2();
 				} else {
