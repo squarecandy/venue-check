@@ -14,8 +14,13 @@ require VENUE_CHECK_DIR_PATH . 'inc/venue-edit.php';
 require VENUE_CHECK_DIR_PATH . '/inc/class-venue-conflicts.php';
 
 function venuecheck_scripts_styles( $hook ) {
+
 	global $post_type;
-	if ( ( 'post-new.php' !== $hook && 'post.php' !== $hook ) || 'tribe_events' !== $post_type ) {
+	$venuecheck_post_types = array( 'tribe_events' );
+	if ( venuecheck_exclude_venues() ) {
+		$venuecheck_post_types[] = 'tribe_venue';
+	}
+	if ( ( 'post-new.php' !== $hook && 'post.php' !== $hook ) || ! in_array( $post_type, $venuecheck_post_types ) ) {
 		return;
 	}
 
