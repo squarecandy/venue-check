@@ -224,9 +224,16 @@ select.readonly + .select2-container {
 
 #venuecheck-conflicts-report-count div {
 	display: grid;
+	grid-column-gap: 1em;
 	grid-row-gap: 0.5em;
+	align-items: baseline;
+
+	span:first-child {
+		grid-row-start: 1;
+	}
 
 	a {
+		grid-row-start: 1;
 		text-align: right;
 	}
 
@@ -326,7 +333,7 @@ table.venuecheck-section {
 }
 
 #event_tribe_venue tr.saved-linked-post td:nth-child(2) {
-	padding: 10px !important;
+	padding: 10px;
 }
 
 #venuecheck-offsets .venuecheck-section tr td.venuecheck-section-label,
@@ -380,7 +387,7 @@ table.venuecheck-section {
 
 #venuecheck-conflicts-button {
 	display: inline-block;
-	margin: 0 0 10px 0;
+	margin: 10px 0
 	padding: 0 10px;
 	color: #555;
 	font-size: 13px;

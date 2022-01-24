@@ -429,13 +429,16 @@ jQuery( function( $ ) {
 						.unbind()
 						.click( function() {
 							$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-							if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 1' );
+							if ( venuecheck.debug )
+								console.log( 'get_event_recurrences_direct recurring - warning -> check_ajax_combined' );
 							vcObject.venuecheck_show_progress_bar();
 							vcObject.venuecheck_check_venues_progress( 0, 100 );
 							vcObject.venue_check_ajax_call_combined( post_data );
 						} );
 				} else {
-					if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 2' );
+					if ( venuecheck.debug ) console.log( 'get_event_recurrences_direct recurring - no warning -> check_ajax_combined' );
+					vcObject.venuecheck_show_progress_bar();
+					vcObject.venuecheck_check_venues_progress( 0, 100 );
 					vcObject.venue_check_ajax_call_combined( post_data );
 				}
 			} else {
@@ -448,7 +451,7 @@ jQuery( function( $ ) {
 				// if the event is not recurring, we can call check_venues directly
 				vcObject.venuecheck_hide_wait();
 
-				if ( venuecheck.debug ) console.log( 'venuecheck_check_venues 3' );
+				if ( venuecheck.debug ) console.log( 'get_event_recurrences_direct - not recurring -> check_venues' );
 
 				vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 			}
@@ -782,7 +785,7 @@ jQuery( function( $ ) {
 				const seriesClass = $( this )
 					.parents( 'tr.recurring.first' )
 					.attr( 'data-series' );
-				console.log( 'others', 'tr.recurring.' + seriesClass + ':not(.first)' );
+
 				$( this )
 					.parents( '#venuecheck-conflicts-report-table tbody' )
 					.find( 'tr.recurring.' + seriesClass + ':not(.first)' )
@@ -928,8 +931,6 @@ jQuery( function( $ ) {
 		},
 
 		venuecheck_toggle_readonly( readonly ) {
-			console.log( 'readonly' );
-			//console.log( vcObject.venueSelect );
 			if ( readonly ) {
 				$( vcObject.venueSelect )
 					.prop( 'readonly', true )
@@ -982,7 +983,6 @@ jQuery( function( $ ) {
 			// sometimes we re-enable the form (e.g. after canceling the available venue lookup )
 			// but the venue select should remain disabled, this is what .venuecheck-preserve-disabled is for
 			for ( const venueId of vcObject.venueSelectArray ) {
-				console.log( venueId + ':not(.venuecheck-preserve-disabled)' );
 				$( venueId + ':not(.venuecheck-preserve-disabled)' )
 					.prop( 'readonly', false )
 					.removeClass( 'readonly' );
