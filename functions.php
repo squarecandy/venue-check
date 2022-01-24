@@ -36,6 +36,8 @@ function venuecheck_scripts_styles( $hook ) {
 		'nonce'       => wp_create_nonce( 'venuecheck-nonce' ),
 		'plugins_url' => plugin_dir_url( __FILE__ ),
 		'debug'       => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
+		'batchsize'   => 50,
+		'recurrence_warning_limit' => 100,
 		'multivenue'  => false,
 	);
 
@@ -44,9 +46,6 @@ function venuecheck_scripts_styles( $hook ) {
 		$localization['fieldkey']   = SQC_Multi_Venue::get_field_key();
 		$localization['field_group'] = SQC_Multi_Venue::get_group_key();
 		$localization['container_id'] = '#multi-venue-container';
-		$localization['use_tec_fields'] = false; 
-		$localization['batchsize'] = 50;
-		$localization['recurrence_warning_limit'] = 100;
 	}
 
 	$localization = apply_filters( 'venuecheck_js_values', $localization );
