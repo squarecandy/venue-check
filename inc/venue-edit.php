@@ -6,8 +6,11 @@ function venuecheck_after_venue_metabox( $post ) {
 	if ( venuecheck_exclude_venues() ) :
 		$checked = get_post_meta( $post->ID, 'venuecheck_exclude_venue', true );
 		?>
-		<table id="venuecheck-offsets">
+		<table id="venuecheck-exclude-venue">
 			<tbody class="venuecheck-section tribe-datetime-block">
+				<tr class="venue-check-title-bar">
+					<td colspan="2" class="venuecheck-section-label">Venue Check</td>
+				</tr>
 				<tr>
 					<td>
 						<label for="venuecheck_exclude_venue">Exclude Venue from Venuecheck:</label>
@@ -15,7 +18,7 @@ function venuecheck_after_venue_metabox( $post ) {
 					<td>
 						<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>"> 
 					    <input type="checkbox" name="venuecheck_exclude_venue" value="1"<?php echo $checked ? 'checked' : '' ?>>
-					    <p>Checking this box will allow events to be booked simultaneously in this venue.</p>
+					    <p class="description">Checking this box will allow events to be booked simultaneously in this venue.</p>
 					</td>
 				</tr>
 			</tbody>
