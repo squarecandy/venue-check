@@ -413,7 +413,7 @@ jQuery( function( $ ) {
 						recurrences_num = descriptionText.substr( countStart, countEnd ).trim();
 					}
 				}
-
+				console.log( 'recurrences_num', recurrences_num, 'showWarning', showWarning );
 				if ( showWarning || recurrences_num > vcObject.recurrence_warning_limit ) {
 					$( '#venuecheck-messages-container' ).addClass( 'has-messages' );
 					$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).show();
@@ -1011,9 +1011,11 @@ jQuery( function( $ ) {
 		venuecheck_find_available_venues() {
 			vcObject.venuecheck_hide_messages();
 			// for testing add ability to switch between splitting the ajax calls (original way) and doing them all at once
-			if ( venuecheck.combine_ajax ) {
+			if ( venuecheck.combine_ajax === '1' ) {
+				console.log( 'find_available_venues -> get_event_recurrences_direct' );
 				vcObject.venuecheck_get_event_recurrences_direct();
 			} else {
+				console.log( 'find_available_venues -> check_stored_recurrences' );
 				vcObject.venuecheck_show_wait();
 				vcObject.venuecheck_check_stored_recurrences(); // check if we have a current version of recurrences
 				//vcObject.venuecheck_get_event_recurrences();
