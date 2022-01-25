@@ -222,25 +222,26 @@ select.readonly + .select2-container {
 	}
 }
 
-#venuecheck-conflicts-report-count div {
-	display: grid;
-	grid-column-gap: 1em;
-	grid-row-gap: 0.5em;
-	align-items: baseline;
+#venuecheck-conflicts-report-count {
 
-	span:first-child {
-		grid-row-start: 1;
+	display: flex;
+	flex-direction: column;
+	width: max-content;
+	max-width: 400px;
+	row-gap: 0.5em;
+
+	.deselected-warning {
+		font-style: italic;
 	}
 
-	a {
-		grid-row-start: 1;
-		text-align: right;
+	.count-unavailable {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		column-gap: 1em;
 	}
 
-	.count-exclusions {
-		grid-column-end: 3;
-		grid-column-start: 1;
-	}
+
 }
 
 #venuecheck-show-exclusions {

@@ -39,7 +39,7 @@ jQuery( function( $ ) {
 
 					if ( venuecheck.debug ) {
 						console.log( 'check form change status after 3 seconds' );
-						console.log( 'is origForm same as current state?', $form.serialize() === origForm );
+						console.log( 'is same as current state?', $form.serialize() === origForm );
 					}
 
 					//removes the modified message when editing existing events
@@ -724,17 +724,38 @@ jQuery( function( $ ) {
 
 				venuecheck_venue_report_count += '<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">';
 
-				venuecheck_venue_report_count += '<div><span>';
+				// add message if venues were deselected
+				const deselectedCount = Object.keys( deselectedVenues ).length;
+				if ( deselectedCount ) {
+					const deselectedNames = Object.values( deselectedVenues );
+					venuecheck_venue_report_count += '<div class="deselected-warning">';
+					if ( deselectedCount > 2 ) {
+						venuecheck_venue_report_count +=
+							deselectedNames.slice( 0, -1 ).join( ', ' ) +
+							', and ' +
+							deselectedNames[ deselectedNames.length - 1 ] +
+							' have';
+					} else if ( deselectedCount === 2 ) {
+						venuecheck_venue_report_count += deselectedNames.join( ' and ' ) + ' have';
+					} else {
+						venuecheck_venue_report_count += deselectedNames[ 0 ] + ' has';
+					}
+					venuecheck_venue_report_count += ' been deselected.</div>';
+				}
+
+				// add count of unavailable venues & link to show full report
+				venuecheck_venue_report_count += '<div class="count-unavailable"><span>';
 				if ( venuecheck_conflicts_count ) {
 					venuecheck_venue_report_count +=
 						venuecheck_conflicts_count + ( venuecheck_conflicts_count === 1 ? ' unavailable venue.' : ' unavailable venues.' );
 				} else {
 					venuecheck_venue_report_count += 'All venues are available.';
 				}
-				venuecheck_venue_report_count += '</span><a id="venuecheck-conflicts-report-link">Show Details</a>';
+				venuecheck_venue_report_count += '</span><a id="venuecheck-conflicts-report-link">Show Details</a></div>';
 
+				// add count of excluded venues
 				if ( count_exclusions ) {
-					venuecheck_venue_report_count += '<span class="count-exclusions">';
+					venuecheck_venue_report_count += '<div class="count-exclusions"><span>';
 					venuecheck_venue_report_count += count_exclusions;
 					venuecheck_venue_report_count +=
 						count_exclusions === 1 ? ' venue is available but has ' : ' venues are available but have ';
