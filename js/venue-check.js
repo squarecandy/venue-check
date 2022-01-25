@@ -658,12 +658,16 @@ jQuery( function( $ ) {
 				$( vcObject.venueSelect + ' option' ).attr( 'disabled', false );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
-					if ( venuecheck.debug ) console.log( index, venue.venueID, venue );
+					if ( venuecheck.debug ) console.log( 'venue:', index, venue.venueID, venue );
 
-					// disable the option in the dropdown
-					$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
-						.attr( 'disabled', 'disabled' )
-						.attr( 'selected', false );
+					if ( ! this.excluded ) {
+						// disable the option in the dropdown
+						$( vcObject.venueSelect + ' option[value="' + venue.venueID + '"]' )
+							.attr( 'disabled', 'disabled' )
+							.attr( 'selected', false );
+						//NB deselecting in this way won't always work on the ACF Select2, see below
+						unavailableVenues[ venue.venueID ] = { name: venue.venueTitle };
+					}
 
 					// prepare venue report
 					const $venuecheck_venue_report_entry = $( vcObject.generate_venue_report( venue ) );
