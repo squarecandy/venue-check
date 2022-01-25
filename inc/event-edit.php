@@ -1,25 +1,28 @@
 <?php
 /* set up for event edit admin page */
+// phpcs:disable NamingConventions.ValidVariableName.VariableNotSnakeCase
+// phpcs:disable WordPress.NamingConventions.ValidVariableName
+// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 // add admin body classes
 add_filter( 'admin_body_class', 'venuecheck_admin_body_class' );
 function venuecheck_admin_body_class( $class ) {
 	$screen = get_current_screen();
 	if ( 'tribe_events' === $screen->id && 'post' === $screen->base ) {
-		$classes = explode(' ', $class );
+		$classes = explode( ' ', $class );
 		if ( 'add' === $screen->action ) {
 			$classes[] = 'venuecheck-new';
 		} else {
 			$classes[] = 'venuecheck-update';
 		}
-		return implode(' ', $classes);
+		return implode( ' ', $classes );
 	}
 }
 
 
 // add html to the publish post section
 add_action( 'post_submitbox_start', 'venue_check_post_submitbox_start' );
-function venue_check_post_submitbox_start( $post ){
+function venue_check_post_submitbox_start( $post ) {
 	if ( 'tribe_events' === $post->post_type ) {
 		echo '<div id="venuecheck-modified-publish" style="display: none;" class="venuecheck-notice notice-error">' .
 				'Because the date/time of this event was modified, the currently selected venue may not be available. ' .
@@ -154,7 +157,7 @@ function venuecheck_save_offsets( $post_id ) {
 
 // add html after the venue section
 add_action( 'tribe_after_location_details', 'venuecheck_tribe_after_location_details', 999 );
-function venuecheck_tribe_after_location_details( $event_id ){
+function venuecheck_tribe_after_location_details( $event_id ) {
 	?>
 	<table class="eventtable venuecheck-section">
 		<tr id="venuecheck-messages-container" style="display: none;">
@@ -167,7 +170,7 @@ function venuecheck_tribe_after_location_details( $event_id ){
 						</div>
 						<div id="venuecheck-modified" style="display: none;" class="venuecheck-notice notice-error">Because the date/time of this event was modified, you need to <a id="modified-conflicts">recheck for venue conflicts</a> before you can save changes.</div>
 						<div id="venuecheck-progress" style="display: none;">
-							<span class="venuecheck-message"><i class="fas fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Loading...</span>Finding available venues...</span> 
+							<span class="venuecheck-message"><i class="fas fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Loading...</span>Finding available venues...</span>
 							<span class="venuecheck-message venuecheck-progress-percent-done">0%</span>
 							<div id="venuecheck-progress-bar" class="progress-bar green stripes">
 								<span style="width: 0%"></span>

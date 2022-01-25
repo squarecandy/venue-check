@@ -1,14 +1,14 @@
 <?php
 class Venue_Conflicts {
 
-	public $conflicts = array();
+	public $conflicts                     = array();
 	private $max_recurring_events_to_show = 1;
-	public $parents = array();
+	public $parents                       = array();
 
 	public function add_venue( $event, $start, $end, $venue_id ) {
 
-		$EventVenueID             = $venue_id;
-		$EventVenueTitle          = get_the_title( $EventVenueID );
+		$EventVenueID    = $venue_id;
+		$EventVenueTitle = get_the_title( $EventVenueID );
 
 		$startDay = $start->format( 'm/d/Y' );
 		$endDay   = $end->format( 'm/d/Y' );
@@ -20,7 +20,7 @@ class Venue_Conflicts {
 			$venuecheck_eventDisplay .= ' ' . $endDay;
 		}
 		$venuecheck_eventDisplay .= $end->format( ' T' );
-		
+
 		if ( $EventVenueTitle ) {
 			// add id & title to index for the venue id ( it may already exist, but id/title shouldn't change, so that's ok )
 			$this->conflicts[ $EventVenueID ]['venueID']    = $EventVenueID;
@@ -41,22 +41,22 @@ class Venue_Conflicts {
 				'eventClass'  => '',
 				'recurrence'  => '',
 			);
-			
+
 			// if this is a recurring event
 			if ( $event->post_parent || tribe_is_recurring_event( $event->ID ) ) {
 				error_log( $event->ID . ' is recurring in series ' . $event->post_parent );
 				$event_item['eventClass'] = 'recurring';
-				
+
 				// if this is the first of this series that we are processing, flag that in the parents array
 				//if ( ! isset( $this->parents[ $EventVenueID ][ $event->post_parent ] ) ) {
 				if ( ! isset( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] ) ) {
 
 					error_log( '* * * is first in series ' );
 					$this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] = array(
-						'id' => $event->post_parent,
+						'id'         => $event->post_parent,
 						'recurrence' => tribe_get_recurrence_text( $event->post_parent ),
 					);
-					error_log(print_r($this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ],true));
+					error_log( print_r( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ], true ) );
 
 					/*
 					// if the parent event of the recurring series preceded us, it wouldn't have triggered the above check, so flag it as first
@@ -80,7 +80,7 @@ class Venue_Conflicts {
 		}
 	}
 
-	public function filter(){
+	public function filter() {
 		$this->conflicts = array_map( 'array_filter', $this->conflicts ); //remove empty array elements
 		$this->conflicts = array_filter( $this->conflicts ); //remove empty array elements
 		//sort by venue title
@@ -93,5 +93,5 @@ class Venue_Conflicts {
 			);
 		}
 	}
-	
+
 }

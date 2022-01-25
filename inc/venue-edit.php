@@ -17,13 +17,13 @@ function venuecheck_after_venue_metabox( $post ) {
 					</td>
 					<td>
 						<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>"> 
-					    <input type="checkbox" name="venuecheck_exclude_venue" value="1"<?php echo $checked ? 'checked' : '' ?>>
-					    <p class="description">Checking this box will allow events to be booked simultaneously in this venue.</p>
+						<input type="checkbox" name="venuecheck_exclude_venue" value="1"<?php echo $checked ? 'checked' : ''; ?>>
+						<p class="description">Checking this box will allow events to be booked simultaneously in this venue.</p>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-	    <?php
+		<?php
 	endif;
 }
 
@@ -51,7 +51,7 @@ function venuecheck_save_exclude_venue( $post_id ) {
 		return;
 	}
 
-	if ( array_key_exists( 'venuecheck_exclude_venue', $_POST ) && '1' === $_POST['venuecheck_exclude_venue' ] ) {
+	if ( array_key_exists( 'venuecheck_exclude_venue', $_POST ) && '1' === $_POST['venuecheck_exclude_venue'] ) {
 		update_post_meta(
 			$post_id,
 			'venuecheck_exclude_venue',
