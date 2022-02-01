@@ -226,7 +226,17 @@ select.readonly + .select2-container {
 
 		p {
 			margin: 0;
+			font-size: 13px;
 		}
+	}
+
+	tr.accordion:not(.open) span.recurrence {
+		display: -webkit-box;
+		max-height: 39px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
 	}
 }
 

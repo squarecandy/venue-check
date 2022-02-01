@@ -806,7 +806,9 @@ jQuery( function( $ ) {
 				const seriesClass = $( this )
 					.parents( 'tr.recurring.first' )
 					.attr( 'data-series' );
-
+				$( this )
+					.parents( 'tr.recurring' )
+					.toggleClass( 'open' );
 				$( this )
 					.parents( '#venuecheck-conflicts-report-table tbody' )
 					.find( 'tr.recurring.' + seriesClass + ':not(.first)' )
