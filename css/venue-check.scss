@@ -201,6 +201,14 @@ select.readonly + .select2-container {
 		white-space: nowrap;
 	}
 
+	tr.recurring:not(.accordion) {
+
+		i.fa-sync-alt.fas,
+		span.recurrence {
+			display: none;
+		}
+	}
+
 	.venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas {
 		margin-right: 5px;
 	}
