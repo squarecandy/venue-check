@@ -740,7 +740,8 @@ jQuery( function( $ ) {
 					} else {
 						venuecheck_venue_report_count += deselectedNames[ 0 ] + ' has';
 					}
-					venuecheck_venue_report_count += ' been deselected.</div>';
+					venuecheck_venue_report_count +=
+						' been deselected because you changed the date and time to conflict with an existing event in this venue.</div>';
 				}
 
 				// add count of unavailable venues & link to show full report

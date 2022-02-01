@@ -239,6 +239,7 @@ select.readonly + .select2-container {
 	row-gap: 0.5em;
 
 	.deselected-warning {
+		color: #b32d2e;
 		font-style: italic;
 	}
 
@@ -248,8 +249,6 @@ select.readonly + .select2-container {
 		width: 100%;
 		column-gap: 1em;
 	}
-
-
 }
 
 #venuecheck-show-exclusions {
