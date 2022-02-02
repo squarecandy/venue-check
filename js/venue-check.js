@@ -160,7 +160,9 @@ jQuery( function( $ ) {
 			$venueDropdown.wrapInner( '<div id="venuecheck-venue-select"></div>' );
 
 			// add conflicts button at end of dropdown cell, after our wrapper div
-			$venueDropdown.append( '<a id="venuecheck-conflicts-button" class="button">Find available venues</a>' );
+			$venueDropdown.append(
+				'<a id="venuecheck-conflicts-button" class="button" tabindex="0" role="button">Find available venues</a>'
+			);
 
 			$venuecheckVenueSection
 				.find( '.edit-linked-post-link' )
@@ -172,6 +174,8 @@ jQuery( function( $ ) {
 
 			if ( $( 'body' ).hasClass( 'venuecheck-new' ) ) {
 				$( '#venuecheck-conflicts-button' ).show();
+			} else if ( ! $( vcObject.venueSelect ).val().length ) {
+				$( '#venuecheck-conflicts-button' ).css( 'display', 'inline-block' );
 			} else {
 				$( '#venuecheck-conflicts-button' ).hide();
 			}
@@ -605,6 +609,7 @@ jQuery( function( $ ) {
 		 */
 		venuecheck_check_venues_handler( venuecheck_conflicts ) {
 			$( 'body' ).addClass( 'venuecheck-update' );
+			$( '#venuecheck-conflicts-button' ).hide();
 
 			if ( venuecheck.debug ) console.log( 'starting venuecheck_check_venues_handler' );
 
