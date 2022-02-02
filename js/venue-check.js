@@ -10,15 +10,16 @@ jQuery( function( $ ) {
 		venueSelect: '#saved_tribe_venue',
 		batchsize: 150, //default
 		recurrence_warning_limit: 300, //default
-		storedRecurrences: { origForm: null, recurrences: null },
+		storedRecurrences: { origFormRecur: null, recurrences: null },
 		showExclusions: venuecheck.show_exclusions ? venuecheck.show_exclusions : false,
+		origForm: null,
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
 			vcObject.debugLog( 'In Multivenue mode? ', vcObject.multiVenueEnabled, typeof vcObject.multiVenueEnabled );
 			vcObject.debugLog( 'venuecheck variables', venuecheck );
 
-			// convert vars to number swhere necessary
+			// convert vars to numbers where necessary
 			[ 'batchsize', 'recurrence_warning_limit' ].forEach( ( element ) => {
 				venuecheck[ element ] = parseInt( venuecheck[ element ], 10 );
 				if ( ! isNaN( venuecheck[ element ] ) ) {
@@ -44,11 +45,11 @@ jQuery( function( $ ) {
 				// run 3s after load
 				setTimeout( function() {
 					const $form = $( 'form#post' );
-					const origForm = $form.serialize();
+					vcObject.origForm = $form.serialize();
 
 					if ( venuecheck.debug ) {
 						console.log( 'check form change status after 3 seconds' );
-						console.log( 'is same as current state?', $form.serialize() === origForm );
+						console.log( 'is same as current state?', $form.serialize() === vcObject.origForm );
 					}
 
 					//removes the modified message when editing existing events
@@ -58,9 +59,11 @@ jQuery( function( $ ) {
 							'body.venuecheck-update #EventInfo .tribe-dropdown,' +
 							'body.venuecheck-update #EventInfo .tribe-button-field',
 						function() {
-							if ( $form.serialize() !== origForm ) {
+							if ( $form.serialize() !== vcObject.origForm ) {
+								vcObject.debugLog( 'form changed, show msg' );
 								vcObject.venuecheck_show_modified_msg();
 							} else {
+								vcObject.debugLog( 'form changed, hide msg' );
 								vcObject.venuecheck_hide_modified_msg();
 							}
 						}
@@ -198,7 +201,7 @@ jQuery( function( $ ) {
 			if (
 				vcObject.storedRecurrences &&
 				vcObject.storedRecurrences.recurrences &&
-				vcObject.storedRecurrences.origForm === vcObject.get_recurrence_form_data()
+				vcObject.storedRecurrences.origFormRecur === vcObject.get_recurrence_form_data()
 			) {
 				vcObject.venuecheck_disable_form();
 				vcObject.venuecheck_hide_wait();
@@ -209,21 +212,21 @@ jQuery( function( $ ) {
 					console.log(
 						'recurrences stored but recurrence changed?',
 						vcObject.storedRecurrences &&
-							vcObject.storedRecurrences.origForm &&
-							vcObject.storedRecurrences.origForm !== vcObject.get_recurrence_form_data()
+							vcObject.storedRecurrences.origFormRecur &&
+							vcObject.storedRecurrences.origFormRecur !== vcObject.get_recurrence_form_data()
 					);
 
 				const recurrenceFormData = vcObject.get_recurrence_form_data();
 				vcObject.debugLog( 'recurrenceFormData', recurrenceFormData );
 				vcObject.storedRecurrences.recurrences = null;
-				vcObject.storedRecurrences.origForm = recurrenceFormData;
-				vcObject.debugLog( 'storing Recurrences', vcObject.storedRecurrences.origForm );
+				vcObject.storedRecurrences.origFormRecur = recurrenceFormData;
+				vcObject.debugLog( 'storing Recurrences', vcObject.storedRecurrences.origFormRecur );
 				vcObject.venuecheck_get_event_recurrences();
 			}
 		},
 
 		get_recurrence_form_data() {
-			// get the form values from the date/time & recurrence sections
+			// get the form values from the date/time & recurrence sections, NOT including the setup time
 			const recurrenceFormElements =
 				'.recurrence-row input, .custom-recurrence-row input, .recurrence-row select, .custom-recurrence-row select,' +
 				'.tribe-datetime-block input';
@@ -717,8 +720,8 @@ jQuery( function( $ ) {
 								);
 							}
 							$venuecheck_venue_report_exclusions.append( $venuecheck_venue_report_entry );
-							count_exclusions++;
 						}
+						count_exclusions++;
 					} else {
 						$venuecheck_venue_report.find( '#venuecheck-conflicts-report-table' ).append( $venuecheck_venue_report_entry );
 					}
@@ -766,7 +769,7 @@ jQuery( function( $ ) {
 				venuecheck_venue_report_count += '</span><a id="venuecheck-conflicts-report-link">Show Details</a></div>';
 
 				// add count of excluded venues
-				if ( count_exclusions ) {
+				if ( count_exclusions && vcObject.showExclusions ) {
 					venuecheck_venue_report_count += '<div class="count-exclusions"><span>';
 					venuecheck_venue_report_count += count_exclusions;
 					venuecheck_venue_report_count +=
@@ -1030,7 +1033,7 @@ jQuery( function( $ ) {
 			$( '.tribe-datetime-block :input' ).removeClass( 'venuecheck-preserve-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
 			$( '#tribe_events_event_details a' ).removeClass( 'venuecheck-disabled' );
-			// const origForm = $( 'form#post' ).serialize();
+			vcObject.origForm = $( 'form#post' ).serialize();
 		},
 
 		venuecheck_show_progress_bar() {
