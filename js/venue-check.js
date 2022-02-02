@@ -11,6 +11,7 @@ jQuery( function( $ ) {
 		batchsize: venuecheck.batchsize,
 		recurrence_warning_limit: venuecheck.recurrence_warning_limit,
 		storedRecurrences: { origForm: null, recurrences: null },
+		showExclusions: venuecheck.show_exclusions ? venuecheck.show_exclusions : false,
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
@@ -699,15 +700,17 @@ jQuery( function( $ ) {
 
 					// if venues that are excluded from check, add them to separate report instead of main report
 					if ( this.excluded ) {
-						// create the exclusions report if we haven't previously
-						if ( ! $venuecheck_venue_report_exclusions ) {
-							$venuecheck_venue_report_exclusions = $(
-								// eslint-disable-next-line max-len
-								'<table id="venuecheck-exclusions-report-table" class="venuecheck-conflicts-report-table" style="display:none"></table>'
-							);
+						if ( vcObject.showExclusions ) {
+							// create the exclusions report if we haven't previously
+							if ( ! $venuecheck_venue_report_exclusions ) {
+								$venuecheck_venue_report_exclusions = $(
+									// eslint-disable-next-line max-len
+									'<table id="venuecheck-exclusions-report-table" class="venuecheck-conflicts-report-table" style="display:none"></table>'
+								);
+							}
+							$venuecheck_venue_report_exclusions.append( $venuecheck_venue_report_entry );
+							count_exclusions++;
 						}
-						$venuecheck_venue_report_exclusions.append( $venuecheck_venue_report_entry );
-						count_exclusions++;
 					} else {
 						$venuecheck_venue_report.find( '#venuecheck-conflicts-report-table' ).append( $venuecheck_venue_report_entry );
 					}
@@ -810,7 +813,7 @@ jQuery( function( $ ) {
 					.parents( 'tr.recurring' )
 					.toggleClass( 'open' );
 				$( this )
-					.parents( '#venuecheck-conflicts-report-table tbody' )
+					.parents( 'tbody' )
 					.find( 'tr.recurring.' + seriesClass + ':not(.first)' )
 					.toggle();
 			} );
