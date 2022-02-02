@@ -948,6 +948,7 @@ jQuery( function( $ ) {
 			$( '#venuecheck-messages-container, #venuecheck-modified-publish, #venuecheck-modified' ).show();
 			$( '#venuecheck-report-container, #venuecheck-conflicts-report-count, #venuecheck-progress' ).hide();
 			$( '#publish' ).prop( 'disabled', true );
+			$( 'input#save-post' ).prop( 'disabled', true );
 			vcObject.venuecheck_toggle_readonly( true );
 			$( '#venuecheck-change-venue' ).show();
 		},
@@ -958,6 +959,7 @@ jQuery( function( $ ) {
 				.hide();
 			$( '#venuecheck-messages-container.has-messages, #venuecheck-conflicts-report-count' ).show();
 			$( '#publish' ).prop( 'disabled', false );
+			$( 'input#save-post' ).prop( 'disabled', false );
 			if ( $( 'body' ).hasClass( 'venuecheck-venues' ) ) {
 				$( '#venuecheck-messages-container' ).show();
 				$( '#venuecheck-report-container' ).hide();
@@ -1008,6 +1010,7 @@ jQuery( function( $ ) {
 				.addClass( 'venuecheck-preserve-disabled' );
 			$( '.tribe-datetime-block :input:disabled' ).addClass( 'venuecheck-preserve-disabled' );
 			$( '#publish' ).prop( 'disabled', true );
+			$( 'input#save-post' ).prop( 'disabled', true );
 			$( '.tribe-datetime-block :input' ).prop( 'disabled', true );
 			$( '#tribe_events_event_details a' )
 				.not(
@@ -1024,14 +1027,12 @@ jQuery( function( $ ) {
 					.prop( 'readonly', false )
 					.removeClass( 'readonly' );
 			}
-			/*$( '#saved_tribe_venue:not(.venuecheck-preserve-disabled)' )
-			.prop( 'readonly', false )
-			.removeClass( 'readonly' );*/
+
 			$( '.tribe-datetime-block :input:not(.venuecheck-preserve-disabled)' ).prop( 'disabled', false );
-			//$( '#saved_tribe_venue, .tribe-datetime-block :input' ).removeClass( 'venuecheck-preserve-disabled' );
 			$( vcObject.venueSelect ).removeClass( 'venuecheck-preserve-disabled' );
 			$( '.tribe-datetime-block :input' ).removeClass( 'venuecheck-preserve-disabled' );
 			$( '#publish' ).prop( 'disabled', false );
+			$( 'input#save-post' ).prop( 'disabled', false );
 			$( '#tribe_events_event_details a' ).removeClass( 'venuecheck-disabled' );
 			vcObject.origForm = $( 'form#post' ).serialize();
 		},
