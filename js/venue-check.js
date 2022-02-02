@@ -8,15 +8,23 @@ jQuery( function( $ ) {
 		multiVenueEnabled: false,
 		venueSelectArray: [ '#saved_tribe_venue' ], //allow for reversion to primary + additional fields
 		venueSelect: '#saved_tribe_venue',
-		batchsize: venuecheck.batchsize,
-		recurrence_warning_limit: venuecheck.recurrence_warning_limit,
+		batchsize: 150, //default
+		recurrence_warning_limit: 300, //default
 		storedRecurrences: { origForm: null, recurrences: null },
 		showExclusions: venuecheck.show_exclusions ? venuecheck.show_exclusions : false,
 		init() {
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
-			vcObject.debugLog( 'In Multivenue mode? ' + vcObject.multiVenueEnabled );
+			vcObject.debugLog( 'In Multivenue mode? ', vcObject.multiVenueEnabled, typeof vcObject.multiVenueEnabled );
 			vcObject.debugLog( 'venuecheck variables', venuecheck );
+
+			// convert vars to number swhere necessary
+			[ 'batchsize', 'recurrence_warning_limit' ].forEach( ( element ) => {
+				venuecheck[ element ] = parseInt( venuecheck[ element ], 10 );
+				if ( ! isNaN( venuecheck[ element ] ) ) {
+					vcObject[ element ] = venuecheck[ element ];
+				}
+			} );
 
 			if ( vcObject.multiVenueEnabled ) {
 				if ( ! venuecheck.use_tec_fields ) {

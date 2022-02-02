@@ -39,8 +39,8 @@ function venuecheck_scripts_styles( $hook ) {
 		'nonce'                    => wp_create_nonce( 'venuecheck-nonce' ),
 		'plugins_url'              => plugin_dir_url( __FILE__ ),
 		'debug'                    => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
-		'batchsize'                => 50,
-		'recurrence_warning_limit' => 100,
+		'batchsize'                => 150, // max 250 - otherwise we hit max_input_vars 1000
+		'recurrence_warning_limit' => 300,
 		'multivenue'               => false,
 		'combine_ajax'             => venuecheck_combine_ajax_calls(),
 	);
