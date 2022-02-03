@@ -58,27 +58,32 @@ table.venuecheck {
 	padding: 0 10px;
 }
 
-.venuecheck-section a:not(.select2-choice) {
+.venuecheck-section a:not(.select2-choice),
+.venuecheck-section button {
 	color: #0073aa;
 	font-size: 12px;
 	text-decoration: underline;
+	background: none;
+	border: none;
 	cursor: pointer;
 }
 
 .venuecheck-section a:not(.select2-choice):hover,
-.venuecheck-section a:not(.select2-choice):active {
+.venuecheck-section a:not(.select2-choice):active,
+.venuecheck-section button:hover,
+.venuecheck-section button:active {
 	color: #00a0d2;
 }
 
-.venuecheck-section a.venuecheck-report-link {
+.venuecheck-section .venuecheck-report-link {
 	text-decoration: none;
 }
 
-.venuecheck-section a.venuecheck-report-link span {
+.venuecheck-section .venuecheck-report-link span {
 	text-decoration: underline;
 }
 
-.venuecheck-section a.venuecheck-report-link i.fa-external-link-alt {
+.venuecheck-section .venuecheck-report-link i.fa-external-link-alt {
 	display: inline;
 	padding-left: 5px;
 	text-decoration: none;

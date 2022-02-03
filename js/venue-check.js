@@ -161,14 +161,14 @@ jQuery( function( $ ) {
 
 			// add conflicts button at end of dropdown cell, after our wrapper div
 			$venueDropdown.append(
-				'<a id="venuecheck-conflicts-button" class="button" tabindex="0" role="button">Find available venues</a>'
+				'<button id="venuecheck-conflicts-button" class="button" type="button" type="button">Find available venues</button>'
 			);
 
 			$venuecheckVenueSection
 				.find( '.edit-linked-post-link' )
 				.after(
 					'<div id="venuecheck-change-venue" style="display: none;">' +
-						'<a id="venuecheck-conflicts-link" class="button">Change Venue</a>' +
+						'<button id="venuecheck-conflicts-link" class="button" type="button">Change Venue</button>' +
 						'</div>'
 				);
 
@@ -652,9 +652,10 @@ jQuery( function( $ ) {
 				// create the report container
 				venuecheck_venue_report += '<div id="venuecheck-conflicts-report-container">';
 				venuecheck_venue_report += '<div id="venuecheck-report-links">';
-				venuecheck_venue_report += '<a id="venuecheck-report-conflicts-link">Recheck for Venue Conflicts</a>';
+				venuecheck_venue_report +=
+					'<button id="venuecheck-report-conflicts-link" type="button">Recheck for Venue Conflicts</button>';
 				venuecheck_venue_report += '<span class="venuecheck-divider">&nbsp;|&nbsp;</span>';
-				venuecheck_venue_report += '<a id="venuecheck-conflicts-report-close">Close</a>';
+				venuecheck_venue_report += '<button id="venuecheck-conflicts-report-close" type="button">Close</button>';
 				venuecheck_venue_report += '</div>';
 				venuecheck_venue_report += '<table id="venuecheck-conflicts-report-table" class="venuecheck-conflicts-report-table">';
 				venuecheck_venue_report += '</table></div>';
@@ -764,14 +765,19 @@ jQuery( function( $ ) {
 				}
 
 				// add count of unavailable venues & link to show full report
-				venuecheck_venue_report_count += '<div class="count-unavailable"><span>';
+				venuecheck_venue_report_count += '<div class="count-unavailable"><span id="vc-report-link-desc">';
 				if ( venuecheck_conflicts_count ) {
 					venuecheck_venue_report_count +=
 						venuecheck_conflicts_count + ( venuecheck_conflicts_count === 1 ? ' unavailable venue.' : ' unavailable venues.' );
 				} else {
 					venuecheck_venue_report_count += 'All venues are available.';
 				}
-				venuecheck_venue_report_count += '</span><a id="venuecheck-conflicts-report-link">Show Details</a></div>';
+				venuecheck_venue_report_count +=
+					'</span>' +
+					'<button id="venuecheck-conflicts-report-link" aria-labelledby="#vc-report-link-desc" type="button">' +
+					'Show Details' +
+					'</button>' +
+					'</div>';
 
 				// add count of excluded venues
 				if ( count_exclusions && vcObject.showExclusions ) {
@@ -805,8 +811,8 @@ jQuery( function( $ ) {
 
 			if ( count_exclusions ) {
 				$( '#venuecheck-conflicts-report-container' ).append(
-					'<div id="venuecheck-show-exclusions"><a href="#">' +
-						'<span>Show</span> available venues with overlapping bookings</a></div>'
+					'<div id="venuecheck-show-exclusions"><button type="button">' +
+						'<span>Show</span> available venues with overlapping bookings</button></div>'
 				);
 				$( '#venuecheck-conflicts-report-container' ).append( $venuecheck_venue_report_exclusions );
 			}

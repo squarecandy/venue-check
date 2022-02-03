@@ -168,7 +168,7 @@ function venuecheck_tribe_after_location_details( $event_id ) {
 						<div id="venuecheck-wait" style="display: none;">
 							<span class="venuecheck-message"><i class="fas fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Loading...</span>Getting event recurrences...</span>
 						</div>
-						<div id="venuecheck-modified" style="display: none;" class="venuecheck-notice notice-error">Because the date/time of this event was modified, you need to <a id="modified-conflicts">recheck for venue conflicts</a> before you can save changes.</div>
+						<div id="venuecheck-modified" style="display: none;" class="venuecheck-notice notice-error">Because the date/time of this event was modified, you need to <button id="modified-conflicts" type="button">recheck for venue conflicts</button> before you can save changes.</div>
 						<div id="venuecheck-progress" style="display: none;">
 							<span class="venuecheck-message"><i class="fas fa-spinner fa-pulse fa-fw"></i><span class="sr-only">Loading...</span>Finding available venues...</span>
 							<span class="venuecheck-message venuecheck-progress-percent-done">0%</span>
@@ -177,7 +177,7 @@ function venuecheck_tribe_after_location_details( $event_id ) {
 							</div>
 						</div>
 						<div id="venuecheck-recurrence-warning" style="display: none;" class="venuecheck-notice notice-warning">
-							It may take up to a minute or more to find available venues for all <span id="venuecheck-recurrence-count"></span> events in this series.<br><em>Note: this system is only able to check conflicts up to 2 years into the future.</em><br>Would you like to continue? <a id="venuecheck-recurrence-warning-continue">Continue</a><span class="venuecheck-divider">&nbsp;|&nbsp;</span><a id="venuecheck-recurrence-warning-cancel">Cancel</a>
+							It may take up to a minute or more to find available venues for all <span id="venuecheck-recurrence-count"></span> events in this series.<br><em>Note: this system is only able to check conflicts up to 2 years into the future.</em><br>Would you like to continue? <button id="venuecheck-recurrence-warning-continue" type="button">Continue</button><span class="venuecheck-divider">&nbsp;|&nbsp;</span><button id="venuecheck-recurrence-warning-cancel" type="button">Cancel</button>
 						</div>
 					</div>
 				</div>
