@@ -108,6 +108,13 @@ jQuery( function( $ ) {
 			$( '#allDayCheckbox' ).click( function() {
 				vcObject.venuecheck_show_hide_offsets();
 			} );
+
+			// for now strip inconsistently applied tabindex from TEC inputs so we can tab through the entire form
+			[ 'EventStartDate', 'EventStartTime', 'allDayCheckbox' ].forEach( ( element ) => {
+				if ( document.getElementById( element ).tabIndex > 1 ) {
+					document.getElementById( element ).tabIndex = 0;
+				}
+			} );
 		},
 
 		tribeEventsEventDetailsLoaded() {

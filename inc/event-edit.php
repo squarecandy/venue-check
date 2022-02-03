@@ -63,7 +63,7 @@ function venuecheck_offsets_html() {
 				<td class="venuecheck-block">
 				<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>">
 
-					<select tabindex="2003" name="_venuecheck_event_offset_start" id="_venuecheck_event_offset_start">
+					<select tabindex="0" name="_venuecheck_event_offset_start" id="_venuecheck_event_offset_start">
 						<option value="0" <?php selected( $eventOffsetStart, '0' ); ?>>None</option>
 						<option value="15" <?php selected( $eventOffsetStart, '15' ); ?>>15 minutes</option>
 						<option value="30" <?php selected( $eventOffsetStart, '30' ); ?>>30 minutes</option>
@@ -87,7 +87,7 @@ function venuecheck_offsets_html() {
 				<td class="venuecheck-label">Cleanup Time:</td>
 				<td class="venuecheck-block">
 
-					<select tabindex="2003" name="_venuecheck_event_offset_end" id="_venuecheck_event_offset_end">
+					<select tabindex="0" name="_venuecheck_event_offset_end" id="_venuecheck_event_offset_end">
 						<option value="0" <?php selected( $eventOffsetEnd, '0' ); ?>>None</option>
 						<option value="15" <?php selected( $eventOffsetEnd, '15' ); ?>>15 minutes</option>
 						<option value="30" <?php selected( $eventOffsetEnd, '30' ); ?>>30 minutes</option>
