@@ -24,6 +24,11 @@ body.venuecheck-update #venuecheck-conflicts-button {
 	display: inline-block;
 }
 
+.multi-venue-container #venuecheck-change-venue {
+	margin-top: 14px;
+	vertical-align: top;
+}
+
 #venuecheck-conflicts-report {
 	display: none;
 }
@@ -53,7 +58,7 @@ table.venuecheck {
 	background-color: #f4fdef;
 }
 
-.venuecheck-section tr td {
+.venuecheck-section tr:not(.linked-post.venue) td {
 	position: relative;
 	padding: 0 10px;
 }
@@ -344,13 +349,26 @@ table.venuecheck-section {
 	border-collapse: collapse;
 }
 
+#venuecheck-messages-container,
+#event_tribe_venue .saved-linked-post,
+.multi-venue-container .saved-linked-post,
+.linked-post.venue,
+.tribe-linked-type-venue-googlemap-link {
+
+	td:first-child {
+		width: 10%;
+	}
+}
+
+.tribe-linked-type-venue-googlemap-link td:first-child {
+	padding-left: 30px;
+}
 
 #venuecheck-messages-container,
 #event_tribe_venue .saved-linked-post,
 .multi-venue-container .saved-linked-post {
 
 	td:first-child {
-		width: 10%;
 		padding-top: 10px;
 		vertical-align: top;
 	}
@@ -358,6 +376,15 @@ table.venuecheck-section {
 
 #event_tribe_venue tr.saved-linked-post td:nth-child(2) {
 	padding: 10px;
+}
+
+tr.linked-post.venue td:nth-child(2),
+.tribe-linked-type-venue-googlemap-link td:nth-child(2) {
+	padding: 5px 10px;
+}
+
+.multi-venue-container .multi-venue-add-cancel {
+	margin-left: 10px;
 }
 
 #venuecheck-offsets .venuecheck-section tr td.venuecheck-section-label,
