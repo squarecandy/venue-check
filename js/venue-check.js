@@ -745,9 +745,11 @@ jQuery( function( $ ) {
 				} else {
 					$( vcObject.venueSelect ).trigger( 'change' ); //@TODO maybe this would work the same as select2()
 				}
-
+				vcObject.debugLog( 'count conflicts', count_exclusions );
+				vcObject.debugLog( 'count exclusions', count_exclusions );
 				// calculate the count of unavailable and excluded venues & add to top of the report
 				const venuecheck_conflicts_count = Object.keys( venuecheck_conflicts ).length - count_exclusions;
+				vcObject.debugLog( 'venuecheck_conflicts_count', venuecheck_conflicts_count );
 
 				venuecheck_venue_report_count += '<div id="venuecheck-conflicts-report-count" class="venuecheck-notice notice-info">';
 
@@ -816,7 +818,7 @@ jQuery( function( $ ) {
 			$( '#venuecheck-messages' ).append( venuecheck_venue_report_count );
 			$( '#venuecheck-conflicts-report' ).append( $venuecheck_venue_report );
 
-			if ( count_exclusions ) {
+			if ( count_exclusions && vcObject.showExclusions ) {
 				$( '#venuecheck-conflicts-report-container' ).append(
 					'<div id="venuecheck-show-exclusions"><button type="button">' +
 						'<span>Show</span> available venues with overlapping bookings</button></div>'
