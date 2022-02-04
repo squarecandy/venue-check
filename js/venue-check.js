@@ -115,6 +115,31 @@ jQuery( function( $ ) {
 					document.getElementById( element ).tabIndex = 0;
 				}
 			} );
+
+			// if we're targeting an ACF field, adjust the dropdown sorting so selected items are in sequence rather than at the bottom
+			if ( vcObject.multiVenueEnabled ) {
+				// since the Select2 options aren't populated yet on the open event, add an observer to catch when they appear
+				jQuery( '#acf-field_61dgdie0eee3e' ).on( 'select2:open', function() {
+					const newObserver = new window.MutationObserver( function( mutationRecords, observer ) {
+						let resultsList = [];
+						// loop through results list and build an array we can sort by venue name
+						jQuery( '#select2-acf-field_61dgdie0eee3e-results li' ).each( function() {
+							resultsList.push( { name: this.innerText, html: this.outerHTML } );
+						} );
+						// sort the array and map it to just the html
+						resultsList.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+						resultsList = jQuery.map( resultsList, ( n ) => n.html );
+						resultsList = resultsList.join( '' );
+						jQuery( '#select2-acf-field_61dgdie0eee3e-results' )[ 0 ].innerHTML = resultsList;
+						// we only want to do this once so disconnect the observer
+						observer.disconnect();
+					} );
+					const elem = document.getElementById( 'select2-acf-field_61dgdie0eee3e-results' );
+					newObserver.observe( elem, {
+						childList: true, // observe direct children
+					} );
+				} );
+			}
 		},
 
 		tribeEventsEventDetailsLoaded() {
