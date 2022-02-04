@@ -28,13 +28,8 @@ jQuery( function( $ ) {
 			} );
 
 			if ( vcObject.multiVenueEnabled ) {
-				if ( ! venuecheck.use_tec_fields ) {
-					vcObject.venueSelect = '#acf-' + venuecheck.fieldkey;
-					vcObject.venueSelectArray = [ vcObject.venueSelect ];
-				} else {
-					vcObject.venueSelectArray = [ '#saved_tribe_venue', '#venuecheck-additional-venues select' ];
-					vcObject.venueSelect = vcObject.venueSelectArray.join( ', ' );
-				}
+				vcObject.venueSelect = '#acf-' + venuecheck.fieldkey;
+				vcObject.venueSelectArray = [ vcObject.venueSelect ];
 			}
 
 			window.addEventListener( 'load', ( e ) => {
@@ -371,131 +366,6 @@ jQuery( function( $ ) {
 
 			vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 		}, // end venuecheck_get_event_recurrences
-
-		venue_check_ajax_call_combined( post_data ) {
-			if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
-			return $.ajax( {
-				type: 'POST',
-				url: venuecheck.ajax_url,
-				dataType: 'json',
-				data: {
-					action: 'venuecheck_get_event_recurrences',
-					nonce: venuecheck.nonce,
-					post_data,
-				},
-			} )
-				.done( function( response ) {
-					//$.merge( event_recurrences, response );
-					if ( venuecheck.debug ) {
-						console.log( '=====/////CONFLICTS-RECURRING/////=====' );
-						console.log( response );
-						console.log( '=====/////CONFLICTS-RECURRING/////=====' );
-					}
-
-					if ( venuecheck.debug ) console.log( 'ajax_call_combined => handle_check_venues_response' );
-
-					vcObject.venuecheck_handle_check_venues_response( response );
-				} )
-				.fail( function( jqXHR, textStatus, error ) {
-					console.error( 'ajax error: ' + error );
-				} );
-		},
-
-		venuecheck_get_event_recurrences_direct() {
-			const formVars = {};
-			$.each( $( 'form#post' ).serializeArray(), function( i, field ) {
-				formVars[ field.name ] = field.value;
-			} );
-
-			if ( $( '#allDayCheckbox' ).prop( 'checked' ) === true ) {
-				formVars.EventStartTime = '00:00:00';
-				formVars.EventEndTime = '23:59:59';
-			}
-
-			const start = formVars.EventStartTime;
-			if ( venuecheck.debug ) console.log( 'start', start );
-			const end = formVars.EventEndTime;
-			const startTime = vcObject.venuecheck_convert_time( start );
-			const endTime = vcObject.venuecheck_convert_time( end );
-
-			const event_recurrences = [];
-			const event_recurrence = {
-				eventStart: formVars.EventStartDate + ' ' + startTime,
-				eventEnd: formVars.EventEndDate + ' ' + endTime,
-				eventTimezone: formVars.EventTimezone,
-				eventOffsetStart: formVars._venuecheck_event_offset_start,
-				eventOffsetEnd: formVars._venuecheck_event_offset_end,
-			};
-
-			event_recurrences.push( event_recurrence );
-			const post_data = $( 'form#post' ).serialize();
-
-			vcObject.venuecheck_disable_form();
-
-			if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
-
-			// if event is recurring, send the recurrence data via ajax to get the array of recurring dates in return
-			if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
-				// use event description to get number of recurrences
-				let recurrences_num = '';
-				let showWarning = false;
-				const descriptionText = jQuery( '.tribe-event-recurrence-description' )[ 0 ].innerText;
-				if ( descriptionText.includes( 'repeating indefinitely' ) ) {
-					showWarning = true;
-				} else {
-					const startWord = 'happening';
-					const endWord = 'times';
-					let countStart = descriptionText.search( startWord );
-					let countEnd = descriptionText.search( endWord );
-					if ( countStart > 0 && countEnd > 0 ) {
-						countStart += startWord.length;
-						countEnd -= countStart;
-						recurrences_num = descriptionText.substr( countStart, countEnd ).trim();
-					}
-				}
-				vcObject.debugLog( 'recurrences_num', recurrences_num, 'showWarning', showWarning );
-				if ( showWarning || recurrences_num > vcObject.recurrence_warning_limit ) {
-					$( '#venuecheck-messages-container' ).addClass( 'has-messages' );
-					$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).show();
-					$( '#venuecheck-recurrence-count' ).text( recurrences_num );
-					$( '#venuecheck-recurrence-warning-cancel' )
-						.unbind()
-						.click( function() {
-							$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-							vcObject.venuecheck_enable_form();
-							return false;
-						} );
-					$( '#venuecheck-recurrence-warning-continue' )
-						.unbind()
-						.click( function() {
-							$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-							if ( venuecheck.debug )
-								console.log( 'get_event_recurrences_direct recurring - warning -> check_ajax_combined' );
-							vcObject.venuecheck_show_progress_bar();
-							vcObject.venuecheck_check_venues_progress( 0, 100 );
-							vcObject.venue_check_ajax_call_combined( post_data );
-						} );
-				} else {
-					if ( venuecheck.debug ) console.log( 'get_event_recurrences_direct recurring - no warning -> check_ajax_combined' );
-					vcObject.venuecheck_show_progress_bar();
-					vcObject.venuecheck_check_venues_progress( 0, 100 );
-					vcObject.venue_check_ajax_call_combined( post_data );
-				}
-			} else {
-				if ( venuecheck.debug ) {
-					console.log( '=====/////RECURRENCES/////=====' );
-					console.log( event_recurrences );
-					console.log( '=====/////RECURRENCES/////=====' );
-				}
-
-				// if the event is not recurring, we can call check_venues directly
-				vcObject.venuecheck_hide_wait();
-
-				if ( venuecheck.debug ) console.log( 'get_event_recurrences_direct - not recurring -> check_venues' );
-
-				vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
-			}
-		}, // end venuecheck_get_event_recurrences_direct
 
 		/**
 		 *
@@ -1093,16 +963,9 @@ jQuery( function( $ ) {
 
 		venuecheck_find_available_venues() {
 			vcObject.venuecheck_hide_messages();
-			// for testing add ability to switch between splitting the ajax calls (original way) and doing them all at once
-			if ( venuecheck.combine_ajax === '1' ) {
-				vcObject.debugLog( 'find_available_venues -> get_event_recurrences_direct' );
-				vcObject.venuecheck_get_event_recurrences_direct();
-			} else {
-				vcObject.debugLog( 'find_available_venues -> check_stored_recurrences' );
-				vcObject.venuecheck_show_wait();
-				vcObject.venuecheck_check_stored_recurrences(); // check if we have a current version of recurrences
-				//vcObject.venuecheck_get_event_recurrences();
-			}
+			vcObject.debugLog( 'find_available_venues -> check_stored_recurrences' );
+			vcObject.venuecheck_show_wait();
+			vcObject.venuecheck_check_stored_recurrences(); // check if we have a current version of recurrences
 		},
 
 		venuecheck_show_hide_divider() {
