@@ -188,5 +188,15 @@ function venuecheck_tribe_after_location_details( $event_id ) {
 		</tr>
 	</table>
 	<?php
+}
 
+//remove "my venues" section at top of venues dropdown
+add_filter( 'tribe_events_get_linked_post_info_args', 'venuecheck_remove_my_venues', 10, 2 );
+function venuecheck_remove_my_venues( $args, $linked_post_type ) {
+	if ( $args['post_type'] === 'tribe_venue' ) {
+		if ( isset( $args['author'] ) && $args['author'] === get_current_user_id() ) {
+			$args['post__in'] = array(0);
+		}
+	}
+	return $args;
 }

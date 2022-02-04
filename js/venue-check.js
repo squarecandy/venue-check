@@ -520,28 +520,6 @@ jQuery( function( $ ) {
 
 			if ( venuecheck.debug ) console.log( 'venuecheck_venues', $venuecheck_venues );
 
-			if ( ! vcObject.multiVenueEnabled ) {
-				// remove the confusing double list from Modern Tribe ("My Venues" vs "Available Venues")
-				$venuecheck_venues.each( function() {
-					if (
-						'My Venues' === $( this ).attr( 'label' ) ||
-						'My Venues' ===
-							$( this )
-								.parent()
-								.attr( 'label' )
-					) {
-						$( this ).remove();
-					}
-
-					if ( 'Available Venues' === $( this ).attr( 'label' ) ) {
-						$( this )
-							.parent()
-							.append( $( this ).html() );
-						$( this ).remove();
-					}
-				} );
-			}
-
 			//disable and message any venue venuecheck_conflicts
 			let venuecheck_venue_report_count = '';
 			let venuecheck_venue_report = '';
