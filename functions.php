@@ -228,192 +228,32 @@ function venuecheck_get_event_recurrences() {
  */
 function venuecheck_get_upcoming_events() {
 
-	// Record the start time before the query is executed.
-	$started = microtime( true );
-
 	global $wpdb;
 
-	// set which query method to test
-	$query_method = '2b';
+	// use mysql pivot technique to ouput an object with the postmeta we need
+	$now        = wp_date( 'Y-m-d ' ) . '00:00:01';
+	$pivot_meta = array(
+		// column name                   => meta_key
+		'_EventTimezone'                 => '_EventTimezone',
+		'_EventStartDate'                => '_EventStartDate',
+		'_EventEndDate'                  => '_EventEndDate',
+		'_venuecheck_event_offset_start' => '_venuecheck_event_offset_start',
+		'_venuecheck_event_offset_end'   => '_venuecheck_event_offset_end',
+		'_EventVenueID'                  => '_EventVenueID',
+		'multiVenue'                     => 'multiVenue',
+	);
 
-	error_log( 'METHOD: ' . $query_method );
-	$mem_baseline = print_mem( 'INITIAL' );
-
-	switch ( $query_method ) {
-
-		case '0':
-			// CURRENT METHOD - WP_Query
-			$now = wp_date( 'Y-m-d ' ) . '00:00:01';
-
-			$args = array(
-				'post_type'              => 'tribe_events',
-				'posts_per_page'         => -1, // @TODO - this is still a danger of overloading the server memory. Should be changed for a paginated ajax recursion that runs until done.
-				'post_status'            => array(
-					'publish',
-					'pending',
-					'draft',
-					'auto-draft',
-					'future',
-					'private',
-					'inherit',
-				),
-				'meta_query'             => array(
-					array(
-						'key'     => '_EventEndDate',
-						'value'   => $now,
-						'compare' => '>=',
-					),
-				),
-				// make query more efficient - https://10up.github.io/Engineering-Best-Practices/php/
-				'no_found_rows'          => true,
-				'update_post_term_cache' => false,
-				'update_post_meta_cache' => false,
-
-			);
-
-			$upcomingEvents = new WP_Query( $args );
-
-			// log query
-			error_log( $upcomingEvents->request );
-
-			$upcomingEvents = $upcomingEvents->get_posts();
-
-			break;
-
-		case '1':
-			//METHOD 1, sql, only the fields we need, no date check (getting ALL events)
-
-			$sql = "SELECT p.ID, p.post_parent, p.post_title, m.meta_key, m.meta_value FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id AND m.meta_key IN ( '_EventTimezone', '_EventStartDate', '_EventEndDate', '_venuecheck_event_offset_start', '_venuecheck_event_offset_end', '_EventVenueID' ) AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') AND p.post_type = 'tribe_events'";
-
-			// log query
-			error_log( $sql );
-
-			$results = $wpdb->get_results( $sql, ARRAY_A );
-
-			$sorted_results = array();
-			// this returns an array fo columns, not post objects, we need to loop through the result to turn them into objects
-			foreach ( $results as $key => $result ) {
-				if ( ! isset( $sorted_results[ $result['ID'] ] ) ) {
-					$sorted_results[ $result['ID'] ] = (object) array(
-						'ID'                => $result['ID'],
-						'post_parent'       => $result['post_parent'],
-						'post_title'        => $result['post_title'],
-						$result['meta_key'] => $result['meta_value'],
-					);
-				} else {
-					$sorted_results[ $result['ID'] ]->{$result['meta_key']} = $result['meta_value'];
-				}
-			}
-
-			$upcomingEvents = $sorted_results;
-
-			break;
-
-		case '1b':
-			//METHOD 1b, sql, only the fields we need, with date check
-			$now = wp_date( 'Y-m-d ' ) . '00:00:01';
-			$sql = "SELECT p.ID, p.post_parent, p.post_title, m1.meta_value _EventStartDate, m.meta_key, m.meta_value FROM $wpdb->posts p JOIN $wpdb->postmeta m1 ON p.ID = m1.post_id AND m1.meta_key = '_EventStartDate' AND m1.meta_value >= '$now' JOIN $wpdb->postmeta m ON p.ID = m.post_id AND m.meta_key IN ( '_EventTimezone', '_EventEndDate', '_venuecheck_event_offset_start', '_venuecheck_event_offset_end', '_EventVenueID' ) AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') AND p.post_type = 'tribe_events'";
-
-			// log query
-			error_log( $sql );
-			$results = $wpdb->get_results( $sql, ARRAY_A );
-
-			// process results array
-			$sorted_results = array();
-			foreach ( $results as $key => $result ) {
-				if ( ! isset( $sorted_results[ $result['ID'] ] ) ) {
-					$sorted_results[ $result['ID'] ] = (object) array(
-						'ID'                => $result['ID'],
-						'post_parent'       => $result['post_parent'],
-						'post_title'        => $result['post_title'],
-						'_EventStartDate'   => $result['_EventStartDate'],
-						$result['meta_key'] => $result['meta_value'],
-					);
-				} else {
-					$sorted_results[ $result['ID'] ]->{$result['meta_key']} = $result['meta_value'];
-				}
-			}
-
-			$upcomingEvents = $sorted_results;
-
-			break;
-
-		case '2':
-			//METHOD 2, sql, use mysql pivot technique to ouput an object with the postmeta we need, no date check
-			$pivot_meta      = array( '_EventTimezone', '_EventStartDate', '_EventEndDate', '_venuecheck_event_offset_start', '_venuecheck_event_offset_end', '_EventVenueID' );
-			$pivot_meta_case = array();
-			foreach ( $pivot_meta as $key => $meta_key ) {
-				$pivot_meta_case[] = "MAX(CASE WHEN m.meta_key='$meta_key' then m.meta_value end) $meta_key";
-			}
-			$pivot_meta      = implode( "', '", $pivot_meta );
-			$pivot_meta_case = implode( ', ', $pivot_meta_case );
-			$pivot_sql       = "SELECT p.ID, p.post_parent, p.post_title, $pivot_meta_case FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id AND m.meta_key IN ( '$pivot_meta' ) WHERE p.post_type = 'tribe_events' AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') group by ID";
-
-			// log query
-			error_log( $pivot_sql );
-
-			$pivot_results  = $wpdb->get_results( $pivot_sql, OBJECT );
-			$upcomingEvents = $pivot_results;
-
-			break;
-
-		case '2b':
-			//METHOD 2b, sql, use mysql pivot technique to ouput an object with the postmeta we need, withdate check
-
-			$now        = wp_date( 'Y-m-d ' ) . '00:00:01';
-			$pivot_meta = array(
-				// column name                   => meta_key
-				'_EventTimezone'                 => '_EventTimezone',
-				'_EventStartDate'                => '_EventStartDate',
-				'_EventEndDate'                  => '_EventEndDate',
-				'_venuecheck_event_offset_start' => '_venuecheck_event_offset_start',
-				'_venuecheck_event_offset_end'   => '_venuecheck_event_offset_end',
-				'_EventVenueID'                  => '_EventVenueID',
-				'multiVenue'                     => 'multiVenue',
-			);
-
-			$pivot_meta      = apply_filters( 'venuecheck_upcoming_events_meta', $pivot_meta );
-			$pivot_meta_case = array();
-			foreach ( $pivot_meta as $key => $meta_key ) {
-				$pivot_meta_case[] = "MAX(CASE WHEN m.meta_key='$meta_key' then m.meta_value end) $key";
-			}
-			$pivot_meta      = implode( "', '", array_values( $pivot_meta ) );
-			$pivot_meta_case = implode( ', ', $pivot_meta_case );
-			$pivot_sql       = "SELECT p.ID, p.post_parent, p.post_title, q.* FROM $wpdb->posts p JOIN ( SELECT m.post_id, $pivot_meta_case FROM $wpdb->postmeta m WHERE m.meta_key IN ( '$pivot_meta' )  GROUP by post_id ) q ON p.ID = q.post_id AND p.post_type = 'tribe_events' AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') AND q._EventStartDate >= '$now'";
-
-			// log query
-			error_log( $pivot_sql );
-
-			$pivot_results  = $wpdb->get_results( $pivot_sql, OBJECT );
-			$upcomingEvents = $pivot_results;
-
-			break;
-
-		case '3':
-			//METHOD 3, sql, store our data in a new table
-
-			$now = wp_date( 'Y-m-d ' ) . '00:00:01';
-			$sql = "SELECT p.post_parent, p.post_title, v.* FROM $wpdb->posts p JOIN {$wpdb->prefix}vc_events v ON p.ID = v.ID AND v._EventStartDate >= '$now'";
-			error_log( $sql );
-			$pivot_results = $wpdb->get_results( $sql, OBJECT );
-			error_log( print_r( $pivot_results, true ) );
-			$upcomingEvents = $pivot_results;
-
-			break;
+	$pivot_meta      = apply_filters( 'venuecheck_upcoming_events_meta', $pivot_meta );
+	$pivot_meta_case = array();
+	foreach ( $pivot_meta as $key => $meta_key ) {
+		$pivot_meta_case[] = "MAX(CASE WHEN m.meta_key='$meta_key' then m.meta_value end) $key";
 	}
+	$pivot_meta      = implode( "', '", array_values( $pivot_meta ) );
+	$pivot_meta_case = implode( ', ', $pivot_meta_case );
+	$pivot_sql       = "SELECT p.ID, p.post_parent, p.post_title, q.* FROM $wpdb->posts p JOIN ( SELECT m.post_id, $pivot_meta_case FROM $wpdb->postmeta m WHERE m.meta_key IN ( '$pivot_meta' )  GROUP by post_id ) q ON p.ID = q.post_id AND p.post_type = 'tribe_events' AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') AND q._EventStartDate >= '$now'";
 
-	//Record the end time after the query has finished running.
-	$end = microtime( true );
-
-	//Calculate the difference in microseconds.
-	$difference = $end - $started;
-
-	//Format the time so that it only shows 10 decimal places.
-	$queryTime = number_format( $difference, 10 );
-
-	//Print out the seconds it took for the query to execute.
-	print_mem( 'POST QUERY', $mem_baseline );
-	error_log( "SQL: $queryTime seconds. Returned " . count( $upcomingEvents ) . ' rows.' );
+	$pivot_results  = $wpdb->get_results( $pivot_sql, OBJECT );
+	$upcomingEvents = $pivot_results;
 
 	//end events query
 	return $upcomingEvents;
@@ -710,69 +550,29 @@ function venue_check_gu_override_dot_org() {
 
 
 function get_cached_upcoming_events() {
-	// Record the start time before the query is executed.
-	$started      = microtime( true );
-	$mem_baseline = print_mem( 'PRE CACHE CHECK' );
 
 	$cache    = tribe( 'cache' );
 	$u_events = $cache->get_transient( 'venue_check_upcoming_events', 'save_post' );
 	if ( is_array( $u_events ) ) {
 		error_log( 'USING CACHE' );
-		//Print out the seconds it took for the query to execute.
-		print_mem( 'POST QUERY', $mem_baseline );   //Record the end time after the query has finished running.
-		$end = microtime( true );
-
-		//Calculate the difference in microseconds.
-		$difference = $end - $started;
-
-		//Format the time so that it only shows 10 decimal places.
-		$queryTime = number_format( $difference, 10 );
-		error_log( "SQL: $queryTime seconds. Returned " . count( $u_events ) . ' rows.' );
 		return $u_events;
 	}
 
 	$u_events = venuecheck_get_upcoming_events();
 	error_log( 'SETTING CACHE' );
 	$cache->set_transient( 'venue_check_upcoming_events', $u_events, Tribe__Cache::NO_EXPIRATION, 'save_post' );
-	error_log( print_r( $cache->get_transient( 'venue_check_upcoming_events', 'save_post' ), true ) );
 
 	return $u_events;
 }
 
 
-function print_mem( $message, $compare = array() ) {
-	/* Currently used memory */
-	$mem_usage      = memory_get_usage();
-	$mem_usage_real = memory_get_usage( true );
-
-	/* Peak memory usage */
-	$mem_peak = memory_get_peak_usage();
-	$output   = $message . ': ';
-	//$output .= round($mem_usage/1024/1024) .  'MiB (used) / ' . round($mem_usage_real/1024/1024) . 'MiB (allocated) ';
-
-	$values  = array(
-		'real' => $mem_usage_real,
-		'used' => $mem_usage,
-	);
-	$output .= 'initial: ' . round( $mem_usage / 1024 / 1024, 2 ) . ' MiB (used) / ' . round( $mem_usage_real / 1024 / 1024, 2 ) . ' MiB (allocated) ';
-	if ( $compare && isset( $compare['real'] ) && isset( $compare['used'] ) ) {
-		$values['real_diff'] = $mem_usage_real - $compare['real'];
-		$values['used_diff'] = $mem_usage - $compare['used'];
-		$output             .= 'diff: ' . round( $values['used_diff'] / 1024 / 1024, 2 ) . ' MiB (used) / ' . round( $values['real_diff'] / 1024 / 1024, 2 ) . ' MiB (allocated) ';
-	}
-
-	$output .= ' Peak: ' . round( $mem_peak / 1024 / 1024, 2 ) . ' MiB';
-	error_log( $output );
-	return $values;
-}
-
-
+// allow exclude venues setting to be set e.g. in the theme 
 function venuecheck_exclude_venues() {
-	error_log( 'exclude_venues ' . apply_filters( 'venuecheck_exclude_venues', false ) );
 	return apply_filters( 'venuecheck_exclude_venues', false );
 }
 
+
+// check whether a venue is "excluded"
 function venuecheck_is_excluded_venue( $venue_id ) {
-	error_log( 'is_excluded_venue ' . $venue_id . get_the_title( $venue_id ) . '? ' . get_post_meta( $venue_id, 'venuecheck_exclude_venue', true ) );
 	return get_post_meta( $venue_id, 'venuecheck_exclude_venue', true );
 }
