@@ -1,4 +1,5 @@
-/* venue-check.js v2.2.0-rc5 */
+/* venue-check admin side scripts */
+
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
 /* global venuecheck */
