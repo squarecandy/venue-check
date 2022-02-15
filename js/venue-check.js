@@ -2,7 +2,8 @@
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
 /* global venuecheck */
-jQuery( function( $ ) {
+
+( function( $ ) {
 	const vcObject = {
 		progress: null, // for progress bar percentage
 		multiVenueEnabled: false,
@@ -36,41 +37,42 @@ jQuery( function( $ ) {
 
 			//=====FORM MODIFIED=====//
 
-			const $form = $( 'form#post' );
-			vcObject.origForm = $form.serialize();
+			// run 1s after load
+			setTimeout( function() {
+				const $form = $( 'form#post' );
+				vcObject.origForm = $form.serialize();
 
-			if ( venuecheck.debug ) {
-				console.log( 'check form change status' );
-				console.log( 'is same as current state?', $form.serialize() === vcObject.origForm );
-			}
+				if ( venuecheck.debug ) {
+					console.log( 'check form change status after 1 second' );
+					console.log( 'is same as current state?', $form.serialize() === vcObject.origForm );
+				}
 
-			//removes the modified message when editing existing events
-			$( document ).on(
-				'change',
-				'body.venuecheck-update #EventInfo :input,' +
-				'body.venuecheck-update #EventInfo input,' + // :input alone does not work in FF 97 on Win10
-				'body.venuecheck-update #EventInfo select,' + // :input alone does not work in FF 97 on Win10
-					'body.venuecheck-update #EventInfo .tribe-dropdown,' +
-					'body.venuecheck-update #EventInfo .tribe-button-field',
-				function() {
-					if ( $form.serialize() !== vcObject.origForm ) {
-						vcObject.debugLog( 'form changed, show msg' );
-						vcObject.venuecheck_show_modified_msg();
-					} else {
-						vcObject.debugLog( 'form changed, hide msg' );
-						vcObject.venuecheck_hide_modified_msg();
+				//removes the modified message when editing existing events
+				$( document ).on(
+					'change',
+					'body.venuecheck-update #EventInfo :input,' +
+						'body.venuecheck-update #EventInfo .tribe-dropdown,' +
+						'body.venuecheck-update #EventInfo .tribe-button-field',
+					function() {
+						if ( $form.serialize() !== vcObject.origForm ) {
+							vcObject.debugLog( 'form changed, show msg' );
+							vcObject.venuecheck_show_modified_msg();
+						} else {
+							vcObject.debugLog( 'form changed, hide msg' );
+							vcObject.venuecheck_hide_modified_msg();
+						}
 					}
-				}
-			);
+				);
 
-			//does not remove modified message for new events
-			$( document ).on(
-				'click',
-				'body.venuecheck-update .tribe-row-delete-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .button-red',
-				function() {
-					vcObject.venuecheck_show_modified_msg();
-				}
-			);
+				//does not remove modified message for new events
+				$( document ).on(
+					'click',
+					'body.venuecheck-update .tribe-row-delete-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .button-red',
+					function() {
+						vcObject.venuecheck_show_modified_msg();
+					}
+				);
+			}, 1 * 1000 ); // 1 second timeout
 
 			// Setup additional required HTML elements and classes
 			// It would be great to do this in PHP instead, but there is no way to modify the form
@@ -968,7 +970,7 @@ jQuery( function( $ ) {
 			} )();
 		},
 	};
-	window.addEventListener( 'load', () => {
+	window.onload = () => {
 		vcObject.init();
-	} );
-} );
+	};
+} )( jQuery );
