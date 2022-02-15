@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0-RC1](https://github.com/squarecandy/venue-check/compare/v2.2.4...v2.3.0-RC1) (2022-02-15)
+
+
+### Bug Fixes
+
+* add message when deselecting venues ([2f6f8d5](https://github.com/squarecandy/venue-check/commit/2f6f8d5be4b854bdafb7d9faa42d80376151c156))
+* back out more testing code ([cde9a92](https://github.com/squarecandy/venue-check/commit/cde9a925e07327124f79ae9b6196828bc57462aa))
+* back out testing code ([5730c3d](https://github.com/squarecandy/venue-check/commit/5730c3dde40edd716ffe8d48f725c928a630eede))
+* batchsize & warning always need to be set ([15a0431](https://github.com/squarecandy/venue-check/commit/15a043180384dd043a2a0b11fec8df4ec747e7c8))
+* change empty link elements to buttons ([6c806bb](https://github.com/squarecandy/venue-check/commit/6c806bb102d405fd5c0e20897367fa430e810bec))
+* change style & text of deselected warning ([25647a8](https://github.com/squarecandy/venue-check/commit/25647a8f03aacafa38fb6057bed9fb02f5e98aba))
+* clean up logging ([9387799](https://github.com/squarecandy/venue-check/commit/9387799b4524f36d2e77d5a8a2403a130a706789))
+* css ([4dc7fd2](https://github.com/squarecandy/venue-check/commit/4dc7fd2b51fa0efad2b3df361ce9f16b593f0329))
+* css ([ae5ff8b](https://github.com/squarecandy/venue-check/commit/ae5ff8b2fda5b261afe3957e242a7dad31b5b98d))
+* disable save draft as well as publish ([afed911](https://github.com/squarecandy/venue-check/commit/afed9110f1ed1c427c3e07a9fc25a8c16c96e9c0))
+* don't disable excluded venues ([6f99cf5](https://github.com/squarecandy/venue-check/commit/6f99cf55d5998fb9e6d316adef2a33f19910e191))
+* don't show recurrence indicator on singletons ([38c4402](https://github.com/squarecandy/venue-check/commit/38c44020caa82363e783d54061411b39fe3df45a))
+* firefox not recognizing input changes ([e25845a](https://github.com/squarecandy/venue-check/commit/e25845a1b9b735f97d0cf60e34696123050158ac))
+* for now override inconsistent TEC tabindexes ([68df9d5](https://github.com/squarecandy/venue-check/commit/68df9d569786a800e369dd7959f486cabe32be32))
+* hide exclusions report ([9040d97](https://github.com/squarecandy/venue-check/commit/9040d97fcabd7109fd019855b23d8741d3aad37b))
+* increase warning limit & fix batchsize NaN bug ([2698cf5](https://github.com/squarecandy/venue-check/commit/2698cf5d45d3bccd928d7f3d80535992c31aac72))
+* jquery migrate errors ([1b9bb4a](https://github.com/squarecandy/venue-check/commit/1b9bb4a96675a7cf33d2ff2bf445790d5ee04363))
+* js bug ([09b6652](https://github.com/squarecandy/venue-check/commit/09b6652baecf30e43d4a459ea4ed0e612f6cd9a8))
+* really deselect options ([0f8379f](https://github.com/squarecandy/venue-check/commit/0f8379f49c5647e5464930eb5c3f4e6310914de5))
+* really hide exclusions form ([8f9760f](https://github.com/squarecandy/venue-check/commit/8f9760f484165025e04c55b07d60a522f9eb32f0))
+* recheck recurrences if date changes, don't delete venue edit link ([60e98ca](https://github.com/squarecandy/venue-check/commit/60e98ca17e4c2778e04295452d5052faef353e45))
+* report count bug & select2 issues ([140ef87](https://github.com/squarecandy/venue-check/commit/140ef87f6678fe9e1147fe28d8d1dae525326637))
+* save updated form state ([9effb32](https://github.com/squarecandy/venue-check/commit/9effb32e9c19a01f962d50c3be293492ed6fe07b))
+* shift removal of "my venues" section to php ([8fbd339](https://github.com/squarecandy/venue-check/commit/8fbd3392493ab144256f913ed9f62536ec04cdb5))
+* show "find available venues" on existing events with no venue, make it tabbable ([f5eb19f](https://github.com/squarecandy/venue-check/commit/f5eb19f0b1873b363fe69c65558e8899afccc739))
+* sort order of ACF venue dropdown ([8f894f6](https://github.com/squarecandy/venue-check/commit/8f894f64ad141e6a496e7d5ec64f1cc479cb7913))
+* truncate display of long recurrence patterns ([5653556](https://github.com/squarecandy/venue-check/commit/5653556205e06950d68e0585f25ff60c7bc8ef19))
+
 ### [2.2.4](https://github.com/squarecandy/venue-check/compare/v2.2.3...v2.2.4) (2021-10-27)
 
 
