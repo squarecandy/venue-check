@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0-rc2](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc1...v2.3.0-rc2) (2022-02-15)
+
+
+### Bug Fixes
+
+* Firefox Win input changes not registering ([27374a5](https://github.com/squarecandy/venue-check/commit/27374a5c4e44c0696785acf0b82d71570a44d73d))
+
+## [2.3.0-rc2](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc1...v2.3.0-rc2) (2022-02-15)
+
 ## [2.3.0-rc1](https://github.com/squarecandy/venue-check/compare/v2.2.4...v2.3.0-RC1) (2022-02-15)
 
 ### Features

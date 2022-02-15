@@ -29,9 +29,9 @@ function venuecheck_scripts_styles( $hook ) {
 
 	/* REGISTER JS */
 	if ( defined( 'WP_DEBUG' ) ? WP_DEBUG : false ) {
-		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.3.0-RC1', true );
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.3.0-rc2', true );
 	} else {
-		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.3.0-RC1', true );
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.3.0-rc2', true );
 	}
 
 	$localization = array(
@@ -57,7 +57,7 @@ function venuecheck_scripts_styles( $hook ) {
 	wp_localize_script( 'venuecheck-scripts', 'venuecheck', $localization );
 
 	/* REGISTER CSS */
-	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.3.0-RC1' );
+	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.3.0-rc2' );
 	wp_enqueue_style( 'fontawesome', '//use.fontawesome.com/releases/v5.2.0/css/all.css', array(), '5.2.0' );
 
 }
