@@ -14,6 +14,8 @@ jQuery( function( $ ) {
 		showExclusions: venuecheck.show_exclusions ? venuecheck.show_exclusions : false,
 		origForm: null,
 		init() {
+			if ( venuecheck.debug ) console.log( 'init(): load event fire' );
+
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
 			vcObject.debugLog( 'In Multivenue mode? ', vcObject.multiVenueEnabled, typeof vcObject.multiVenueEnabled );
@@ -32,50 +34,43 @@ jQuery( function( $ ) {
 				vcObject.venueSelectArray = [ vcObject.venueSelect ];
 			}
 
-			window.addEventListener( 'load', ( e ) => {
-				if ( venuecheck.debug ) console.log( 'load event fire', e );
+			//=====FORM MODIFIED=====//
 
-				//=====FORM MODIFIED=====//
+			const $form = $( 'form#post' );
+			vcObject.origForm = $form.serialize();
 
-				// run 3s after load
-				setTimeout( function() {
-					const $form = $( 'form#post' );
-					vcObject.origForm = $form.serialize();
+			if ( venuecheck.debug ) {
+				console.log( 'check form change status' );
+				console.log( 'is same as current state?', $form.serialize() === vcObject.origForm );
+			}
 
-					if ( venuecheck.debug ) {
-						console.log( 'check form change status after 3 seconds' );
-						console.log( 'is same as current state?', $form.serialize() === vcObject.origForm );
+			//removes the modified message when editing existing events
+			$( document ).on(
+				'change',
+				'body.venuecheck-update #EventInfo :input,' +
+				'body.venuecheck-update #EventInfo input,' + // :input alone does not work in FF 97 on Win10
+				'body.venuecheck-update #EventInfo select,' + // :input alone does not work in FF 97 on Win10
+					'body.venuecheck-update #EventInfo .tribe-dropdown,' +
+					'body.venuecheck-update #EventInfo .tribe-button-field',
+				function() {
+					if ( $form.serialize() !== vcObject.origForm ) {
+						vcObject.debugLog( 'form changed, show msg' );
+						vcObject.venuecheck_show_modified_msg();
+					} else {
+						vcObject.debugLog( 'form changed, hide msg' );
+						vcObject.venuecheck_hide_modified_msg();
 					}
+				}
+			);
 
-					//removes the modified message when editing existing events
-					$( document ).on(
-						'change',
-						'body.venuecheck-update #EventInfo :input,' +
-						'body.venuecheck-update #EventInfo input,' + // :input alone does not work in FF 97 on Win10
-						'body.venuecheck-update #EventInfo select,' + // :input alone does not work in FF 97 on Win10
-							'body.venuecheck-update #EventInfo .tribe-dropdown,' +
-							'body.venuecheck-update #EventInfo .tribe-button-field',
-						function() {
-							if ( $form.serialize() !== vcObject.origForm ) {
-								vcObject.debugLog( 'form changed, show msg' );
-								vcObject.venuecheck_show_modified_msg();
-							} else {
-								vcObject.debugLog( 'form changed, hide msg' );
-								vcObject.venuecheck_hide_modified_msg();
-							}
-						}
-					);
-
-					//does not remove modified message for new events
-					$( document ).on(
-						'click',
-						'body.venuecheck-update .tribe-row-delete-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .button-red',
-						function() {
-							vcObject.venuecheck_show_modified_msg();
-						}
-					);
-				}, 3000 );
-			} ); //load
+			//does not remove modified message for new events
+			$( document ).on(
+				'click',
+				'body.venuecheck-update .tribe-row-delete-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .button-red',
+				function() {
+					vcObject.venuecheck_show_modified_msg();
+				}
+			);
 
 			// Setup additional required HTML elements and classes
 			// It would be great to do this in PHP instead, but there is no way to modify the form
@@ -973,5 +968,7 @@ jQuery( function( $ ) {
 			} )();
 		},
 	};
-	vcObject.init();
+	window.addEventListener( 'load', () => {
+		vcObject.init();
+	} );
 } );
