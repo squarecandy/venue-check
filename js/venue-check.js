@@ -51,6 +51,8 @@ jQuery( function( $ ) {
 					$( document ).on(
 						'change',
 						'body.venuecheck-update #EventInfo :input,' +
+						'body.venuecheck-update #EventInfo input,' + // :input alone does not work in FF 97 on Win10
+						'body.venuecheck-update #EventInfo select,' + // :input alone does not work in FF 97 on Win10
 							'body.venuecheck-update #EventInfo .tribe-dropdown,' +
 							'body.venuecheck-update #EventInfo .tribe-button-field',
 						function() {
