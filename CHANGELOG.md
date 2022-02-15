@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0-rc3](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc2...v2.3.0-rc3) (2022-02-15)
+
+
+### Bug Fixes
+
+* race condition in js ([5956080](https://github.com/squarecandy/venue-check/commit/5956080b172a9b040ee92cf51504b98a07af3d7d))
+
 ## [2.3.0-rc2](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc1...v2.3.0-rc2) (2022-02-15)
 
 

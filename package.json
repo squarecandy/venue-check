@@ -1,6 +1,6 @@
 {
 	"name": "venue-check",
-	"version": "2.3.0-rc2",
+	"version": "2.3.0-rc3",
 	"description": "Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.",
 	"repository": {
 		"type": "git",
