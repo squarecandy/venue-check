@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0-rc4](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc3...v2.3.0-rc4) (2022-02-15)
+
+
+### Bug Fixes
+
+* more firefox fixes (reconfigure jquery wrap) ([9486626](https://github.com/squarecandy/venue-check/commit/94866266cc528ce765b4b88ec0236de505124140))
+
 ## [2.3.0-rc3](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc2...v2.3.0-rc3) (2022-02-15)
 
 
