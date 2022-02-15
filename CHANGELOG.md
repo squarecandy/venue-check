@@ -2,24 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.3.0-RC1](https://github.com/squarecandy/venue-check/compare/v2.2.4...v2.3.0-RC1) (2022-02-15)
+## [2.3.0-rc1](https://github.com/squarecandy/venue-check/compare/v2.2.4...v2.3.0-RC1) (2022-02-15)
 
+### Features
+
+* Support Multi-Venue checking
+* Major Performance enhancements (query only for the required data)
 
 ### Bug Fixes
 
 * add message when deselecting venues ([2f6f8d5](https://github.com/squarecandy/venue-check/commit/2f6f8d5be4b854bdafb7d9faa42d80376151c156))
-* back out more testing code ([cde9a92](https://github.com/squarecandy/venue-check/commit/cde9a925e07327124f79ae9b6196828bc57462aa))
-* back out testing code ([5730c3d](https://github.com/squarecandy/venue-check/commit/5730c3dde40edd716ffe8d48f725c928a630eede))
 * batchsize & warning always need to be set ([15a0431](https://github.com/squarecandy/venue-check/commit/15a043180384dd043a2a0b11fec8df4ec747e7c8))
 * change empty link elements to buttons ([6c806bb](https://github.com/squarecandy/venue-check/commit/6c806bb102d405fd5c0e20897367fa430e810bec))
 * change style & text of deselected warning ([25647a8](https://github.com/squarecandy/venue-check/commit/25647a8f03aacafa38fb6057bed9fb02f5e98aba))
 * clean up logging ([9387799](https://github.com/squarecandy/venue-check/commit/9387799b4524f36d2e77d5a8a2403a130a706789))
-* css ([4dc7fd2](https://github.com/squarecandy/venue-check/commit/4dc7fd2b51fa0efad2b3df361ce9f16b593f0329))
-* css ([ae5ff8b](https://github.com/squarecandy/venue-check/commit/ae5ff8b2fda5b261afe3957e242a7dad31b5b98d))
 * disable save draft as well as publish ([afed911](https://github.com/squarecandy/venue-check/commit/afed9110f1ed1c427c3e07a9fc25a8c16c96e9c0))
 * don't disable excluded venues ([6f99cf5](https://github.com/squarecandy/venue-check/commit/6f99cf55d5998fb9e6d316adef2a33f19910e191))
 * don't show recurrence indicator on singletons ([38c4402](https://github.com/squarecandy/venue-check/commit/38c44020caa82363e783d54061411b39fe3df45a))
-* firefox not recognizing input changes ([e25845a](https://github.com/squarecandy/venue-check/commit/e25845a1b9b735f97d0cf60e34696123050158ac))
 * for now override inconsistent TEC tabindexes ([68df9d5](https://github.com/squarecandy/venue-check/commit/68df9d569786a800e369dd7959f486cabe32be32))
 * hide exclusions report ([9040d97](https://github.com/squarecandy/venue-check/commit/9040d97fcabd7109fd019855b23d8741d3aad37b))
 * increase warning limit & fix batchsize NaN bug ([2698cf5](https://github.com/squarecandy/venue-check/commit/2698cf5d45d3bccd928d7f3d80535992c31aac72))
