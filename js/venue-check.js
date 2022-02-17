@@ -227,45 +227,6 @@
 
 		//=====FORM MODIFIED=====//
 
-		venuecheck_check_stored_recurrences() {
-			vcObject.debugLog( 'checking storedRecurrences', vcObject.storedRecurrences );
-			if (
-				vcObject.storedRecurrences &&
-				vcObject.storedRecurrences.recurrences &&
-				vcObject.storedRecurrences.origFormRecur === vcObject.get_recurrence_form_data()
-			) {
-				vcObject.venuecheck_disable_form();
-				vcObject.venuecheck_hide_wait();
-				if ( venuecheck.debug ) console.log( 'venuecheck_check_stored_recurrences have not changed' );
-				vcObject.venuecheck_check_venues( vcObject.storedRecurrences.recurrences, vcObject.batchsize );
-			} else {
-				if ( venuecheck.debug )
-					console.log(
-						'recurrences stored but recurrence changed?',
-						vcObject.storedRecurrences &&
-							vcObject.storedRecurrences.origFormRecur &&
-							vcObject.storedRecurrences.origFormRecur !== vcObject.get_recurrence_form_data()
-					);
-
-				const recurrenceFormData = vcObject.get_recurrence_form_data();
-				vcObject.debugLog( 'recurrenceFormData', recurrenceFormData );
-				vcObject.storedRecurrences.recurrences = null;
-				vcObject.storedRecurrences.origFormRecur = recurrenceFormData;
-				vcObject.debugLog( 'storing Recurrences', vcObject.storedRecurrences.origFormRecur );
-				vcObject.venuecheck_get_event_recurrences();
-			}
-		},
-
-		get_recurrence_form_data() {
-			// get the form values from the date/time & recurrence sections, NOT including the setup time
-			const recurrenceFormElements =
-				'.recurrence-row input, .custom-recurrence-row input, .recurrence-row select, .custom-recurrence-row select,' +
-				'.tribe-datetime-block input';
-			const origForm = $( recurrenceFormElements ).serialize();
-			vcObject.debugLog( 'getting recurrence form', origForm );
-			return origForm;
-		},
-
 		venuecheck_get_event_recurrences() {
 			const formVars = {};
 			$.each( $( 'form#post' ).serializeArray(), function( i, field ) {
@@ -938,9 +899,9 @@
 
 		venuecheck_find_available_venues() {
 			vcObject.venuecheck_hide_messages();
-			vcObject.debugLog( 'find_available_venues -> check_stored_recurrences' );
+			vcObject.debugLog( 'find_available_venues' );
 			vcObject.venuecheck_show_wait();
-			vcObject.venuecheck_check_stored_recurrences(); // check if we have a current version of recurrences
+			vcObject.venuecheck_get_event_recurrences();
 		},
 
 		venuecheck_show_hide_divider() {
