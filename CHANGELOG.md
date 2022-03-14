@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc4...v2.3.0) (2022-03-14)
+
+
+### Bug Fixes
+
+* back out stored recurrence check ([54d803a](https://github.com/squarecandy/venue-check/commit/54d803a3a0e8daeeb0c38e85a7d93785ccad2276))
+
 ## [2.3.0-rc4](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc3...v2.3.0-rc4) (2022-02-15)
 
 
