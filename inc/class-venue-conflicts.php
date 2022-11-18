@@ -27,8 +27,10 @@ class Venue_Conflicts {
 			$this->conflicts[ $EventVenueID ]['venueTitle'] = $EventVenueTitle;
 
 			if ( venuecheck_exclude_venues() && venuecheck_is_excluded_venue( $venue_id ) ) {
-				error_log( $EventVenueID . ' is excluded' );
 				$this->conflicts[ $EventVenueID ]['excluded'] = 1;
+				if ( WP_DEBUG ) {
+					error_log( $EventVenueID . ' is excluded' );
+				}
 			}
 
 			// set up and add this event to an array of events for this venue
@@ -44,19 +46,24 @@ class Venue_Conflicts {
 
 			// if this is a recurring event
 			if ( $event->post_parent || tribe_is_recurring_event( $event->ID ) ) {
-				error_log( $event->ID . ' is recurring in series ' . $event->post_parent );
 				$event_item['eventClass'] = 'recurring';
+				if ( WP_DEBUG ) {
+					error_log( $event->ID . ' is recurring in series ' . $event->post_parent );
+				}
 
 				// if this is the first of this series that we are processing, flag that in the parents array
 				//if ( ! isset( $this->parents[ $EventVenueID ][ $event->post_parent ] ) ) {
 				if ( ! isset( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] ) ) {
 
-					error_log( '* * * is first in series ' );
+					
 					$this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] = array(
 						'id'         => $event->post_parent,
 						'recurrence' => tribe_get_recurrence_text( $event->post_parent ),
 					);
-					error_log( print_r( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ], true ) );
+					if ( WP_DEBUG ) {
+						error_log( '* * * is first in series ' );
+						error_log( print_r( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ], true ) );
+					}
 
 					/*
 					// if the parent event of the recurring series preceded us, it wouldn't have triggered the above check, so flag it as first

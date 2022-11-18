@@ -554,12 +554,16 @@ function get_cached_upcoming_events() {
 	$cache    = tribe( 'cache' );
 	$u_events = $cache->get_transient( 'venue_check_upcoming_events', 'save_post' );
 	if ( is_array( $u_events ) ) {
-		error_log( 'USING CACHE' );
+		if ( WP_DEBUG ) {
+			error_log( 'USING CACHE' );
+		}
 		return $u_events;
 	}
 
 	$u_events = venuecheck_get_upcoming_events();
-	error_log( 'SETTING CACHE' );
+	if ( WP_DEBUG ) {
+		error_log( 'SETTING CACHE' );
+	}
 	$cache->set_transient( 'venue_check_upcoming_events', $u_events, Tribe__Cache::NO_EXPIRATION, 'save_post' );
 
 	return $u_events;
