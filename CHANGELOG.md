@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.1](https://github.com/squarecandy/venue-check/compare/v2.3.0...v2.3.1) (2022-11-18)
+
+
+### Bug Fixes
+
+* don't output to error_log unles WP_DEBUG is true ([21c255b](https://github.com/squarecandy/venue-check/commit/21c255b01531fd9604e2c64a315bdcd325cabde7))
+* less aggressive transient clearing ([9a1d647](https://github.com/squarecandy/venue-check/commit/9a1d6478299f2eb0330b65dcd5890013ec40c758))
+* prevent endless proliferation of transients ([e80a120](https://github.com/squarecandy/venue-check/commit/e80a120ab84a71c2e96b3de5ad2a66b398c417d7))
+
 ## [2.3.0](https://github.com/squarecandy/venue-check/compare/v2.3.0-rc4...v2.3.0) (2022-03-14)
 
 
