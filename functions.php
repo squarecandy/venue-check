@@ -552,7 +552,7 @@ function venue_check_gu_override_dot_org() {
 function get_cached_upcoming_events() {
 
 	$cache    = tribe( 'cache' );
-	$u_events = $cache->get_transient( 'venue_check_upcoming_events', 'save_post' );
+	$u_events = $cache->get_transient( 'tribe_venue_check_upcoming_events', 'save_post' ); // by adding 'tribe_' at the start we allow these transients to be cleaned up by TEC
 	if ( is_array( $u_events ) ) {
 		if ( WP_DEBUG ) {
 			error_log( 'USING CACHE' );
@@ -564,13 +564,13 @@ function get_cached_upcoming_events() {
 	if ( WP_DEBUG ) {
 		error_log( 'SETTING CACHE' );
 	}
-	$cache->set_transient( 'venue_check_upcoming_events', $u_events, Tribe__Cache::NO_EXPIRATION, 'save_post' );
+	$cache->set_transient( 'tribe_venue_check_upcoming_events', $u_events, Tribe__Cache::NON_PERSISTENT, 'save_post' ); // NON_PERSISTENT, should be cleaned up by next 'tribe_schedule_transient_purge' run
 
 	return $u_events;
 }
 
 
-// allow exclude venues setting to be set e.g. in the theme 
+// allow exclude venues setting to be set e.g. in the theme
 function venuecheck_exclude_venues() {
 	return apply_filters( 'venuecheck_exclude_venues', false );
 }
