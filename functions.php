@@ -564,7 +564,7 @@ function get_cached_upcoming_events() {
 	if ( WP_DEBUG ) {
 		error_log( 'SETTING CACHE' );
 	}
-	$cache->set_transient( 'tribe_venue_check_upcoming_events', $u_events, Tribe__Cache::NON_PERSISTENT, 'save_post' ); // NON_PERSISTENT, should be cleaned up by next 'tribe_schedule_transient_purge' run
+	$cache->set_transient( 'tribe_venue_check_upcoming_events', $u_events, HOUR_IN_SECONDS, 'save_post' ); // NON_PERSISTENT, should be cleaned up by next 'tribe_schedule_transient_purge' run
 
 	return $u_events;
 }
