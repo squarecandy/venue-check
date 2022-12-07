@@ -45,6 +45,13 @@ class Venue_Conflicts {
 			);
 
 			// if this is a recurring event
+			if ( tribe_is_recurring_event( $event->ID ) && ! $event->post_parent  ) {
+				$event->post_parent = $event->ID;
+				if ( WP_DEBUG ) {
+					error_log( $event->ID . ' is parent of series ' );
+				}
+			}
+
 			if ( $event->post_parent || tribe_is_recurring_event( $event->ID ) ) {
 				$event_item['eventClass'] = 'recurring';
 				if ( WP_DEBUG ) {
@@ -53,7 +60,7 @@ class Venue_Conflicts {
 
 				// if this is the first of this series that we are processing, flag that in the parents array
 				//if ( ! isset( $this->parents[ $EventVenueID ][ $event->post_parent ] ) ) {
-				if ( ! isset( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] ) ) {
+				if ( $event->post_parent && ! isset( $this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] ) ) {
 
 					
 					$this->conflicts[ $EventVenueID ]['series'][ $event->post_parent ] = array(
