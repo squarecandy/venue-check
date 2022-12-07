@@ -2,7 +2,7 @@
 
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
-/* global venuecheck */
+/* global venuecheck, tecEventDetails */
 
 ( function( $ ) {
 	const vcObject = {
@@ -341,8 +341,12 @@
 			vcObject.venuecheck_show_progress_bar();
 
 			vcObject.storedRecurrences.recurrences = event_recurrences;
-
-			const postID = $( '#post_ID' ).val();
+			if ( typeof tecEventDetails !== 'undefined' ) console.log( 'tecEventDetails', tecEventDetails );
+			//const postID = $( '#post_ID' ).val();
+			const postID =
+				typeof tecEventDetails !== 'undefined' && tecEventDetails.event.post_id
+					? tecEventDetails.event.post_id
+					: $( '#post_ID' ).val();
 			// pre-split array into batchs
 			const batchArray = [];
 			for ( let i = 0; i < event_recurrences.length; i += batch_size ) {
