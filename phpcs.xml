@@ -107,6 +107,15 @@
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/26 -->
 	<rule ref="WordPress.WP.GlobalVariablesOverride"/>
 
+	<!-- Encourage the use of strict ( === and !== ) comparisons.
+		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/242 -->
+	<rule ref="WordPress.PHP.StrictComparisons"/>
+
+	<!-- Check that in_array() and array_search() use strict comparisons.
+		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/399
+		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/503 -->
+	<rule ref="WordPress.PHP.StrictInArray"/>
+
 	<!-- Check enqueue and register styles and scripts to have version and in_footer parameters explicitly set.
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/1146 -->
 	<rule ref="WordPress.WP.EnqueuedResourceParameters"/>
@@ -182,34 +191,26 @@
 	<!-- Check for single blank line after namespace declaration. -->
 	<rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
 
+	<!--
+	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
+	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035#issuecomment-1325532520
+	Note that this doesn't stop checking for depreciated errors in YOUR code,
+	it just stops wpcs incompatibility with php8 from stopping phpcs from running.
+	We don't want to have to switch back to 7.4 everytime we run linting.
+	This should be removed once wpcs updates their code.
+	-->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+
+	<!-- https://github.com/PHPCompatibility/PHPCompatibility -->
+
+	<!-- Run against the PHPCompatibility ruleset -->
+	<rule ref="PHPCompatibility"/>
 
 	<!--
-	#############################################################################
-	Custom settings for this project.
-	#############################################################################
+	Check within range 7.4 and up.
+	Note that only 8.0 checking currently exists, but this should automatically support higher versions
+	as they are added.
 	-->
-
-	<!-- Existing code base uses mixed snake and camel case conventions, skip this for now -->
-	<rule ref="WordPress.NamingConventions">
-		<exclude name="WordPress.NamingConventions.ValidVariableName"/>
-	</rule>
-
-	<!-- Existing code base uses lots of loose comparisons, skip this for now -->
-	<rule ref="WordPress.PHP">
-		<exclude name="WordPress.PHP.StrictComparisons"/>
-	</rule>
-
-	<!-- Existing code file names, skip this for now -->
-	<rule ref="WordPress.Files.FileName">
-		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
-		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
-	</rule>
-
-	<!-- specific rule breaking class names required for Modern Tribe class overrides -->
-	<rule ref="PEAR.NamingConventions">
-		<exclude name="PEAR.NamingConventions.ValidClassName"/>
-		<exclude name="PEAR.NamingConventions.ValidVariableName"/>
-		<exclude name="PEAR.NamingConventions.ValidFunctionName"/>
-	</rule>
+	<config name="testVersion" value="7.4-"/>
 
 </ruleset>
