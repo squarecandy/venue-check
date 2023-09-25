@@ -251,12 +251,32 @@ function venuecheck_get_upcoming_events() {
 	$pivot_meta      = implode( "', '", array_values( $pivot_meta ) );
 	$pivot_meta_case = implode( ', ', $pivot_meta_case );
 	$pivot_sql       = "SELECT p.ID, p.post_parent, p.post_title, q.* FROM $wpdb->posts p JOIN ( SELECT m.post_id, $pivot_meta_case FROM $wpdb->postmeta m WHERE m.meta_key IN ( '$pivot_meta' )  GROUP by post_id ) q ON p.ID = q.post_id AND p.post_type = 'tribe_events' AND p.post_status IN ('publish', 'future', 'draft', 'pending', 'auto-draft' ,'inherit', 'private') AND q._EventStartDate >= '$now'";
-
+	error_log($pivot_sql);
+	$started = microtime(true);
 	$pivot_results  = $wpdb->get_results( $pivot_sql, OBJECT );
 	$upcomingEvents = $pivot_results;
-
+	$ended = microtime(true);
+	$started_t = microtime(true);
+	/*$ids = tribe_events()
+		->where( 'starts_after', $now )
+		->per_page(-1)
+		->order_by( 'start_date', 'DESC' )
+		->pluck( 'ID' );*/
+	$t_sql = "SELECT (o.occurrence_id + 10000000) as 'occurrence_id', o.start_date as _EventStartDate, o.end_date as _EventEndDate, p.ID, p.post_parent, p.post_title, q.* FROM `4Bjov1_posts` p INNER JOIN `4Bjov1_tec_occurrences` o ON p.ID = o.post_id 
+JOIN ( SELECT m.post_id, MAX(CASE WHEN m.meta_key='_EventTimezone' then m.meta_value end) _EventTimezone, MAX(CASE WHEN m.meta_key='_venuecheck_event_offset_start' then m.meta_value end) _venuecheck_event_offset_start, MAX(CASE WHEN m.meta_key='_venuecheck_event_offset_end' then m.meta_value end) _venuecheck_event_offset_end, MAX(CASE WHEN m.meta_key='_EventVenueID' then m.meta_value end) _EventVenueID, MAX(CASE WHEN m.meta_key='additional_venues' then m.meta_value end) multiVenue FROM `4Bjov1_postmeta` m WHERE m.meta_key IN ( '_EventTimezone', '_venuecheck_event_offset_start', '_venuecheck_event_offset_end', '_EventVenueID', 'additional_venues' )  GROUP by post_id ) q ON p.ID = q.post_id
+WHERE 1=1 AND ( CAST(o.start_date_utc AS DATETIME) > '2023-09-22 04:00:01' ) AND p.post_type = 'tribe_events' AND ((p.post_status = 'publish' OR p.post_status = 'private')) GROUP BY o.occurrence_id ORDER BY p.post_date DESC";
+	$t_results  = $wpdb->get_results( $t_sql, OBJECT );
+	$ended_t = microtime(true);
+	//em_log_trace('tribe_events()->where');
+	//em_log_r( $t_results, 'IDS vs' . count( $upcomingEvents ) . ' ' . count( $t_results ));
+	$difference = $ended - $started;
+	$difference_t = $ended_t - $started_t;
+	//Format the time so that it only shows 10 decimal places.
+	$query = number_format($difference, 10);
+	$query_t = number_format($difference_t, 10);
+	error_log( 'mysql: ' . $query . ' tribe: ' . $query_t);
 	//end events query
-	return $upcomingEvents;
+	return $t_results;
 
 }
 
@@ -309,119 +329,6 @@ function venuecheck_get_offset_dates( $event, $timezone ) {
 
 }
 
-function venuecheck_check_venues_no_ajax( $event_recurrences, $postID ) {
-
-	//$upcomingEvents = venuecheck_get_upcoming_events();
-	$upcomingEvents = get_cached_upcoming_events();
-	//end events query
-
-	if ( WP_DEBUG ) {
-		error_log( '**************************************************************************' );
-		error_log( 'Venue Check upcoming events: ' . count( $upcomingEvents ) );
-	}
-
-	$venuecheck_conflicts = new Venue_Conflicts();
-
-	$defaultTimezone = get_option( 'timezone_string' );
-
-	//event confict checking
-
-	//if ( isset( $_POST ) ) {
-
-		/*
-		 * CONFLICT: (StartA < EndB) and (EndA > StartB)
-		 *
-		 * A conflict occurs if:
-		 * the start of the new event is before the end of the existing event
-		 * AND the end of the new event is after the start of the existing event
-		 *
-		 * This accounts for overlaps at the beginning of the existing event; overlaps at the end of the existing event; complete overlap.
-		 *
-		 * data format:
-		 * {eventStart: "2018-05-14 8:00:00", eventEnd: "2018-05-14 17:00:00", eventTimezone: "America/New_York", eventOffsetStart: "0", eventOffsetEnd: "0"}
-		 */
-
-		// new event dates
-
-		//$event_recurrences = $_POST['event_recurrences'];
-		//$postID            = $_POST['postID'];
-		//$total_count       = $_POST['total_count'];
-		//$batch_size        = $_POST['batch_size'];
-		//$batch_count       = $_POST['batch_count'];
-		//$loop_count        = 0;
-
-	if ( WP_DEBUG ) {
-		error_log( '* Venue Check event recurrences for post id ' . $postID );
-		//error_log( '* Venue Check batch: ' . $batch_count . ' of ' . $batch_size );
-		error_log( print_r( $event_recurrences, true ) );
-	}
-
-	foreach ( $event_recurrences as $k => $event_recurrence ) {
-		//$loop_count++;
-		//$current_count = ( $batch_count * $batch_size ) + $loop_count;
-		$timezone = $event_recurrence['eventTimezone'];
-
-		$offsetDatesA = venuecheck_get_offset_dates( $event_recurrence, $timezone );
-		$startA       = $offsetDatesA['OffsetStart'];
-		$endA         = $offsetDatesA['OffsetEnd'];
-
-		if ( WP_DEBUG ) {
-			error_log( '*********************************' );
-			error_log( '* * Venue Check event recurrence: ' . $event_recurrence['eventStart'] . ' to ' . $event_recurrence['eventEnd'] );
-		}
-
-		//upcoming event dates
-		foreach ( $upcomingEvents as $k => $upcomingEvent ) {
-			if ( ! empty( $upcomingEvent->_EventTimezone ) ) {
-				$timezone = $upcomingEvent->_EventTimezone;
-			} else {
-				$timezone = $defaultTimezone;
-			}
-
-			$offsetDatesB = venuecheck_get_offset_dates( $upcomingEvent, $timezone );
-			$startB       = $offsetDatesB['OffsetStart'];
-			$endB         = $offsetDatesB['OffsetEnd'];
-
-			// compare dates to find conflicts
-			if ( $startA < $endB && $endA > $startB ) {
-
-				if ( WP_DEBUG ) {
-					error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate . ' to ' . $upcomingEvent->_EventEndDate );
-				}
-
-				// check that the upcoming event isn't our event, or a recurrence of our event
-				if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
-
-					if ( WP_DEBUG ) {
-						error_log( '* * * * * MULTIVENUE ' . $upcomingEvent->multiVenue );
-						error_log( print_r( maybe_unserialize( $upcomingEvent->multiVenue ), true ) );
-					}
-
-					$venues = $upcomingEvent->multiVenue ? maybe_unserialize( $upcomingEvent->multiVenue ) : array( $upcomingEvent->_EventVenueID );
-
-					foreach ( $venues as $venue_id ) {
-						$EventVenueID = (int) $venue_id;
-						$venuecheck_conflicts->add_venue( $upcomingEvent, $startB, $endB, $EventVenueID );
-					}
-				}
-			}
-		} //end foreach $upcomingEvents
-	} //end foreach $event_recurrences
-
-		$venuecheck_conflicts->filter();
-
-	if ( WP_DEBUG ) {
-		error_log( '* Venuecheck batch done.' );
-		error_log( '**************************************************************************' );
-		error_log( '**************************************************************************' );
-		error_log( print_r( $venuecheck_conflicts, true ) );
-	}
-
-		echo wp_json_encode( $venuecheck_conflicts->conflicts );
-	//}
-	wp_die();
-}
-
 
 function venuecheck_check_venues() {
 
@@ -469,9 +376,11 @@ function venuecheck_check_venues() {
 		$batch_size        = $_POST['batch_size'];
 		$batch_count       = $_POST['batch_count'];
 		$loop_count        = 0;
+		$post_occurrence   = get_post( $postID )->_tec_occurrence;
+		$post_main_id      = $post_occurrence ? $post_occurrence->post_id : $postID;
 
 		if ( WP_DEBUG ) {
-			error_log( '* Venue Check event recurrences for post id ' . $postID . ': ' . $total_count );
+			error_log( '* Venue Check event recurrences for post id ' . $postID . ' (main ID ' . $post_main_id . '): ' . $total_count );
 			error_log( '* Venue Check batch: ' . $batch_count . ' of ' . $batch_size );
 		}
 
@@ -505,15 +414,16 @@ function venuecheck_check_venues() {
 				if ( $startA < $endB && $endA > $startB ) {
 
 					if ( WP_DEBUG ) {
-						error_log( '* * * * * ' . $upcomingEvent->ID . ': ' . $upcomingEvent->_EventStartDate . ' to ' . $upcomingEvent->_EventEndDate );
+						error_log( '* * * * * ' . $upcomingEvent->ID . ': (' . $upcomingEvent->post_title . ')' . ' (main ID ' . $upcoming_main_id . ') ' . ' (parent ' . $upcomingEvent->post_parent . ') ' . ' . (occurence ' . $upcomingEvent->occurrence_id . ') ' . $upcomingEvent->_EventStartDate . ' to ' . $upcomingEvent->_EventEndDate );
 					}
 
 					// check that the upcoming event isn't our event, or a recurrence of our event
-					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID ) {
+					// need to update this to work with TEC 6
+					if ( $upcomingEvent->ID != $postID && $upcomingEvent->post_parent != $postID && $post_main_id != $upcoming_main_id && $post_main_id != $upcomingEvent->post_parent ) {
 
 						if ( WP_DEBUG ) {
-							error_log( '* * * * * MULTIVENUE ' . $upcomingEvent->multiVenue );
-							error_log( print_r( maybe_unserialize( $upcomingEvent->multiVenue ), true ) );
+							error_log( '* * * * * conflict venue ' . $upcomingEvent->multiVenue );
+							//error_log( print_r( maybe_unserialize( $upcomingEvent->multiVenue ), true ) );
 						}
 
 						$venues = $upcomingEvent->multiVenue ? maybe_unserialize( $upcomingEvent->multiVenue ) : array( $upcomingEvent->_EventVenueID );
@@ -552,13 +462,13 @@ function venue_check_gu_override_dot_org() {
 function get_cached_upcoming_events() {
 
 	$cache    = tribe( 'cache' );
-	$u_events = $cache->get_transient( 'tribe_venue_check_upcoming_events', 'save_post' ); // by adding 'tribe_' at the start we allow these transients to be cleaned up by TEC
+	/*$u_events = $cache->get_transient( 'tribe_venue_check_upcoming_events', 'save_post' ); // by adding 'tribe_' at the start we allow these transients to be cleaned up by TEC
 	if ( is_array( $u_events ) ) {
 		if ( WP_DEBUG ) {
 			error_log( 'USING CACHE' );
 		}
 		return $u_events;
-	}
+	}*/
 
 	$u_events = venuecheck_get_upcoming_events();
 	if ( WP_DEBUG ) {

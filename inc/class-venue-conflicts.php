@@ -35,13 +35,15 @@ class Venue_Conflicts {
 
 			// set up and add this event to an array of events for this venue
 			$event_item = array(
-				'eventID'     => $event->ID,
-				'eventLink'   => get_edit_post_link( $event->ID ),
+				'postID'      => $event->ID,
+				'eventID'     => $event->occurrence_id, // use as eventID?
+				'eventLink'   => get_edit_post_link( $event->occurrence_id ), //what does this return now
 				'eventTitle'  => $event->post_title,
 				'eventDate'   => $venuecheck_eventDisplay,
 				'eventParent' => $event->post_parent,
 				'eventClass'  => '',
 				'recurrence'  => '',
+				'EventSeries' => tec_event_series( $event->ID ),
 			);
 
 			// if this is a recurring event
