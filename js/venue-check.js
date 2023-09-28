@@ -16,7 +16,7 @@
 		showExclusions: venuecheck.show_exclusions ? venuecheck.show_exclusions : false,
 		origForm: null,
 		init() {
-			if ( venuecheck.debug ) console.log( 'init(): load event fire' );
+			vcObject.debugLog( 'init(): load event fire' );
 
 			vcObject.multiVenueEnabled = venuecheck.multivenue ? venuecheck.multivenue : false;
 
@@ -43,10 +43,8 @@
 				const $form = $( 'form#post' );
 				vcObject.origForm = $form.serialize();
 
-				if ( venuecheck.debug ) {
-					console.log( 'check form change status after 1 second' );
-					console.log( 'is same as current state?', $form.serialize() === vcObject.origForm );
-				}
+				vcObject.debugLog( 'check form change status after 1 second' );
+				vcObject.debugLog( 'is same as current state?', $form.serialize() === vcObject.origForm );
 
 				//removes the modified message when editing existing events
 				$( document ).on(
@@ -163,10 +161,8 @@
 			// $venueDropdown is the last td in the 1st tr of the tbody
 			const $venueDropdown = $venuecheckVenueSection.find( 'tr.saved-linked-post > td' ).last();
 
-			if ( venuecheck.debug ) {
-				console.log( '$venuecheckVenueSection', $venuecheckVenueSection );
-				console.log( '$venueDropdown', $venueDropdown );
-			}
+			vcObject.debugLog( '$venuecheckVenueSection', $venuecheckVenueSection );
+			vcObject.debugLog( '$venueDropdown', $venueDropdown );
 
 			//add class to section
 			$venuecheckVenueSection.addClass( 'venuecheck-section' );
@@ -239,7 +235,7 @@
 			}
 
 			const start = formVars.EventStartTime;
-			if ( venuecheck.debug ) console.log( 'start', start );
+			vcObject.debugLog( 'start', start );
 			const end = formVars.EventEndTime;
 			const startTime = vcObject.venuecheck_convert_time( start );
 			const endTime = vcObject.venuecheck_convert_time( end );
@@ -258,13 +254,13 @@
 
 			vcObject.venuecheck_disable_form();
 
-			if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
+			vcObject.debugLog( 'nonce: ' + venuecheck.nonce );
 
 			// if event is recurring, send the recurrence data via ajax to get the array of recurring dates in return
 			if ( typeof formVars[ 'is_recurring[]' ] !== 'undefined' ) {
 				// show "getting recurrences" spinner
 				vcObject.venuecheck_show_wait();
-				if ( venuecheck.debug ) console.log( 'RECURRING EVENT' );
+				vcObject.debugLog( 'RECURRING EVENT' );
 				return $.ajax( {
 					type: 'POST',
 					url: venuecheck.ajax_url,
@@ -299,17 +295,18 @@
 								.unbind()
 								.click( function() {
 									$( '#venuecheck-messages-container, #venuecheck-recurrence-warning' ).hide();
-									if ( venuecheck.debug ) console.log( 'get_event_recurrences recurring - post warning -> check_venues' );
+									vcObject.debugLog( 'get_event_recurrences recurring - post warning -> check_venues' );
 									vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 								} );
 						} else {
 							vcObject.venuecheck_hide_wait();
-							if ( venuecheck.debug ) console.log( 'get_event_recurrences recurring - no warning -> check_venues' );
+							vcObject.debugLog( 'get_event_recurrences recurring - no warning -> check_venues' );
 							vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 						}
 					} )
 					.fail( function( jqXHR, textStatus, error ) {
 						console.error( 'ajax error: ' + error );
+						vcObject.venuecheck_hide_wait();
 					} );
 			}
 
@@ -350,7 +347,16 @@
 			// pre-split array into batchs
 			const batchArray = [];
 			for ( let i = 0; i < event_recurrences.length; i += batch_size ) {
-				if ( venuecheck.debug ) console.log( 'venuecheck_check_venues i: ' + i );
+				if ( venuecheck.debug )
+					console.log(
+						'venuecheck_check_venues batch i: ' +
+							i +
+							' (batch size: ' +
+							batch_size +
+							') (total: ' +
+							event_recurrences.length +
+							')'
+					);
 				batchArray.push( event_recurrences.slice( i, i + batch_size ) );
 			}
 
@@ -383,7 +389,8 @@
 								const percent_end = Math.round(
 									( ( ( batch_count + 1 ) * batch_size - batch_remainder ) / total_count ) * 100
 								);
-								if ( batchArray.length > 1 ) {
+								// always display (fake) progress bar
+								if ( batchArray.length ) {
 									vcObject.venuecheck_check_venues_progress( percent_current, percent_end );
 								}
 								vcObject.venuecheck_toggle_readonly( true );
@@ -394,9 +401,15 @@
 						} );
 					} );
 				}, Promise.resolve() )
-				.then( function() {
-					vcObject.venuecheck_handle_check_venues_response( venuecheck_conflicts );
-				} );
+				.then(
+					function() {
+						vcObject.venuecheck_handle_check_venues_response( venuecheck_conflicts );
+					},
+					function() {
+						console.log( 'venuecheck_check_venues ajax js fail' );
+						//vcObject.venuecheck_hide_wait(); //form doesn;t work after this, not sure how to reset it correctly
+					}
+				);
 		}, //venuecheck_check_venues
 
 		venuecheck_handle_check_venues_response( conflicts ) {
@@ -440,7 +453,7 @@
 		/**
 		 *
 		 * updates progress bar percentage on ui
-		 *
+		 * NB progress displayed is fake - not based on ajax progress...
 		 */
 
 		//let progress;
@@ -448,7 +461,7 @@
 		venuecheck_check_venues_progress( percent_current, percent_end ) {
 			clearTimeout( vcObject.progress );
 
-			if ( venuecheck.debug ) console.log( 'check_venues_progress percent: ' + percent_current );
+			if ( venuecheck.debug ) console.log( 'check_venues_progress percent: ' + percent_current + ' / ' + percent_end );
 
 			$( '#venuecheck-progress .progress-bar span' ).css( {
 				width: percent_current + '%',
@@ -457,6 +470,7 @@
 			percent_current += Math.floor( Math.random() * 5 + 1 ); //randomize step size
 			if ( percent_current <= percent_end ) {
 				const timeout = Math.floor( Math.random() * 1500 + 300 ); //randomize step duration
+				if ( venuecheck.debug ) console.log( 'check_venues_progress timeout: ' + timeout );
 				vcObject.progress = setTimeout( function() {
 					vcObject.venuecheck_check_venues_progress( percent_current, percent_end );
 				}, timeout );
@@ -537,7 +551,7 @@
 						$.each( this.series, function() {
 							const seriesClass = 'series-' + seriesVenueID + '-' + this.id;
 							const $firstEvent = $venuecheck_venue_report_entry.find( '.' + seriesClass ).first();
-
+							if ( venuecheck.debug ) console.log( 'Recurring events series: ', seriesClass, 'first event:', $firstEvent );
 							$firstEvent.addClass( 'first' );
 
 							// if more than one event in the series, make an accordion
@@ -728,7 +742,7 @@
 					eventList.push( event.eventID );
 					const eventID = event.eventID;
 
-					if ( event.eventParent ) {
+					if ( event.eventParent && event.eventParent !== '0' ) {
 						event.eventClass = 'recurring';
 						event.eventClass += ' series-' + venue.venueID + '-' + event.eventParent;
 					} else if ( venue.series && venue.series.eventID ) {
@@ -837,11 +851,13 @@
 		},
 
 		venuecheck_show_wait() {
+			vcObject.debugLog( 'venuecheck_show_wait' );
 			$( '#venuecheck-messages-container' ).addClass( 'has-messages' );
 			$( '#venuecheck-messages-container, #venuecheck-wait' ).show();
 		},
 
 		venuecheck_hide_wait() {
+			vcObject.debugLog( 'venuecheck_hide_wait' );
 			$( '#venuecheck-messages-container' ).removeClass( 'has-messages' );
 			$( '#venuecheck-messages-container, #venuecheck-wait' ).hide();
 		},
