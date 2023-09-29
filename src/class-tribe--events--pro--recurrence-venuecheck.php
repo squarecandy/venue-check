@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable
 /**
  * CIS
  * Create a new class Tribe__Events__Pro__Recurrence_VenueCheck
@@ -122,3 +123,4 @@ class Tribe__Events__Pro__Recurrence_VenueCheck extends Tribe__Events__Pro__Recu
 		return $recurrenceParameters;
 	}
 }
+// phpcs:enable
