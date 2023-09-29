@@ -16,7 +16,7 @@ Plugin URI: https://wordpress.org/plugins/venue-check/
 GitHub Plugin URI: https://github.com/squarecandy/venue-check
 Primary Branch: main
 Description: Venue Check prevents double booking venues with The Events Calendar by Modern Tribe.
-Version: 2.3.1
+Version: 2.3.2-dev.0
 Author: Expient LLC
 Author URI: https://expient.com
 Text Domain: venue-check
