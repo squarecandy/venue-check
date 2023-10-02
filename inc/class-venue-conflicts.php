@@ -16,7 +16,7 @@ class Venue_Conflicts {
 		//display the date and time
 		$event_venue_id    = $venue_id;
 		$event_venue_title = get_the_title( $event_venue_id );
-		$date_format       = apply_filters( 'venuecheck_date_format', 'n/d/Y' );
+		$date_format       = apply_filters( 'venuecheck_date_format', 'n/j/Y' );
 		$time_format       = apply_filters( 'venuecheck_time_format', 'g:ia' );
 		$compact_time      = apply_filters( 'venuecheck_compact_time', ':00' );
 		$show_timezone     = apply_filters( 'venuecheck_show_timezone', 'T' );
@@ -37,6 +37,7 @@ class Venue_Conflicts {
 		$venuecheck_event_display .= $end_time;
 
 		if ( $start_day !== $end_day ) {
+			$venuecheck_event_display .= ' ';
 			$venuecheck_event_display .= $show_day ? $end->format( $show_day ) . ' ' : '';
 			$venuecheck_event_display .= $end_day;
 		}
