@@ -220,6 +220,10 @@ select.readonly + .select2-container {
 		}
 	}
 
+	tr.recurring:not(.first) {
+		border-top: none;
+	}
+
 	.venuecheck-conflicts-report-venue-date i.fa-sync-alt.fas {
 		margin-right: 5px;
 	}
@@ -236,8 +240,13 @@ select.readonly + .select2-container {
 		text-decoration: none;
 
 		p {
+			display: inline;
 			margin: 0;
 			font-size: 13px;
+		}
+
+		p + p::before {
+			content: ", ";
 		}
 	}
 

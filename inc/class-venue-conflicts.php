@@ -13,20 +13,39 @@ class Venue_Conflicts {
 
 	public function add_venue( $event, $start, $end, $venue_id ) {
 
+		//display the date and time
 		$event_venue_id    = $venue_id;
 		$event_venue_title = get_the_title( $event_venue_id );
+		$date_format       = apply_filters( 'venuecheck_date_format', 'n/d/Y' );
+		$time_format       = apply_filters( 'venuecheck_time_format', 'g:ia' );
+		$compact_time      = apply_filters( 'venuecheck_compact_time', ':00' );
+		$show_timezone     = apply_filters( 'venuecheck_show_timezone', 'T' );
+		$show_day          = apply_filters( 'venuecheck_show_day', 'D' );
 
-		$start_day = $start->format( 'm/d/Y' );
-		$end_day   = $end->format( 'm/d/Y' );
-
-		$venuecheck_event_display  = $start_day . ' ' . $start->format( 'g:i a' );
-		$venuecheck_event_display .= ' &ndash; ';
-		$venuecheck_event_display .= $end->format( 'g:i a' );
-		if ( $start_day !== $end_day ) {
-			$venuecheck_event_display .= ' ' . $end_day;
+		$start_day  = $start->format( $date_format ); //for comparing day
+		$end_day    = $end->format( $date_format );
+		$start_time = $start->format( $time_format );
+		$end_time   = $end->format( $time_format );
+		if ( $compact_time ) {
+			$start_time = str_replace( $compact_time, '', $start_time );
+			$end_time   = str_replace( ':00', '', $end_time );
 		}
-		$venuecheck_event_display .= $end->format( ' T' );
 
+		$venuecheck_event_display  = $show_day ? $start->format( $show_day ) . ' ' : '';
+		$venuecheck_event_display .= $start_day . ' ' . $start_time;
+		$venuecheck_event_display .= ' &ndash; ';
+		$venuecheck_event_display .= $end_time;
+
+		if ( $start_day !== $end_day ) {
+			$venuecheck_event_display .= $show_day ? $end->format( $show_day ) . ' ' : '';
+			$venuecheck_event_display .= $end_day;
+		}
+
+		if ( $show_timezone ) {
+			$venuecheck_event_display .= ' ' . $end->format( $show_timezone );
+		}
+
+		//display the venue
 		if ( $event_venue_title ) {
 			// add id & title to index for the venue id ( it may already exist, but id/title shouldn't change, so that's ok )
 			$this->conflicts[ $event_venue_id ]['venueID']    = $event_venue_id;
