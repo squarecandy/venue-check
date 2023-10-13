@@ -34,8 +34,8 @@ function venue_check_post_submitbox_start( $post ) {
 
 /**
  * append html section for offset controls
- * 
- * tribe_events_date_display: 
+ *
+ * tribe_events_date_display:
  * Fires after the event end date field in The Events Calendar meta box
  * HTML outputted here should be wrapped in a table row (<tr>) that contains 2 cells (<td>s)
  *
