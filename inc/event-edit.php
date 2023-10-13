@@ -32,7 +32,16 @@ function venue_check_post_submitbox_start( $post ) {
 }
 
 
-//append html section for offset controls
+/**
+ * append html section for offset controls
+ * 
+ * tribe_events_date_display: 
+ * Fires after the event end date field in The Events Calendar meta box
+ * HTML outputted here should be wrapped in a table row (<tr>) that contains 2 cells (<td>s)
+ *
+ * @param int $event->ID the event currently being edited, will be 0 if creating a new event
+ * @param boolean
+ */
 add_action( 'tribe_events_date_display', 'venuecheck_offsets_html' );
 function venuecheck_offsets_html() {
 
@@ -49,16 +58,10 @@ function venuecheck_offsets_html() {
 	}
 	?>
 
-	<table id="venuecheck-offsets">
-		<colgroup>
-			<col style="width:15%">
-				<col style="width:85%">
-		</colgroup>
-		<tbody class="venuecheck-section tribe-datetime-block">
-			<tr class="venue-check-title-bar">
+			<tr class="venuecheck-section-row tribe-datetime-block">
 				<td colspan="2" class="venuecheck-section-label">Venue Check</td>
 			</tr>
-			<tr class="setup-time">
+			<tr id="venuecheck-offsets" class="venuecheck-section-row setup-time">
 				<td class="venuecheck-label">Setup Time:</td>
 				<td class="venuecheck-block">
 				<input type="hidden" name="venuecheck_meta_nonce" value="<?php echo wp_create_nonce( 'venuecheck-meta-nonce' ); ?>">
@@ -83,7 +86,7 @@ function venuecheck_offsets_html() {
 					</select>
 				</td>
 			</tr>
-			<tr class="cleanup-time">
+			<tr class="venuecheck-section-row cleanup-time">
 				<td class="venuecheck-label">Cleanup Time:</td>
 				<td class="venuecheck-block">
 
@@ -107,15 +110,13 @@ function venuecheck_offsets_html() {
 					</select>
 				</td>
 			</tr>
-			<tr class="helper-text">
+			<tr class="venuecheck-section-row helper-text">
 				<td>
 				</td>
 				<td>
 					<div class="venuecheck-helper-text">Adding setup and cleanup time to your event is useful for reserving a venue with extra time at the beginning and/or end. Setup and cleanup time will not be displayed on your site with your event listings, but it will be used in venue conflict checking.</div>
 				</td>
 			</tr>
-		</tbody>
-	</table>
 	<?php
 }
 

@@ -805,11 +805,11 @@
 
 		venuecheck_show_hide_offsets() {
 			if ( $( '#allDayCheckbox' ).prop( 'checked' ) === true ) {
-				$( '#venuecheck-offsets' ).hide();
+				$( '.venuecheck-section-row' ).hide();
 				$( '#_venuecheck_event_offset_start' ).val( '0' );
 				$( '#_venuecheck_event_offset_end' ).val( '0' );
 			} else {
-				$( '#venuecheck-offsets' ).show();
+				$( '.venuecheck-section-row' ).show();
 			}
 		},
 

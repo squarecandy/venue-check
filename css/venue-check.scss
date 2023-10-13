@@ -1,3 +1,5 @@
+$color-background: #f4fdef;
+
 body.venuecheck-new,
 body.venuecheck-update {
 
@@ -54,8 +56,9 @@ table.venuecheck {
 
 .venuecheck-section tr,
 #event_tribe_venue tbody tr,
-.multi-venue-container tr {
-	background-color: #f4fdef;
+.multi-venue-container tr,
+.venuecheck-section-row {
+	background-color: $color-background;
 }
 
 .venuecheck-section tr:not(.linked-post.venue) td {
@@ -350,12 +353,16 @@ select.readonly + .select2-container {
 	font-style: italic;
 }
 
-
+table.eventtable,
 table#event_tribe_venue,
 table#venuecheck-offsets,
 table.multi-venue-container,
 table.venuecheck-section {
 	border-collapse: collapse;
+}
+
+.eventtable td {
+	padding: 2px 6px 10px 3px;
 }
 
 #venuecheck-messages-container,
@@ -383,8 +390,9 @@ table.venuecheck-section {
 	}
 }
 
-#event_tribe_venue tr.saved-linked-post td:nth-child(2) {
-	padding: 10px;
+/* in non multivenue, this is the venue select once it's shown*/
+body:not(.tod-multivenue) #venuecheck-venue-select {
+	padding: 10px 0;
 }
 
 tr.linked-post.venue td:nth-child(2),
@@ -396,8 +404,8 @@ tr.linked-post.venue td:nth-child(2),
 	margin-left: 10px;
 }
 
-#venuecheck-offsets .venuecheck-section tr td.venuecheck-section-label,
-.venuecheck-section tr td.venuecheck-section-label {
+.venuecheck-section tr td.venuecheck-section-label,
+.venuecheck-section-row td.venuecheck-section-label {
 	padding: 2px 5px;
 	color: #82d005;
 	font-style: italic;
@@ -405,19 +413,23 @@ tr.linked-post.venue td:nth-child(2),
 	background-color: #e3ffd3;
 }
 
-#venuecheck-offsets {
-	margin-top: 20px;
+tr.event-dynamic-helper td {
+	padding-bottom: 30px;
+}
+
+.venuecheck-section-row {
 
 	td {
 		position: relative;
 		margin: 0;
 		padding: 10px;
-		background-color: #f4fdef;
+		background-color: $color-background;
 		border: 0;
 	}
 
 	td:first-child {
-		width: 15%;
+
+		/*width: 15%;*/
 	}
 }
 
@@ -459,7 +471,7 @@ tr.linked-post.venue td:nth-child(2),
 }
 
 #venuecheck-report-container > td {
-	background-color: #f4fdef;
+	background-color: $color-background;
 }
 
 #venuecheck-status {
@@ -517,8 +529,10 @@ tr.linked-post.venue td:nth-child(2),
 	background-color: #82d005;
 }
 
+$striped: rgba(255, 255, 255, 0.25);
+
 .stripes span {
-	background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 75%, transparent 75%, transparent); /* stylelint-disable-line max-line-length */
+	/* stylelint-disable-line max-line-length */ background-image: linear-gradient(135deg, $striped 25%, transparent 25%, transparent 50%, $striped 50%, $striped 75%, transparent 75%, transparent);
 	background-size: 30px 30px;
 	animation: animate-stripes 3s linear infinite;
 }
