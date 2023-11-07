@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/squarecandy/venue-check/compare/v2.3.1...v2.4.0) (2023-11-07)
+
+
+### Bug Fixes
+
+* adjust date/time display & add filters ([2d63720](https://github.com/squarecandy/venue-check/commit/2d6372041964515a4c794fcd4078aa93355d03ef))
+* fix date format issues ([cb591a1](https://github.com/squarecandy/venue-check/commit/cb591a1cb702234321c9485fee70f650807d193e))
+* fix issue where certain recurrence types were blocked ([148f416](https://github.com/squarecandy/venue-check/commit/148f4161513b73babde8999b7ebbe16a2c9f2378))
+* fix: get event id in tec event series ([b67ae75](https://github.com/squarecandy/venue-check/commit/b67ae758b1d902ef2a2a829a06aaf3977863d566))
+* handle backwards compatibility ([b0628b0](https://github.com/squarecandy/venue-check/commit/b0628b0710e1fd5d1538fc720911dac5218454f0))
+* set post_parent to self for first/parent of series ([8f157fa](https://github.com/squarecandy/venue-check/commit/8f157fab5b1b13ae2fd1ba83a51d24ba60417c29))
+* update to use tec occurences ([46c56d9](https://github.com/squarecandy/venue-check/commit/46c56d9b1501c65795cacf5d870460d3607241a9))
+
 ### [2.3.1](https://github.com/squarecandy/venue-check/compare/v2.3.0...v2.3.1) (2022-11-18)
 
 
