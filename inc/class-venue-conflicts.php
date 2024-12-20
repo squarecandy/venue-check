@@ -97,7 +97,7 @@ class Venue_Conflicts {
 			}
 
 			// if the event is recurring, add its parent/set to our records so we can groiup all recurring events together when displaying them
-			if ( $event->parent_event || tribe_is_recurring_event( $event->ID ) ) {
+			if ( ! empty( $event->parent_event ) || tribe_is_recurring_event( $event->ID ) ) {
 
 				$event_item['eventClass'] = 'recurring';
 
@@ -106,7 +106,7 @@ class Venue_Conflicts {
 				}
 
 				// if this is the first of this series that we are processing, add that to the parents array
-				if ( $event->parent_event && ! isset( $this->conflicts[ $event_venue_id ]['series'][ $event->parent_event ] ) ) {
+				if ( ! empty( $event->parent_event ) && ! isset( $this->conflicts[ $event_venue_id ]['series'][ $event->parent_event ] ) ) {
 
 					// recurrence text now is output with placeholders that are usually completed in js, so we need to complete it ourselves
 					$recurrence_text   = tribe_get_recurrence_text( $event->parent_event );

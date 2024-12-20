@@ -6,6 +6,7 @@
 
 define( 'VENUE_CHECK_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
+define( 'VENUE_CHECK_VERSION', 'version-2.4.0' );
 
 // set up for event edit admin page
 require VENUE_CHECK_DIR_PATH . 'inc/event-edit.php';
@@ -20,18 +21,20 @@ function venuecheck_scripts_styles( $hook ) {
 
 	global $post_type;
 	$venuecheck_post_types = array( 'tribe_events' );
+
 	if ( venuecheck_exclude_venues() ) {
 		$venuecheck_post_types[] = 'tribe_venue';
 	}
+
 	if ( ( 'post-new.php' !== $hook && 'post.php' !== $hook ) || ! in_array( $post_type, $venuecheck_post_types, true ) ) {
 		return;
 	}
 
 	/* REGISTER JS */
 	if ( defined( 'WP_DEBUG' ) ? WP_DEBUG : false ) {
-		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), 'version-2.4.0', true );
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'js/venue-check.js', array( 'jquery' ), VENUE_CHECK_VERSION, true );
 	} else {
-		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), 'version-2.4.0', true );
+		wp_enqueue_script( 'venuecheck-scripts', VENUE_CHECK_URL . 'dist/js/venue-check.min.js', array( 'jquery' ), VENUE_CHECK_VERSION, true );
 	}
 
 	$localization = array(
@@ -57,7 +60,7 @@ function venuecheck_scripts_styles( $hook ) {
 	wp_localize_script( 'venuecheck-scripts', 'venuecheck', $localization );
 
 	/* REGISTER CSS */
-	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), 'version-2.4.0' );
+	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), VENUE_CHECK_VERSION );
 	wp_enqueue_style( 'fontawesome', '//use.fontawesome.com/releases/v5.2.0/css/all.css', array(), '5.2.0' );
 
 }
@@ -104,7 +107,7 @@ function venue_check_sqc_multi_venue_meta( $meta_pivot ) {
 	return $meta_pivot;
 }
 
-
+// called via ajax
 function venuecheck_get_event_recurrences() {
 
 	// Check for nonce security
@@ -114,17 +117,23 @@ function venuecheck_get_event_recurrences() {
 	}
 
 	include 'src/class-tribe--events--pro--recurrence-venuecheck.php';
-	if ( isset( $_POST ) ) {
+	if ( isset( $_POST['post_data'] ) ) {
 		$postData = $_POST['post_data'];
+	} else {
+		echo wp_json_encode( array( 'error' => 'error: no post data' ) );
+		die();
 	}
 
 	if ( class_exists( 'Tribe__Events__Pro__Recurrence' ) ) {
+
 		parse_str( $postData, $vars );
 		$EventAllDay = 'no';
+
 		if ( array_key_exists( 'EventAllDay', $vars ) ) {
 			$EventAllDay = $vars['EventAllDay'];
 		}
-		$event_id              = $vars['post_ID'];
+		
+		$event_id              = $vars['post_ID']; //not used
 		$startdate             = $vars['EventStartDate'];
 		$starttime             = $vars['EventStartTime'];
 		$eventTimezone         = $vars['EventTimezone'];

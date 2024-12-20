@@ -8,8 +8,8 @@
 add_filter( 'admin_body_class', 'venuecheck_admin_body_class' );
 function venuecheck_admin_body_class( $class ) {
 	$screen = get_current_screen();
-	if ( 'tribe_events' === $screen->id && 'post' === $screen->base ) {
-		$classes = explode( ' ', $class );
+	if ( $screen && 'tribe_events' === $screen->id && 'post' === $screen->base ) {
+		$classes = $class ? explode( ' ', $class ) : array();
 		if ( 'add' === $screen->action ) {
 			$classes[] = 'venuecheck-new';
 		} else {
@@ -17,13 +17,14 @@ function venuecheck_admin_body_class( $class ) {
 		}
 		return implode( ' ', $classes );
 	}
+	return $class;
 }
 
 
 // add html to the publish post section
 add_action( 'post_submitbox_start', 'venue_check_post_submitbox_start' );
 function venue_check_post_submitbox_start( $post ) {
-	if ( 'tribe_events' === $post->post_type ) {
+	if ( isset( $post->post_type ) && 'tribe_events' === $post->post_type ) {
 		echo '<div id="venuecheck-modified-publish" style="display: none;" class="venuecheck-notice notice-error">' .
 				'Because the date/time of this event was modified, the currently selected venue may not be available. ' .
 				'See venue selection below for more information.' .
@@ -49,7 +50,7 @@ function venuecheck_offsets_html() {
 	$post_id = $post->ID;
 	$screen  = get_current_screen();
 
-	if ( 'add' === $screen->action || ! $post_id ) {
+	if ( ( $screen && 'add' === $screen->action ) || ! $post_id ) {
 		$eventOffsetStart = 0;
 		$eventOffsetEnd   = 0;
 	} else {
