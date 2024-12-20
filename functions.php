@@ -132,7 +132,7 @@ function venuecheck_get_event_recurrences() {
 		if ( array_key_exists( 'EventAllDay', $vars ) ) {
 			$EventAllDay = $vars['EventAllDay'];
 		}
-		
+
 		$event_id              = $vars['post_ID']; //not used
 		$startdate             = $vars['EventStartDate'];
 		$starttime             = $vars['EventStartTime'];
