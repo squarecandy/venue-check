@@ -8,6 +8,10 @@ define( 'VENUE_CHECK_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
 define( 'VENUE_CHECK_VERSION', 'version-2.4.1' );
 
+// squarecandy-common files
+require VENUE_CHECK_DIR_PATH . '/inc/sqcdy-common.php';
+require VENUE_CHECK_DIR_PATH . '/inc/sqcdy-plugin.php';
+
 // set up for event edit admin page
 require VENUE_CHECK_DIR_PATH . 'inc/event-edit.php';
 
