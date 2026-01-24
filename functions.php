@@ -66,7 +66,6 @@ function venuecheck_scripts_styles( $hook ) {
 	/* REGISTER CSS */
 	wp_enqueue_style( 'venuecheck-styles', VENUE_CHECK_URL . 'dist/css/venue-check.min.css', array(), VENUE_CHECK_VERSION );
 	wp_enqueue_style( 'fontawesome', '//use.fontawesome.com/releases/v5.2.0/css/all.css', array(), '5.2.0' );
-
 }
 
 add_action( 'admin_enqueue_scripts', 'venuecheck_scripts_styles', 99999 );
@@ -352,7 +351,6 @@ function venuecheck_get_offset_dates( $event, $timezone ) {
 	);
 
 	return $offset_array;
-
 }
 
 
@@ -408,7 +406,7 @@ function venuecheck_check_venues() {
 		}
 
 		foreach ( $event_recurrences as $k => $event_recurrence ) {
-			$loop_count++;
+			++$loop_count;
 			$current_count = ( $batch_count * $batch_size ) + $loop_count;
 			$timezone      = $event_recurrence['eventTimezone'];
 

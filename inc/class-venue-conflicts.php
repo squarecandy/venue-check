@@ -151,5 +151,4 @@ class Venue_Conflicts {
 			);
 		}
 	}
-
 }

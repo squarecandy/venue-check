@@ -60,5 +60,4 @@ function venuecheck_save_exclude_venue( $post_id ) {
 	} else {
 		delete_post_meta( $post_id, 'venuecheck_exclude_venue' );
 	}
-
 }
