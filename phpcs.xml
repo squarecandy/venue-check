@@ -9,7 +9,6 @@
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/pull/382 -->
 	<rule ref="Generic.PHP.DeprecatedFunctions"/>
 	<rule ref="Generic.PHP.ForbiddenFunctions"/>
-	<rule ref="Generic.Functions.CallTimePassByReference"/>
 	<rule ref="Generic.CodeAnalysis.EmptyStatement"/>
 	<rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
 	<rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
@@ -24,11 +23,9 @@
 		</properties>
 	</rule>
 
-	<!-- Duplicate of upstream. Can be removed once minimum PHPCS requirement has gone up.
-		 https://github.com/squizlabs/PHP_CodeSniffer/pull/1594
-		 Note: the "assignment in ternary" part of the sniff is currently not yet covered in
-		 the upstream version. This needs to be pulled first before we can defer to upstream. -->
-	<rule ref="WordPress.CodeAnalysis.AssignmentInCondition"/>
+	<!-- Updated 2026-01-07. See https://github.com/WordPress/WordPress-Coding-Standards/wiki/Upgrade-Guide-to-WordPressCS-3.0.0-for-ruleset-maintainers -->
+	<rule ref="Generic.CodeAnalysis.AssignmentInCondition"/>
+	<rule ref="WordPress.CodeAnalysis.AssignmentInTernaryCondition"/>
 
 	<!-- More generic PHP best practices.
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/607 -->
@@ -56,7 +53,7 @@
 	<!-- Check correct spacing of language constructs. This also ensures that the
 	     above rule for not using brackets with require is fixed correctly.
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/1153 -->
-	<rule ref="Squiz.WhiteSpace.LanguageConstructSpacing"/>
+	<rule ref="Generic.WhiteSpace.LanguageConstructSpacing"/>
 
 	<!-- Hook callbacks may not use all params -->
 	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/pull/382#discussion_r29981655 -->
@@ -107,9 +104,9 @@
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/26 -->
 	<rule ref="WordPress.WP.GlobalVariablesOverride"/>
 
-	<!-- Encourage the use of strict ( === and !== ) comparisons.
-		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/242 -->
-	<rule ref="WordPress.PHP.StrictComparisons"/>
+	<!-- Encourage the use of strict ( === and !== ) comparisons. -->
+	<!-- Updated 2026-01-07. See https://github.com/WordPress/WordPress-Coding-Standards/wiki/Upgrade-Guide-to-WordPressCS-3.0.0-for-ruleset-maintainers -->
+	<rule ref="Universal.Operators.StrictComparisons"/>
 
 	<!-- Check that in_array() and array_search() use strict comparisons.
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/399
@@ -139,16 +136,13 @@
 	<!-- Verify that everything in the global namespace is prefixed. -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals"/>
 
-	<!-- Check that object instantiations always have braces & are not assigned by reference.
-		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/919
-		 Note: there is a similar upstream sniff `PSR12.Classes.ClassInstantiation`, however
-		 that sniff:
-		 - does not cover JS files;
-		 - does not demand parentheses for PHP anonymous classes;
-		 - does not check the whitespace between the class name and the parentheses;
-		 - does not check for PHP new by reference.
-		 For those reasons, the WPCS version should remain. -->
-	<rule ref="WordPress.Classes.ClassInstantiation"/>
+	<!-- Check that object instantiations always have braces & are not assigned by reference. -->
+	<!--<rule ref="WordPress.Classes.ClassInstantiation"/>-->
+	<!-- Updated 2026-01-07. See https://github.com/WordPress/WordPress-Coding-Standards/wiki/Upgrade-Guide-to-WordPressCS-3.0.0-for-ruleset-maintainers -->
+	<rule ref="PSR12.Classes.ClassInstantiation"/>
+	<rule ref="Universal.Classes.RequireAnonClassParentheses"/>
+	<rule ref="Universal.WhiteSpace.AnonClassKeywordSpacing"/>
+	<rule ref="PEAR.Functions.FunctionCallSignature"/>
 
 	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/1157 -->
 	<rule ref="WordPress.Security.PluginMenuSlug"/>
@@ -164,7 +158,8 @@
 		 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/pull/1450 -->
 	<rule ref="WordPress.PHP.NoSilencedErrors">
 		<properties>
-			<property name="use_default_whitelist" value="false"/>
+			<!-- Updated 2026-01-07. See https://github.com/WordPress/WordPress-Coding-Standards/wiki/Upgrade-Guide-to-WordPressCS-3.0.0-for-ruleset-maintainers#ruleset-and-custom-properties -->
+			<property name="usePHPFunctionsList" value="false"/>
 		</properties>
 	</rule>
 
@@ -191,26 +186,12 @@
 	<!-- Check for single blank line after namespace declaration. -->
 	<rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
 
-	<!--
-	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
-	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035#issuecomment-1325532520
-	Note that this doesn't stop checking for depreciated errors in YOUR code,
-	it just stops wpcs incompatibility with php8 from stopping phpcs from running.
-	We don't want to have to switch back to 7.4 everytime we run linting.
-	This should be removed once wpcs updates their code.
-	-->
-	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
-
 	<!-- https://github.com/PHPCompatibility/PHPCompatibility -->
 
 	<!-- Run against the PHPCompatibility ruleset -->
 	<rule ref="PHPCompatibility"/>
 
-	<!--
-	Check within range 7.4 and up.
-	Note that only 8.0 checking currently exists, but this should automatically support higher versions
-	as they are added.
-	-->
+	<!-- Check within range 7.4 and up. -->
 	<config name="testVersion" value="7.4-"/>
 
 </ruleset>
