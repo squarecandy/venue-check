@@ -6,18 +6,18 @@
 
 // add admin body classes
 add_filter( 'admin_body_class', 'venuecheck_admin_body_class' );
-function venuecheck_admin_body_class( $class ) {
+function venuecheck_admin_body_class( $classes ) {
 	$screen = get_current_screen();
 	if ( $screen && 'tribe_events' === $screen->id && 'post' === $screen->base ) {
-		$classes = $class ? explode( ' ', $class ) : array();
+		$classes_array = $classes ? explode( ' ', $classes ) : array();
 		if ( 'add' === $screen->action ) {
-			$classes[] = 'venuecheck-new';
+			$classes_array[] = 'venuecheck-new';
 		} else {
-			$classes[] = 'venuecheck-update';
+			$classes_array[] = 'venuecheck-update';
 		}
-		return implode( ' ', $classes );
+		return implode( ' ', $classes_array );
 	}
-	return $class;
+	return $classes;
 }
 
 
