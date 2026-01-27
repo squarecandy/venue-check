@@ -30,7 +30,6 @@ module.exports = function( grunt ) {
 			options: {
 				map: true, // inline sourcemaps
 				processors: [
-					require( 'pixrem' )(), // add fallbacks for rem units
 					require( 'autoprefixer' )( { grid: 'autoreplace' } ), // add vendor prefixes
 					require( 'cssnano' )(), // minify the result
 				],
@@ -112,8 +111,8 @@ module.exports = function( grunt ) {
 				args: [ 'stylelint', 'css/*.scss', '--fix' ],
 			},
 			eslintfix: {
-				cmd: 'eslint',
-				args: [ 'js/*.js', '--fix' ],
+				cmd: 'npx',
+				args: [ 'eslint', 'js/*.js', 'Gruntfile.js', '--fix' ],
 			},
 			bump: {
 				cmd: 'npm',
