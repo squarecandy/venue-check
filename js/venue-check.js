@@ -320,7 +320,9 @@
 			// hide "getting recurrences" spinner
 			vcObject.venuecheck_hide_wait();
 
-			if ( venuecheck.debug ) console.log( 'get_event_recurrences - not recurring -> check_venues' );
+			if ( venuecheck.debug ) {
+				console.log( 'get_event_recurrences - not recurring -> check_venues' );
+			}
 
 			vcObject.venuecheck_check_venues( event_recurrences, vcObject.batchsize );
 		}, // end venuecheck_get_event_recurrences
@@ -338,7 +340,9 @@
 			vcObject.venuecheck_show_progress_bar();
 
 			vcObject.storedRecurrences.recurrences = event_recurrences;
-			if ( typeof tecEventDetails !== 'undefined' ) console.log( 'tecEventDetails', tecEventDetails );
+			if ( typeof tecEventDetails !== 'undefined' ) {
+				console.log( 'tecEventDetails', tecEventDetails );
+			}
 			//const postID = $( '#post_ID' ).val();
 			const postID =
 				typeof tecEventDetails !== 'undefined' && tecEventDetails.event.post_id
@@ -347,8 +351,8 @@
 			// pre-split array into batchs
 			const batchArray = [];
 			for ( let i = 0; i < event_recurrences.length; i += batch_size ) {
-				if ( venuecheck.debug )
-					console.log(
+				if ( venuecheck.debug ) {
+						console.log(
 						'venuecheck_check_venues batch i: ' +
 							i +
 							' (batch size: ' +
@@ -357,6 +361,7 @@
 							event_recurrences.length +
 							')'
 					);
+				}
 				batchArray.push( event_recurrences.slice( i, i + batch_size ) );
 			}
 
@@ -369,7 +374,9 @@
 					const total_count = event_recurrences.length;
 					const batch_count = batchArray.indexOf( batch );
 					return p.then( function() {
-						if ( venuecheck.debug ) console.log( 'nonce: ' + venuecheck.nonce );
+						if ( venuecheck.debug ) {
+							console.log( 'nonce: ' + venuecheck.nonce );
+						}
 						return $.ajax( {
 							type: 'POST',
 							dataType: 'json',
@@ -396,7 +403,9 @@
 								vcObject.venuecheck_toggle_readonly( true );
 							},
 						} ).then( function( data ) {
-							if ( venuecheck.debug ) console.log( 'venuecheck_check_venues ajax return data:', data );
+							if ( venuecheck.debug ) {
+								console.log( 'venuecheck_check_venues ajax return data:', data );
+							}
 							venuecheck_conflicts = venuecheck_conflicts.concat( data );
 						} );
 					} );
@@ -433,11 +442,15 @@
 				}, {} )
 			);
 
-			if ( venuecheck.debug ) console.log( 'CONFLICTS', conflicts );
+			if ( venuecheck.debug ) {
+				console.log( 'CONFLICTS', conflicts );
+			}
 
 			conflicts = result;
 
-			if ( venuecheck.debug ) console.log( 'CONFLICTS MERGED', conflicts );
+			if ( venuecheck.debug ) {
+				console.log( 'CONFLICTS MERGED', conflicts );
+			}
 
 			clearTimeout( vcObject.progress );
 			$( '#venuecheck-progress .progress-bar span' ).css( {
@@ -461,7 +474,9 @@
 		venuecheck_check_venues_progress( percent_current, percent_end ) {
 			clearTimeout( vcObject.progress );
 
-			if ( venuecheck.debug ) console.log( 'check_venues_progress percent: ' + percent_current + ' / ' + percent_end );
+			if ( venuecheck.debug ) {
+				console.log( 'check_venues_progress percent: ' + percent_current + ' / ' + percent_end );
+			}
 
 			$( '#venuecheck-progress .progress-bar span' ).css( {
 				width: percent_current + '%',
@@ -470,7 +485,9 @@
 			percent_current += Math.floor( Math.random() * 5 + 1 ); //randomize step size
 			if ( percent_current <= percent_end ) {
 				const timeout = Math.floor( Math.random() * 1500 + 300 ); //randomize step duration
-				if ( venuecheck.debug ) console.log( 'check_venues_progress timeout: ' + timeout );
+				if ( venuecheck.debug ) {
+					console.log( 'check_venues_progress timeout: ' + timeout );
+				}
 				vcObject.progress = setTimeout( function() {
 					vcObject.venuecheck_check_venues_progress( percent_current, percent_end );
 				}, timeout );
@@ -492,12 +509,16 @@
 			$( 'body' ).addClass( 'venuecheck-update' );
 			$( '#venuecheck-conflicts-button' ).hide();
 
-			if ( venuecheck.debug ) console.log( 'starting venuecheck_check_venues_handler' );
+			if ( venuecheck.debug ) {
+				console.log( 'starting venuecheck_check_venues_handler' );
+			}
 
 			const $venuecheck_venues = $( vcObject.venueSelect ).find( 'option, optgroup' );
 			const venuecheck_venue_options = [ {} ];
 
-			if ( venuecheck.debug ) console.log( 'venuecheck_venues', $venuecheck_venues );
+			if ( venuecheck.debug ) {
+				console.log( 'venuecheck_venues', $venuecheck_venues );
+			}
 
 			//disable and message any venue venuecheck_conflicts
 			let venuecheck_venue_report_count = '';
@@ -522,14 +543,18 @@
 
 				$venuecheck_venue_report = $( venuecheck_venue_report );
 
-				if ( venuecheck.debug ) console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
-				if ( venuecheck.debug ) console.log( 'venuecheck_venue_options', venuecheck_venue_options );
+				if ( venuecheck.debug ) {
+					console.log( 'venuecheck_conflicts', venuecheck_conflicts, $.type( venuecheck_conflicts ) );
+					console.log( 'venuecheck_venue_options', venuecheck_venue_options );
+				}
 
 				// reset all options to enabled by default before we loop through.
 				$( vcObject.venueSelect + ' option' ).attr( 'disabled', false );
 
 				$.each( venuecheck_conflicts, function( index, venue ) {
-					if ( venuecheck.debug ) console.log( 'venue:', index, venue.venueID, venue );
+					if ( venuecheck.debug ) {
+						console.log( 'venue:', index, venue.venueID, venue );
+					}
 
 					if ( ! this.excluded ) {
 						// disable the option in the dropdown
@@ -551,7 +576,9 @@
 						$.each( this.series, function() {
 							const seriesClass = 'series-' + seriesVenueID + '-' + this.id;
 							const $firstEvent = $venuecheck_venue_report_entry.find( '.' + seriesClass ).first();
-							if ( venuecheck.debug ) console.log( 'Recurring events series: ', seriesClass, 'first event:', $firstEvent );
+							if ( venuecheck.debug ) {
+								console.log( 'Recurring events series: ', seriesClass, 'first event:', $firstEvent );
+							}
 							$firstEvent.addClass( 'first' );
 
 							// if more than one event in the series, make an accordion
@@ -612,7 +639,7 @@
 						venuecheck_venue_report_count +=
 							deselectedNames.slice( 0, -1 ).join( ', ' ) +
 							', and ' +
-							deselectedNames[ deselectedNames.length - 1 ] +
+							deselectedNames[ deselectedNames.length -1 ] +
 							' have';
 					} else if ( deselectedCount === 2 ) {
 						venuecheck_venue_report_count += deselectedNames.join( ' and ' ) + ' have';
@@ -791,14 +818,22 @@
 
 			// get am/pm and convert to 24h time if needed
 			const AMPM = time.substr( -2 ).toLowerCase();
-			if ( AMPM === 'pm' && hours < 12 ) hours = hours + 12;
-			if ( AMPM === 'am' && hours === 12 ) hours = hours - 12;
+			if ( AMPM === 'pm' && hours < 12 ) {
+				hours = hours + 12;
+			}
+			if ( AMPM === 'am' && hours === 12 ) {
+				hours = hours - 12;
+			}
 
 			// hours and minutes to strings with leading zeros
 			let sHours = hours.toString();
 			let sMinutes = minutes.toString();
-			if ( hours < 10 ) sHours = '0' + sHours;
-			if ( minutes < 10 ) sMinutes = '0' + sMinutes;
+			if ( hours < 10 ) {
+				sHours = '0' + sHours;
+			}
+			if ( minutes < 10 ) {
+				sMinutes = '0' + sMinutes;
+			}
 
 			return sHours + ':' + sMinutes + ':00';
 		},
@@ -945,7 +980,9 @@
 					callback();
 				} else {
 					setTimeout( function() {
-						if ( timeoutInMs && Date.now() - startTimeInMs > timeoutInMs ) return;
+						if ( timeoutInMs && Date.now() - startTimeInMs > timeoutInMs ) {
+							return;
+						}
 						loopSearch();
 					}, checkFrequencyInMs );
 				}
