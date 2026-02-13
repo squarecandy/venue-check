@@ -352,7 +352,7 @@
 			const batchArray = [];
 			for ( let i = 0; i < event_recurrences.length; i += batch_size ) {
 				if ( venuecheck.debug ) {
-						console.log(
+					console.log(
 						'venuecheck_check_venues batch i: ' +
 							i +
 							' (batch size: ' +
