@@ -6,7 +6,7 @@
 
 define( 'VENUE_CHECK_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'VENUE_CHECK_URL', plugin_dir_url( __FILE__ ) );
-define( 'VENUE_CHECK_VERSION', 'version-2.4.2-develop.1' );
+define( 'VENUE_CHECK_VERSION', 'version-2.4.2-develop.2' );
 
 // squarecandy-common files
 require VENUE_CHECK_DIR_PATH . '/inc/sqcdy-common.php';
