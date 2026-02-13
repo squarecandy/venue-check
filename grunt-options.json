@@ -1,0 +1,16 @@
+{
+	"sassFiles": {
+		"dist/css/venue-check.min.css": "css/venue-check.scss"
+	},
+	"copyType": "plugin",
+	"phpFiles": [ "*.php", "inc/*.php", "src/*.php" ],
+	"additionalCopyFiles": [],
+	"copyCycle2": false,
+	"copyMagnific": false,
+	"copyMixitup": false,
+	"customGruntfile": false,
+	"customPackageJson": false,
+	"customComposerJson": false,
+	"doModernizr": false,
+	"doSvgStore": false
+}

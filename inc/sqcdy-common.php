@@ -1,7 +1,7 @@
 <?php
 /**
  * PHP code that should be distributed to all themes & plugins goes here.
- * Version: 1.9.0
+ * Version: 2.0.3
  */
 
 // for debugging

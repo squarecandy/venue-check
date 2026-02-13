@@ -3,11 +3,18 @@
 		"dealerdirect/phpcodesniffer-composer-installer": "~1.2.0",
 		"wp-coding-standards/wpcs": "~3.0",
 		"phpcompatibility/php-compatibility": "~9.3.5",
-		"iodigital-com/php-code-sniffer-standard": "*"
+		"iodigital-com/php-code-sniffer-standard": "*",
+		"phprtflite/phprtflite": "dev-develop"
 	},
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
-	}
+	},
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/squarecandy/PHPRtfLite"
+		}
+	]
 }
