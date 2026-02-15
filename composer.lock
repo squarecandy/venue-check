@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "699182093e74db89a0a003e28c4e01db",
+    "content-hash": "7dedd8c0ad72cf821bbca5a277b5acbe",
     "packages": [],
     "packages-dev": [
         {
@@ -393,17 +393,52 @@
             "time": "2025-12-08T14:27:58+00:00"
         },
         {
-            "name": "phpstan/phpdoc-parser",
-            "version": "2.3.1",
+            "name": "phprtflite/phprtflite",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "16dbf9937da8d4528ceb2145c9c7c0bd29e26374"
+                "url": "https://github.com/squarecandy/PHPRtfLite.git",
+                "reference": "a3bf2f6d93be91243b4d0540f63b919de803aa89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/16dbf9937da8d4528ceb2145c9c7c0bd29e26374",
-                "reference": "16dbf9937da8d4528ceb2145c9c7c0bd29e26374",
+                "url": "https://api.github.com/repos/squarecandy/PHPRtfLite/zipball/a3bf2f6d93be91243b4d0540f63b919de803aa89",
+                "reference": "a3bf2f6d93be91243b4d0540f63b919de803aa89",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPRtfLite": "lib/"
+                }
+            },
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Steffen Zeidler",
+                    "email": "sigma_z@sigma-scripts.de"
+                }
+            ],
+            "description": "PHPRtfLite is an API enabling developers to create rtf documents with php.",
+            "support": {
+                "source": "https://github.com/squarecandy/PHPRtfLite/tree/develop"
+            },
+            "time": "2026-02-03T23:15:20+00:00"
+        },
+        {
+            "name": "phpstan/phpdoc-parser",
+            "version": "2.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpdoc-parser.git",
+                "reference": "a004701b11273a26cd7955a61d67a7f1e525a45a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/a004701b11273a26cd7955a61d67a7f1e525a45a",
+                "reference": "a004701b11273a26cd7955a61d67a7f1e525a45a",
                 "shasum": ""
             },
             "require": {
@@ -435,9 +470,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.1"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.2"
             },
-            "time": "2026-01-12T11:33:04+00:00"
+            "time": "2026-01-25T14:56:51+00:00"
         },
         {
             "name": "slevomat/coding-standard",
@@ -652,7 +687,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "phprtflite/phprtflite": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
