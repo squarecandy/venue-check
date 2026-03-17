@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.4.2](https://github.com/squarecandy/venue-check/compare/v2.4.1...v2.4.2) (2026-03-17)
+
+
+### Bug Fixes
+
+* update, copy and use sqarecandy-common ([0cbe482](https://github.com/squarecandy/venue-check/commit/0cbe482b90c489135418526756ea82310a723e89))
+
 ### [2.4.1](https://github.com/squarecandy/venue-check/compare/v2.4.0...v2.4.1) (2025-01-23)
 
 
